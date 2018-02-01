@@ -7,3 +7,6 @@
 /build
 /captures
 .externalNativeBuild
+app/build.gradle
+build.gradle
+app/google-services.json
