@@ -1,8 +1,25 @@
 package t.systematic.letsgo.Database;
 
-/**
- * Created by Jorge B Martinez on 2/1/2018.
- */
+import android.support.v4.app.FragmentActivity;
 
-public class DatabaseHelper {
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+public class DatabaseHelper extends FragmentActivity{
+    private static DatabaseHelper mDatabaseHelper;
+    private FirebaseApp mFirebaseApp;
+    private FirebaseDatabase database;
+    private DatabaseReference ref;
+
+    public DatabaseHelper(){
+        database = FirebaseDatabase.getInstance();
+        ref = database.getReference();
+
+    }
+
+    public void writeToDB(String str){
+        ref.setValue(str);
+    }
+
 }
