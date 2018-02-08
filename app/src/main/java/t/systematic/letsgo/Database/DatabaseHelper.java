@@ -7,8 +7,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class DatabaseHelper extends FragmentActivity{
-    private static DatabaseHelper mDatabaseHelper;
-    private FirebaseApp mFirebaseApp;
+    private static DatabaseHelper mDatabaseHelper; //TODO [Ivan]: Delete?
+    private FirebaseApp mFirebaseApp; //TODO [Ivan]: Delete?
     private FirebaseDatabase database;
     private DatabaseReference ref;
 
