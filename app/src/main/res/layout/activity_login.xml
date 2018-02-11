@@ -1,6 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+    <EditText
+        android:id="@+id/userLoginEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="35dp"
+        android:ems="10"
+        android:hint="Enter User Name"
+        android:inputType="textPersonName"
+        android:textColorHighlight="#1E90FF"
+        android:textColorLink="#1E90FF" />
+
+    <EditText
+        android:id="@+id/userPasswordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_alignStart="@+id/userLoginEditText"
+        android:layout_below="@+id/userLoginEditText"
+        android:layout_marginRight="15dp"
+        android:hint="Enter Password"
+        android:inputType="textPassword"
+        android:singleLine="true"
+        android:textColorHighlight="#1E90FF"
+        android:textColorLink="#1E90FF" />
+
+    <Button
+        android:id="@+id/forgotPasswordButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/createAccountButton"
+        android:layout_alignStart="@+id/loginButton"
+        android:onClick="startForgotInfoActivity"
+        android:text="Forgot Password?" />
+
+    <Button
+        android:id="@+id/forgotUserNameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/forgotPasswordButton"
+        android:layout_alignBottom="@+id/forgotPasswordButton"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="15dp"
+        android:layout_toEndOf="@+id/forgotPasswordButton"
+        android:onClick="startForgotInfoActivity"
+        android:text="Forgot Username?" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/userPasswordEditText"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="46dp"
+        android:background="#1E90FF"
+        android:onClick="validateLogin"
+        android:text="Log In"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textSize="18dp" />
+
+    <Button
+        android:id="@+id/createAccountButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:onClick="sendToCreateAccActivity"
+        android:text="Create Account" />
+
+</RelativeLayout>
