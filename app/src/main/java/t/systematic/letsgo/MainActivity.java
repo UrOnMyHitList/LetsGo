@@ -3,15 +3,14 @@ package t.systematic.letsgo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
+import t.systematic.letsgo.AccountManagement.LogInActivity;
 import t.systematic.letsgo.Database.DatabaseHelper;
-import t.systematic.letsgo.MeetingActivities.MapActivity;
-import t.systematic.letsgo.MeetingActivities.MeetingManagerActivity;
+import t.systematic.letsgo.Database.OnGetDataListener;
 
 public class MainActivity extends AppCompatActivity {
     private DatabaseReference ref;
@@ -20,9 +19,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        DatabaseHelper database = new DatabaseHelper();
-        database.writeToDB("Ivan does not suck");
 
         /*
         For Testing - This activity takes user straight to the Log In screen
