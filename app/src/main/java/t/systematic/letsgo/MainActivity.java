@@ -3,14 +3,14 @@ package t.systematic.letsgo;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
+import t.systematic.letsgo.AccountManagement.LogInActivity;
 import t.systematic.letsgo.Database.DatabaseHelper;
-import t.systematic.letsgo.MeetingActivities.MapActivity;
+import t.systematic.letsgo.Database.OnGetDataListener;
 import t.systematic.letsgo.MeetingActivities.MeetingManagerActivity;
 
 public class MainActivity extends AppCompatActivity {
