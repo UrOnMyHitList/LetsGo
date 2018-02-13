@@ -33,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
 //        startActivity(i);
 
 
-
+//test comment to test commits
+        int a = 0;
         /* Check if user is logged in if yes, send to MeetingManagerActivity,
         *  if no, send to Login Screen*/
         Intent i;
