@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">LetsGo</string>
     <string name="title_activity_map">Map</string>
+    <string name="shared_preference">UsernameFile</string>>
 </resources>

@@ -7,6 +7,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+
+import t.systematic.letsgo.Database.DatabaseHelper;
+import t.systematic.letsgo.Database.OnGetDataListener;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.SettingsActivity;
 
@@ -40,10 +44,10 @@ public class ChangeAccountInfoActivity extends SettingsActivity {
 
     protected void onClickPasswordChange(View view){
         EditText currentPasswrdEditText = (EditText) findViewById(R.id.inputCurrentPswrd);
-        String currentPassword = currentPasswrdEditText.getText().toString();
+        final String currentPassword = currentPasswrdEditText.getText().toString();
 
         EditText newPasswrdEditText = (EditText) findViewById(R.id.inputNewPswrd);
-        String newPasswrd = newPasswrdEditText.getText().toString();
+        final String newPasswrd = newPasswrdEditText.getText().toString();
 
         EditText reenterNewPasswrdEditText = (EditText) findViewById(R.id.reinputNewPswrd);
         String reenteredNewPasswrd = reenterNewPasswrdEditText.getText().toString();
@@ -61,15 +65,47 @@ public class ChangeAccountInfoActivity extends SettingsActivity {
             return;
         }
 
-        //Database Ref to change Password
+        DatabaseHelper.getInstance().validateUser(username, currentPassword, new OnGetDataListener() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                DatabaseHelper.getInstance().changePassword(username, newPasswrd, new OnGetDataListener() {
+                    @Override
+                    public void onSuccess(DataSnapshot dataSnapshot) {
+                        Toast.makeText(ChangeAccountInfoActivity.this, "Password Changed", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(String failure) {
+                        Toast.makeText(ChangeAccountInfoActivity.this, ""+failure, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String failure) {
+
+            }
+        });
+
         Toast.makeText(this, "Password changed", Toast.LENGTH_SHORT).show();
     }
 
     protected void onClickPhoneNumber(View view){
+        String number = ((EditText) findViewById(R.id.inputPhoneNum)).getText().toString();
+        DatabaseHelper.getInstance().changePhoneNumber(username, number, new OnGetDataListener() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                Toast.makeText(ChangeAccountInfoActivity.this, "Phone Number Changed", Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void onFailure(String failure) {
+                Toast.makeText(ChangeAccountInfoActivity.this, ""+failure, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     protected void onClickUsername(View view){
-
+        
     }
 }
