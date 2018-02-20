@@ -9,8 +9,9 @@ import android.widget.Toast;
 import t.systematic.letsgo.FriendActivities.FriendsManagerActivity;
 import t.systematic.letsgo.MainActivity;
 import t.systematic.letsgo.R;
+import t.systematic.letsgo.SettingsActivity;
 
-public class MeetingManagerActivity extends AppCompatActivity {
+public class MeetingManagerActivity extends SettingsActivity {
     private float x1,x2,y1,y2;
 
     @Override
