@@ -67,4 +67,45 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void changePhoneNumber(final String username, final String number, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    userRef.child("phone").setValue(number);
+                    listener.onSuccess(dataSnapshot);
+                }
+                else{
+                    listener.onFailure("Error changing phone number.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error changing phone number.");
+            }
+        });
+    }
+
+    public void changePassword(final String username, final String newPassword, final OnGetDataListener listener) {
+        final DatabaseReference userRef = ref.child("users").child(username);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    userRef.child("password").setValue(newPassword);
+                    listener.onSuccess(dataSnapshot);
+                }
+                else{
+                    listener.onFailure("Error changing password.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error changing password.");
+            }
+        });
+    }
 }
