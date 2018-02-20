@@ -23,6 +23,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        DatabaseHelper database = new DatabaseHelper();
+       // database.writeToDB("Ivan does not suck");
+
         /*
         For Testing - This activity takes user straight to the Log In screen
 
@@ -47,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
         /* Check if user is logged in if yes, send to MeetingManagerActivity,
         *  if no, send to Login Screen*/
-//        Intent i;
-//        if(true){
-//            i = new Intent(MainActivity.this, MeetingManagerActivity.class);
-//            startActivity(i);
-//        }
+        Intent i;
+        if(true){
+            i = new Intent(MainActivity.this, MeetingManagerActivity.class);
+            startActivity(i);
+        }
     }
 
 

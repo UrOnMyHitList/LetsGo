@@ -14,6 +14,10 @@ import t.systematic.letsgo.UserObject.User;
 
 public class Meeting implements Comparable<Meeting>{
 
+    /* Name of the meeting given by Admin of meeting.*/
+    private final String mMeetingName;
+    /* Name of destination - Example: McDonalds, Mount Baldy, LAX Airport
+    *  Will probably be pulled from google maps if available.*/
     private String mDestination;
     private ArrayList<User> mParticipants;
     /* We can do something like the top answer below to hold the date and time.
@@ -26,8 +30,9 @@ public class Meeting implements Comparable<Meeting>{
     private Location mLocation;
 
     /* Constructor  */
-    public Meeting(String destination, ArrayList<User> participants, Calendar dateTime,
+    public Meeting(String meetingName, String destination, ArrayList<User> participants, Calendar dateTime,
                     Location location){
+        mMeetingName = meetingName;
         mDestination = destination;
         mParticipants = participants;
         mDateTime = dateTime;
