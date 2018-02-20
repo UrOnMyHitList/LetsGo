@@ -41,6 +41,7 @@
             android:name=".MeetingActivities.MapActivity"
             android:label="@string/title_activity_map" />
         <activity android:name=".MeetingActivities.MeetingManagerActivity" />
+        <activity android:name=".AccountManagement.ChangeAccountInfoActivity" />
         <activity android:name=".FriendActivities.FriendsManagerActivity" />
         <activity android:name=".ParentChildActivities.ParentChildManagerActivity" />
         <activity android:name=".MeetingActivities.ViewEditMeetingActivity"></activity>

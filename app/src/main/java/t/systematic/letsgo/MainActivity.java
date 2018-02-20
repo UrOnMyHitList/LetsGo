@@ -1,6 +1,8 @@
 package t.systematic.letsgo;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -29,8 +31,20 @@ public class MainActivity extends AppCompatActivity {
 
         No need to pass anything into intent
          */
-//        Intent i = new Intent(MainActivity.this, LogInActivity.class);
-//        startActivity(i);
+
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.shared_preference), Context.MODE_PRIVATE);
+        String defaultValue = "";
+        String username = sharedPref.getString("username", defaultValue);
+
+        if(!username.equals(defaultValue)){
+            Intent goToMainMenu = new Intent(MainActivity.this, MeetingManagerActivity.class);
+            goToMainMenu.putExtra("username", username);
+            MainActivity.this.startActivity(goToMainMenu);
+        }
+        else {
+            Intent i = new Intent(MainActivity.this, LogInActivity.class);
+            startActivity(i);
+        }
 
 
 
@@ -42,5 +56,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
         }
     }
+
 
 }
