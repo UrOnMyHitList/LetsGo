@@ -44,6 +44,8 @@
         <activity android:name=".AccountManagement.ChangeAccountInfoActivity" />
         <activity android:name=".FriendActivities.FriendsManagerActivity" />
         <activity android:name=".ParentChildActivities.ParentChildManagerActivity" />
+        <activity android:name=".MeetingActivities.ViewEditMeetingActivity"></activity>
+
         <activity android:name=".AccountManagement.CreateAccountActivity"></activity>
     </application>
 
