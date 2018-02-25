@@ -3,6 +3,7 @@ package t.systematic.letsgo.Meeting;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -20,13 +21,9 @@ public class Meeting implements Comparable<Meeting>, Serializable{
 
     /* Name of the meeting given by Admin of meeting.*/
     private final String mMeetingName;
-
+    /* All users in the meeting. */
     private ArrayList<String> mParticipants;
-    /* We can do something like the top answer below to hold the date and time.
-    *  We can separate them with a character like _ to parse when we only need one.
-    *
-    *  https://stackoverflow.com/questions/36257085/set-date-and-desired-time-in-android
-    */
+    /* Date info of when meeting is scheduled to take place.*/
     private Calendar mDateTime;
     /* Don't remember which exactly was best, can change dataType once we get there. */
     private transient Location mLocation;
