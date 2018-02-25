@@ -19,20 +19,28 @@ public class User implements Serializable{
     private String mUserName;
     private ArrayList<String> mFriends;
     private ArrayList<Meeting> mMeetings;
+    private String email_addr;
+    private String phone_number;
 
     /* Constructor */
-    public User (String userName, ArrayList<String> friends, ArrayList<Meeting> meetings){
+    public User (String userName, ArrayList<String> friends, ArrayList<Meeting> meetings, String email, String phone){
         mUserName = userName;
         mFriends = friends;
         mMeetings = meetings;
+        email_addr = email;
+        phone_number = phone;
     }
+
+
 
     /* Setters */
     public void setFriends(ArrayList<String> friends){ mFriends = friends; }
     public void setMeetings(ArrayList<Meeting> meetings){ mMeetings = meetings; }
 
     /* Getters */
-    public String getUserName(){ return mUserName; }
+    public String getUsername(){ return mUserName; }
+    public String getEmail_addr(){return email_addr;}
+    public String getPhone_number(){return phone_number;}
     public ArrayList<String> getFriends() { return mFriends; }
     public ArrayList<Meeting> getMeetings() { return mMeetings; }
     public int getNumberOfMeetings() { return mMeetings.size(); }

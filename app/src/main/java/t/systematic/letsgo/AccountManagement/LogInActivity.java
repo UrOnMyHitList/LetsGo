@@ -1,6 +1,8 @@
 package t.systematic.letsgo.AccountManagement;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -72,6 +74,11 @@ public class LogInActivity extends AppCompatActivity implements OnGetDataListene
     @Override
     public void onSuccess(DataSnapshot dataSnapshot) {
         //Toast.makeText(getApplicationContext(), "Logging in", Toast.LENGTH_LONG).show();
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.shared_preference), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("username", username.getText().toString());
+        editor.commit();
+
         Intent goToMainMenu = new Intent(LogInActivity.this, MeetingManagerActivity.class);
         goToMainMenu.putExtra("username", username.getText().toString());
         LogInActivity.this.startActivity(goToMainMenu);

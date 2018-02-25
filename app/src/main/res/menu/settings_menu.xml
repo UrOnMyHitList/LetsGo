@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".SettingsActivity">
+    <item
+        android:id="@+id/changeDisplayName"
+        android:title="Change Display Name"
+        android:orderInCategory="101"
+        />
+    <item
+        android:id="@+id/changePhoneNumber"
+        android:title="Change Phone Number"
+        android:orderInCategory="102"
+        />
+    <item
+        android:id="@+id/changePassword"
+        android:title="Change Password"
+        android:orderInCategory="103"
+        />
+    <item
+        android:id="@+id/logout"
+        android:title="Log Out"
+        android:orderInCategory="104"
+        />
+
+</menu>

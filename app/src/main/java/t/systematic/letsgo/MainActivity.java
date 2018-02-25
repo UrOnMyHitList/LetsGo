@@ -1,6 +1,8 @@
 package t.systematic.letsgo;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,37 +30,33 @@ import t.systematic.letsgo.UserObject.User;
 public class MainActivity extends AppCompatActivity implements  OnGetDataListener{
     private DatabaseReference ref;
     private User user;
+    private String mUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*
-        For Testing - This activity takes user straight to the Log In screen
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.shared_preference), Context.MODE_PRIVATE);
+        String defaultValue = "";
+        String username = sharedPref.getString("username", defaultValue);
 
-        No need to pass anything into intent
-         */
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2018, 2,2, 14,42,00);
-
-        Log.d("TIMEEE", "" + calendar.get(Calendar.DATE));
-
-
-
-        // TODO finish updating code to handle calendar time and into DB
-
-
-       DatabaseHelper.getInstance().getUserInfo("stefin", this);
+        if(!username.equals(defaultValue)){
+            mUsername = username;
+            DatabaseHelper.getInstance().getUserInfo(username, this);
+        }
+        else {
+            Intent i = new Intent(MainActivity.this, LogInActivity.class);
+            startActivity(i);
+        }
     }
 
     @Override
     public void onSuccess(DataSnapshot dataSnapshot) {
-        user = new User("stefin", new ArrayList<String>(), new ArrayList<Meeting>());
-        Log.d("FIRST", "USER INIT");
+        user = new User(mUsername, new ArrayList<String>(), new ArrayList<Meeting>(), dataSnapshot.child("email").toString(),
+                dataSnapshot.child("phone").toString());
         /* Add user's friends. */
         for(DataSnapshot friend : dataSnapshot.child("friends").getChildren()){
-            Log.d("FRIEND", friend.getValue().toString() );
             user.addFriend(friend.getValue().toString());
         }
 

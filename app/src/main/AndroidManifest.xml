@@ -10,6 +10,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -41,6 +45,7 @@
             android:name=".MeetingActivities.MapActivity"
             android:label="@string/title_activity_map" />
         <activity android:name=".MeetingActivities.MeetingManagerActivity" />
+        <activity android:name=".AccountManagement.ChangeAccountInfoActivity" />
         <activity android:name=".FriendActivities.FriendsManagerActivity" />
         <activity android:name=".ParentChildActivities.ParentChildManagerActivity" />
         <activity android:name=".MeetingActivities.ViewEditMeetingActivity" />
