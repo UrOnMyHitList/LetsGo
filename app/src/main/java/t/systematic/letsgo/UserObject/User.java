@@ -31,8 +31,6 @@ public class User implements Serializable{
         phone_number = phone;
     }
 
-
-
     /* Setters */
     public void setFriends(ArrayList<String> friends){ mFriends = friends; }
     public void setMeetings(ArrayList<Meeting> meetings){ mMeetings = meetings; }
@@ -66,8 +64,6 @@ public class User implements Serializable{
         Calendar tempMeeting;
         for(int i = 0; i < numberOfMeetings; i++){
             tempMeeting = mMeetings.get(i).getDateTime();
-           // Log.d("GOKU3", ""+tempMeeting);
-            Log.d("GOKU2", " Month " + tempMeeting.get(Calendar.MONTH) + " day " + tempMeeting.get(Calendar.DATE) + " year " + tempMeeting.get(Calendar.YEAR));
             if(monthDayYearMatches(tempMeeting.get(Calendar.MONTH), month, tempMeeting.get(Calendar.DATE), day,
                     tempMeeting.get(Calendar.YEAR), year)){
                 meetingsNamesToday.add(mMeetings.get(i).getMeetingName());
@@ -88,10 +84,7 @@ public class User implements Serializable{
         Collections.sort(mMeetings);
     }
     private boolean monthDayYearMatches(int month1,int month2, int day1, int day2, int year1, int year2){
-        Log.d("GOKU", "CHANGED DATE : m1 " + month1 + " m2 " + month2 + " d1 "+ day1 + " d2 " + day2
-                + " y1 " + year1 + " year2 " +year2 + " RETURN TRUE");
         if((month1 == month2) && (day1 == day2) && (year1 == year2)){
-            Log.d("GOKU", "RETURN TRUE");
             return true;
         }
         return false;
