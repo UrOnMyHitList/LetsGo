@@ -8,10 +8,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
+
+import java.util.ArrayList;
 
 import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.Database.OnGetDataListener;
+import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.MeetingActivities.MeetingManagerActivity;
 import t.systematic.letsgo.R;
 
@@ -80,4 +84,10 @@ public class LogInActivity extends AppCompatActivity implements OnGetDataListene
         else
             Toast.makeText(this, "Error Logging in, Please try again later.", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onSuccess_initializeUserMeetings(Meeting meetings, int lastMeeting) {
+
+    }
+
 }
