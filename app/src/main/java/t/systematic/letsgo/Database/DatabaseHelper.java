@@ -108,4 +108,8 @@ public class DatabaseHelper extends FragmentActivity{
             }
         });
     }
+
+    public void changeUsername(final String oldUsername, final String newUsername, final OnGetDataListener listener){
+        //TODO Get user and create accout for the user.
+    }
 }
