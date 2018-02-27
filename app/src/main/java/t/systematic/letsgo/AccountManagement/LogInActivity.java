@@ -78,6 +78,7 @@ public class LogInActivity extends AppCompatActivity implements OnGetDataListene
         Intent goToMainMenu = new Intent(LogInActivity.this, MeetingManagerActivity.class);
         goToMainMenu.putExtra("username", username.getText().toString());
         LogInActivity.this.startActivity(goToMainMenu);
+        finish();
     }
 
     @Override

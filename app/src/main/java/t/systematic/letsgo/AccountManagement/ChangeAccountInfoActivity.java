@@ -3,6 +3,8 @@ package t.systematic.letsgo.AccountManagement;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -40,6 +42,18 @@ public class ChangeAccountInfoActivity extends SettingsActivity {
         else if(action.equals("username")){
             setContentView(R.layout.activity_change_username);
         }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected void onClickPasswordChange(View view){
@@ -106,6 +120,7 @@ public class ChangeAccountInfoActivity extends SettingsActivity {
     }
 
     protected void onClickUsername(View view){
-        
+        String newUsername = ((EditText) findViewById(R.id.inputDisplayName)).getText().toString();
+
     }
 }

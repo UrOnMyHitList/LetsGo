@@ -3,6 +3,7 @@ package t.systematic.letsgo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -55,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             Intent intent = new Intent(getApplicationContext(), LogInActivity.class);
             startActivity(intent);
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }

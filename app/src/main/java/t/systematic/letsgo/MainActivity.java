@@ -45,16 +45,6 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(MainActivity.this, LogInActivity.class);
             startActivity(i);
         }
-
-
-
-        /* Check if user is logged in if yes, send to MeetingManagerActivity,
-        *  if no, send to Login Screen*/
-        Intent i;
-        if(true){
-            i = new Intent(MainActivity.this, MeetingManagerActivity.class);
-            startActivity(i);
-        }
     }
 
 
