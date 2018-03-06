@@ -19,4 +19,11 @@
     <string name="forgot_username_text">Enter your email</string>
     <string name="forgot_password_text">Enter your username</string>
     <string name="submit_button">Submit</string>
+    <string name="shared_preference">UsernameFile</string>>
+    <string name="create_account">Create Account</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="enter_phone">Enter Phone Number</string>
 </resources>

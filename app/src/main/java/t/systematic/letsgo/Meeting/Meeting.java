@@ -1,8 +1,12 @@
 package t.systematic.letsgo.Meeting;
 
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -12,10 +16,12 @@ import t.systematic.letsgo.UserObject.User;
  * Created by Jorge B Martinez on 2/1/2018.
  */
 
-public class Meeting implements Comparable<Meeting>{
+public class Meeting implements Comparable<Meeting>, Serializable{
 
-    private String mDestination;
-    private ArrayList<User> mParticipants;
+    /* Name of the meeting given by Admin of meeting.*/
+    private final String mMeetingName;
+
+    private ArrayList<String> mParticipants;
     /* We can do something like the top answer below to hold the date and time.
     *  We can separate them with a character like _ to parse when we only need one.
     *
@@ -23,34 +29,35 @@ public class Meeting implements Comparable<Meeting>{
     */
     private Calendar mDateTime;
     /* Don't remember which exactly was best, can change dataType once we get there. */
-    private Location mLocation;
+    private transient Location mLocation;
+    /* The user name of */
+    private String admin;
 
     /* Constructor  */
-    public Meeting(String destination, ArrayList<User> participants, Calendar dateTime,
+    public Meeting(String meetingName, ArrayList<String> participants, Calendar dateTime,
                     Location location){
-        mDestination = destination;
+        mMeetingName = meetingName;
         mParticipants = participants;
         mDateTime = dateTime;
         mLocation = location;
     }
 
     /* Setters */
-    public void setDestination(String destination){ mDestination = destination; }
-    public void setParticipants(ArrayList<User> participants){ mParticipants = participants; }
+    public void setParticipants(ArrayList<String> participants){ mParticipants = participants; }
     public void setDateTime(Calendar dateTime){ mDateTime = dateTime; }
     public void setLocation(Location location){ mLocation = location; }
 
     /* Getters*/
-    public String getDestination(){ return mDestination; }
-    public ArrayList<User> getParticipants(){ return mParticipants; }
+    public ArrayList<String> getParticipants(){ return mParticipants; }
     public Calendar getDateTime() { return mDateTime; }
     public Location getLocation() { return mLocation; }
+    public String getMeetingName() { return mMeetingName; }
 
     /* Functions */
     public int numberOfUsersInMeeting(){
         return mParticipants.size();
     }
-    public void addUser(User newUser){
+    public void addUser(String newUser){
         mParticipants.add(newUser);
     }
     public void removeUser(User deleteUser){

@@ -11,6 +11,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
+import t.systematic.letsgo.UserObject.User;
+
 public class DatabaseHelper extends FragmentActivity{
     private static DatabaseHelper mDatabaseHelper; //TODO [Ivan]: Delete?
     private FirebaseApp mFirebaseApp; //TODO [Ivan]: Delete?
@@ -67,4 +71,56 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void createAccount(final User user, final String password, final OnGetDataListener listener){
+        String username = user.getUsername();
+
+        //Add user and values to database
+        ref.child("users").child(username).setValue(username);
+        ref.child("users").child(username).child("email").setValue(user.getEmail_addr());
+        ref.child("users").child(username).child("phone").setValue(user.getPhone_number());
+        //TODO add password
+
+    }
+
+    public void changePhoneNumber(final String username, final String number, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    userRef.child("phone").setValue(number);
+                    listener.onSuccess(dataSnapshot);
+                }
+                else{
+                    listener.onFailure("Error changing phone number.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error changing phone number.");
+            }
+        });
+    }
+
+    public void changePassword(final String username, final String newPassword, final OnGetDataListener listener) {
+        final DatabaseReference userRef = ref.child("users").child(username);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    userRef.child("password").setValue(newPassword);
+                    listener.onSuccess(dataSnapshot);
+                }
+                else{
+                    listener.onFailure("Error changing password.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error changing password.");
+            }
+        });
+    }
 }
