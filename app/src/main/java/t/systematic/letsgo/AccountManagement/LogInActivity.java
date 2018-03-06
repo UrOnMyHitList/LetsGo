@@ -45,21 +45,19 @@ public class LogInActivity extends AppCompatActivity implements OnGetDataListene
             Toast.makeText(getApplicationContext(), "Input password/username", Toast.LENGTH_LONG).show();
         }
     }
-
+    public static final String EXTRA_FLAVOR = "t.systematic.letsgo.ActivityFlavor";
     public void startForgotInfoActivity(View view){
-//        TODO: Create Forgot Info activity
-        Toast.makeText(this, "Forgot Info activity... Coming Soon!", Toast.LENGTH_SHORT).show();
-/**
+
+        //Toast.makeText(this, "Forgot Info activity... Under Construction!", Toast.LENGTH_SHORT).show();
         Intent forgotInfoActivity = new Intent(LogInActivity.this, ForgotInfoActivity.class);
         if(view.getId() == R.id.forgotPasswordButton){
-            forgotInfoActivity.putExtra("ActivityFlavor", "Password");
+            forgotInfoActivity.putExtra(EXTRA_FLAVOR, "Enter your username to recover your password:");
 
         }
         else if(view.getId() == R.id.forgotUserNameButton){
-            forgotInfoActivity.putExtra("ActivityFlavor", "Username");
+            forgotInfoActivity.putExtra(EXTRA_FLAVOR, "Enter your email to recover your username:");
         }
         LogInActivity.this.startActivity(forgotInfoActivity);
- **/
     }
 
     public void sendToCreateAccActivity(View view){
