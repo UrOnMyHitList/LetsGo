@@ -10,9 +10,14 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
 
     <application
         android:allowBackup="true"
@@ -48,9 +53,10 @@
         <activity android:name=".AccountManagement.ChangeAccountInfoActivity" />
         <activity android:name=".FriendActivities.FriendsManagerActivity" />
         <activity android:name=".ParentChildActivities.ParentChildManagerActivity" />
-        <activity android:name=".MeetingActivities.ViewEditMeetingActivity"></activity>
-
-        <activity android:name=".AccountManagement.CreateAccountActivity"></activity>
+        <activity android:name=".MeetingActivities.ViewEditMeetingActivity" />
+        <activity android:name=".AccountManagement.CreateAccountActivity" />
+        <activity android:name=".AccountManagement.ForgotInfoActivity"
+            android:parentActivityName=".AccountManagement.LogInActivity"/>
     </application>
 
 </manifest>
