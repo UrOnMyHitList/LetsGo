@@ -2,6 +2,7 @@ package t.systematic.letsgo.AccountManagement;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import t.systematic.letsgo.MainActivity;
 import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.UserObject.User;
 
@@ -44,53 +46,45 @@ public class CreateAccountActivity extends AppCompatActivity implements OnGetDat
 
     @Override
     public void onSuccess(DataSnapshot dataSnapshot) {
+        Toast.makeText(getApplicationContext(), "Account Created!", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(CreateAccountActivity.this, MainActivity.class);
+        startActivity(i);
 
     }
 
     @Override
     public void onFailure(String failure) {
-
+        Toast.makeText(getApplicationContext(), failure, Toast.LENGTH_SHORT).show();
     }
 
     public void createAccount(View view){
 
-        //TODO check if username exists
-
-        if ( password.getText().toString().equals(confirm_pw.getText().toString())) {
-
-            //TelephonyManager tMananger = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+        //Verify there are no empty fields
+        if (username.getText().toString().matches("")){
+            Toast.makeText(this, "Please enter a username", Toast.LENGTH_SHORT).show();
+        } else if (password.getText().toString().matches("")){
+            Toast.makeText(this, "Please enter a password", Toast.LENGTH_SHORT).show();
+        } else if (confirm_pw.getText().toString().matches("")){
+            Toast.makeText(this, "Please confirm password", Toast.LENGTH_SHORT).show();
+        } else if (email.getText().toString().matches("")){
+            Toast.makeText(this, "Please enter your email address", Toast.LENGTH_SHORT).show();
+        } else if (phone.getText().toString().matches("")){
+            Toast.makeText(this, "Please enter your phone number", Toast.LENGTH_SHORT).show();
+        } else if (!password.getText().toString().equals(confirm_pw.getText().toString())){
+            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+        }else {
 
             User user = new User(username.getText().toString(),
                     new ArrayList<String>(),
                     new ArrayList<Meeting>(),
                     email.getText().toString(),
                     phone.getText().toString());
-            /**
-            //Toast.makeText(getApplicationContext(), "Creating account", Toast.LENGTH_LONG).show();
-            User user = new User();
-            userName = username.getText().toString();
-            userName = userName.toLowerCase();
-            user.setUsername(userName);
-            user.setPassword(password.getText().toString());
-            user.setEmail(email.getText().toString());
-            user.setFriends(new ArrayList<String>());
-            //Used to get the user's phone number.
-            TelephonyManager tMananger = (TelephonyManager) getApplicationContext().getSystemService(
-                    Context.TELEPHONY_SERVICE);
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                //Android complains without this check.
-                Toast.makeText(getApplicationContext(), "Database Permission Error!", Toast.LENGTH_LONG).show();
-                return;
-            }
-            user.setPhonenumber(tMananger.getLine1Number());
-            user.setmMeetingWith("NULL");
-            user.setMeetingReq("NULL");
-            **/
+
+            //TODO decide if to user input for phone number or use the phone iteself
 
             DatabaseHelper.getInstance().createAccount(user, password.getText().toString(), this);
-        }
-        else{
-            Toast.makeText(this, "Password does not match!", Toast.LENGTH_SHORT).show();
+
+
         }
     }
 }
