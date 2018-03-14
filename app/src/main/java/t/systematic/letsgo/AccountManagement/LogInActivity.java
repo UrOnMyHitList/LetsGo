@@ -35,10 +35,12 @@ public class LogInActivity extends AppCompatActivity implements OnGetDataListene
 
     public void validateLogin(View view){
         //calls Presenter to check database for login details
+        System.out.println("validateLogin CALLED");
+
         String uname = username.getText().toString();
         String pass = password.getText().toString();
         if(!(TextUtils.isEmpty(uname)) && !(TextUtils.isEmpty(pass))){
-            DatabaseHelper.getInstance().validateUser(uname.toLowerCase(), pass.toString(), this);
+            DatabaseHelper.getInstance().validateUser(uname.toLowerCase(), pass, this);
         }
         else{
             //display error
