@@ -40,8 +40,6 @@ public class DatabaseHelper extends FragmentActivity{
 
 
     public void validateUser(final String username, final String password, final OnGetDataListener listener){
-            DatabaseReference userRef = ref.child("users").child(username);
-
         ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -123,15 +121,15 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
-    public void hasUnreadNotifs(final String username, final OnGetDataListener listener){
-        final DatabaseReference userRef = ref.child("users").child(username).child("notifications").child("meetings").child("JorgeCool4303402018-03-13");
+    public void hasUnreadNotifs(final String username, final String notifType, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("notifications").child(notifType);//.child("JorgeCool4303402018-03-13");
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        if(snapshot.child("read").getValue(String.class).equals("N")){
-                            listener.onSuccess(snapshot);
+                        if((snapshot.child("read").getValue(String.class)).toString().equals("N")){
+                            listener.onSuccess(dataSnapshot);
                             return;
                         }
                     }

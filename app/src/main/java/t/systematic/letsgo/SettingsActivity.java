@@ -8,9 +8,15 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
 
 import t.systematic.letsgo.AccountManagement.ChangeAccountInfoActivity;
 import t.systematic.letsgo.AccountManagement.LogInActivity;
+import t.systematic.letsgo.Database.DatabaseHelper;
+import t.systematic.letsgo.Database.OnGetDataListener;
 
 /**
  * Created by mathe on 2/19/2018.
@@ -18,12 +24,19 @@ import t.systematic.letsgo.AccountManagement.LogInActivity;
 
 public class SettingsActivity extends AppCompatActivity {
     private String userName;
+    boolean unreadNotifs;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.shared_preference), Context.MODE_PRIVATE);
+        String defaultValue = "";
+        userName = sharedPref.getString("username", defaultValue);
+        unreadNotifs = false;
+
         getMenuInflater().inflate(R.menu.settings_menu, menu);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
+        hasUnreadNotifs(menu);
         return true;
     }
 
@@ -58,6 +71,56 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+        else if(id == R.id.badge){
+            Toast.makeText(this, "Go to notifications page", Toast.LENGTH_SHORT).show();
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * This method checks both notifications for friend requests and meetings and chnages the icon on Action bar accordingly.
+     * @param menu
+     */
+    public void hasUnreadNotifs(final Menu menu){
+        DatabaseHelper.getInstance().hasUnreadNotifs(userName, "meetings", new OnGetDataListener() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                //Toast.makeText(SettingsActivity.this, "Unread Notification!", Toast.LENGTH_SHORT).show();
+                MenuItem settingsItem = menu.findItem(R.id.badge);
+                settingsItem.setIcon(R.drawable.unread_notif_bell);
+            }
+
+            @Override
+            public void onFailure(String failure) {
+                if(failure.equals("Read")){
+                    //Toast.makeText(SettingsActivity.this, "All notifications are read!", Toast.LENGTH_SHORT).show();
+                    MenuItem settingsItem = menu.findItem(R.id.badge);
+                    settingsItem.setIcon(R.drawable.notif_bell);
+                }
+                else{
+                    Toast.makeText(SettingsActivity.this, ""+failure, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        DatabaseHelper.getInstance().hasUnreadNotifs(userName, "friendRequests", new OnGetDataListener() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                //Toast.makeText(SettingsActivity.this, "Unread Notification!", Toast.LENGTH_SHORT).show();
+                MenuItem settingsItem = menu.findItem(R.id.badge);
+                settingsItem.setIcon(R.drawable.unread_notif_bell);
+            }
+
+            @Override
+            public void onFailure(String failure) {
+                if(failure.equals("Read")){
+                    //Toast.makeText(SettingsActivity.this, "All notifications are read!", Toast.LENGTH_SHORT).show();
+                    MenuItem settingsItem = menu.findItem(R.id.badge);
+                    settingsItem.setIcon(R.drawable.notif_bell);
+                }
+                else{
+                    Toast.makeText(SettingsActivity.this, ""+failure, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

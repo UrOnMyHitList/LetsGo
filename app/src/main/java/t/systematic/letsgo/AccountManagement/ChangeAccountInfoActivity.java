@@ -27,10 +27,11 @@ public class ChangeAccountInfoActivity extends SettingsActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.shared_preference), Context.MODE_PRIVATE);
-        String defaultValue = "";
-        username = sharedPref.getString("username", defaultValue);
+//        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.shared_preference), Context.MODE_PRIVATE);
+//        String defaultValue = "";
+//        username = sharedPref.getString("username", defaultValue);
 
+        username = getIntent().getStringExtra("username");
         action = getIntent().getStringExtra("action");
 
         if(action.equals("password")){
