@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         String defaultValue = "";
         String username = sharedPref.getString("username", defaultValue);
 
+        //TODO commented out for debugging - Ivan
+        /**
         if(!username.equals(defaultValue)){
             Intent goToMainMenu = new Intent(MainActivity.this, MeetingManagerActivity.class);
             goToMainMenu.putExtra("username", username);
@@ -45,6 +47,22 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(MainActivity.this, LogInActivity.class);
             startActivity(i);
         }
+
+
+
+        //Check if user is logged in if yes, send to MeetingManagerActivity, if no, send to Login Screen
+        //TODO: fix the check
+
+        Intent i;
+        if(true){
+            i = new Intent(MainActivity.this, MeetingManagerActivity.class);
+            startActivity(i);
+        }
+        **/
+
+        //TODO delete below after debugging
+        Intent i = new Intent(MainActivity.this, LogInActivity.class);
+        startActivity(i);
     }
 
 

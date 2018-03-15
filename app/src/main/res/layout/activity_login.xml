@@ -33,27 +33,31 @@
         android:textColorHighlight="#1E90FF"
         android:textColorLink="#1E90FF" />
 
-    <Button
-        android:id="@+id/forgotPasswordButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/createAccountButton"
-        android:layout_alignStart="@+id/loginButton"
-        android:onClick="startForgotInfoActivity"
-        android:text="Forgot Password?" />
+        android:layout_alignStart="@id/loginButton"
+        android:layout_alignEnd="@id/loginButton"
+        android:layout_above="@id/createAccountButton"
+        android:id="@+id/linearLayout">
+        <Button
+            android:id="@+id/forgotPasswordButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="startForgotInfoActivity"
+            android:text="Forgot Password?" />
 
-    <Button
-        android:id="@+id/forgotUserNameButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/forgotPasswordButton"
-        android:layout_alignBottom="@+id/forgotPasswordButton"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="15dp"
-        android:layout_toEndOf="@+id/forgotPasswordButton"
-        android:onClick="startForgotInfoActivity"
-        android:text="Forgot Username?" />
+        <Button
+            android:id="@+id/forgotUserNameButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="startForgotInfoActivity"
+            android:text="Forgot Username?" />
+
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/loginButton"
@@ -64,7 +68,7 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="46dp"
-        android:background="#1E90FF"
+        android:background="@color/colorPrimary"
         android:onClick="validateLogin"
         android:text="Log In"
         android:textColor="@color/common_google_signin_btn_text_dark_default"
@@ -75,11 +79,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="20dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:onClick="sendToCreateAccActivity"
         android:text="Create Account" />
+
 
 </RelativeLayout>
