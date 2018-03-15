@@ -24,7 +24,6 @@ public class DatabaseHelper extends FragmentActivity{
     public DatabaseHelper(){
         database = FirebaseDatabase.getInstance();
         ref = database.getReference();
-
     }
 
     public static DatabaseHelper getInstance() {
@@ -41,7 +40,7 @@ public class DatabaseHelper extends FragmentActivity{
 
 
     public void validateUser(final String username, final String password, final OnGetDataListener listener){
-        DatabaseReference userRef = ref.child("users").child(username);
+            DatabaseReference userRef = ref.child("users").child(username);
 
         ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -120,6 +119,32 @@ public class DatabaseHelper extends FragmentActivity{
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 listener.onFailure("Error changing password.");
+            }
+        });
+    }
+
+    public void hasUnreadNotifs(final String username, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("notifications").child("meetings").child("JorgeCool4303402018-03-13");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        if(snapshot.child("read").getValue(String.class).equals("N")){
+                            listener.onSuccess(snapshot);
+                            return;
+                        }
+                    }
+                    listener.onFailure("Read");
+                }
+                else{
+                    listener.onFailure("Error retrieving unread notifications.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error retrieving unread notifications.");
             }
         });
     }
