@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import t.systematic.letsgo.AccountManagement.ChangeUsername;
+import t.systematic.letsgo.AccountManagement.LogInActivity;
 import t.systematic.letsgo.FriendActivities.FriendsManagerActivity;
 import t.systematic.letsgo.R;
 
@@ -32,6 +34,11 @@ public class MeetingManagerActivity extends AppCompatActivity {
         init_listView(meetingNames);
 
 
+    }
+
+    public void testTest(View view){
+        Intent intent = new Intent(MeetingManagerActivity.this, ChangeUsername.class);
+        this.startActivity(intent);
     }
 
     public boolean onTouchEvent(MotionEvent touchEvent){

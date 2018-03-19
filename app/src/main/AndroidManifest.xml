@@ -57,6 +57,7 @@
         <activity android:name=".AccountManagement.CreateAccountActivity" />
         <activity android:name=".AccountManagement.ForgotInfoActivity"
             android:parentActivityName=".AccountManagement.LogInActivity"/>
+        <activity android:name=".AccountManagement.ChangeUsername"/>
     </application>
 
 </manifest>

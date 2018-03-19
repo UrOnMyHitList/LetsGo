@@ -1,32 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AccountManagement.ChangeAccountInfoActivity">
+    android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/inputDisplayName"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="146dp"
-        android:ems="10"
-        android:gravity="center_horizontal"
-        android:hint="Enter new display name"
-        android:inputType="textPersonName" />
+        android:orientation="vertical"
+        android:layout_margin="15dp"
+        android:id="@+id/linearLayout2">
+        <TextView
+            android:id="@+id/textView_change_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:text="@string/change_username"
+            android:textColor="@color/royalAway"
+            android:textSize="28sp" />
+
+        <EditText
+            android:id="@+id/new_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter New Username"
+            android:inputType="textPersonName" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/royalAway"
+            android:onClick="checkAvailability"
+            android:text="Check Availability"
+            android:textColor="#FFF" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/royalAway"
+            android:id="@+id/confirmation_message"/>
+
+
+    </LinearLayout>
 
     <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
+        android:id="@+id/button_confirm"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/inputDisplayName"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:background="#1E90FF"
-        android:onClick="onClickUsername"
-        android:text="Confirm"
-        android:textColor="#FFFFFF" />
+        android:layout_alignParentBottom="true"
+        android:layout_margin="15dp"
+        android:background="@color/colorPrimary"
+        android:text="Confirm Username Change"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:onClick="changeUsername"/>
+
 </RelativeLayout>

@@ -105,7 +105,7 @@ public class ChangeAccountInfoActivity extends SettingsActivity {
         });
     }
 
-    protected void onClickUsername(View view){
+    protected void onClickUsernameChange(View view){
         
     }
 }

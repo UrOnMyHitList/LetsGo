@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPrimary">#B64926</color>
+    <color name="colorPrimaryDark">#FFB03B</color>
+    <color name="colorAccent">#8E2800</color>
+    <color name="royalHome">#FFF0A5</color>
+    <color name="royalAway">#468966</color>
+</resources>
+<!--
+<resources>
     <color name="colorPrimary">#1e90ff</color>
     <color name="colorPrimaryDark">#1f2e42</color>
     <color name="colorAccent">#FDB927</color>
     <color name="royalHome">#fdb927</color>
     <color name="royalAway">#552583</color>
 </resources>
+-->

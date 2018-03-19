@@ -74,7 +74,7 @@ public class DatabaseHelper extends FragmentActivity{
     public void createAccount(final User user, final String password, final OnGetDataListener listener){
         final String username = user.getUsername();
 
-        System.out.println(ref.child("users").child(username).toString());
+        //System.out.println(ref.child("users").child(username).toString());
 
         ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -97,6 +97,51 @@ public class DatabaseHelper extends FragmentActivity{
                     user_ref.child("meetings").child("0").setValue("null");
                     listener.onSuccess(dataSnapshot);
                 }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                listener.onFailure(null);
+            }
+        });
+    }
+
+    public void checkForUsername(final String username, final OnGetDataListener listener){
+        ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.exists()){
+                    if(dataSnapshot.getKey().equals(username)){
+                        listener.onFailure("The username is taken. Please choose a different username.");
+                    }
+                }
+                else{
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                listener.onFailure(null);
+            }
+        });
+    }
+
+    public void changeUsername(final String old_username, final String new_username, final OnGetDataListener listener){
+        ref.child("users").child(old_username).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.exists()){
+                    //TODO change username, not the value
+                    //DatabaseReference user_ref = ref.child("users").child(old_username);
+                    //user_ref.setValue(new_username);
+                    //listener.onSuccess(dataSnapshot);
+                }
+
             }
 
             @Override
