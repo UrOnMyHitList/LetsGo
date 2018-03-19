@@ -63,6 +63,7 @@
             android:name=".NotificationActivities.NotificationActivity"
             android:launchMode="singleTask"
             android:parentActivityName=".MeetingActivities.MeetingManagerActivity"></activity>
+        <activity android:name=".AccountManagement.ChangeUsername"/>
     </application>
 
 </manifest>

@@ -121,7 +121,7 @@ public class ChangeAccountInfoActivity extends SettingsActivity {
     }
 
     protected void onClickUsername(View view){
-        String newUsername = ((EditText) findViewById(R.id.inputDisplayName)).getText().toString();
+        //String newUsername = ((EditText) findViewById(R.id.inputDisplayName)).getText().toString();
 
     }
 }

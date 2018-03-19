@@ -145,7 +145,7 @@ public class DatabaseHelper extends FragmentActivity{
             }
         });
     }
-    
+
     public void changePassword(final String username, final String newPassword, final OnGetDataListener listener) {
 
         final DatabaseReference userRef = ref.child("users").child(username);

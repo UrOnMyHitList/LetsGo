@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.google.firebase.database.DataSnapshot;
 
 import t.systematic.letsgo.AccountManagement.ChangeAccountInfoActivity;
+import t.systematic.letsgo.AccountManagement.ChangeUsername;
 import t.systematic.letsgo.AccountManagement.LogInActivity;
 import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.Database.OnGetDataListener;
@@ -43,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
         if(id == R.id.changeDisplayName){
-            Intent intent = new Intent(getApplicationContext(), ChangeAccountInfoActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ChangeUsername.class);
             intent.putExtra("username", userName);
             intent.putExtra("action", "username");
             startActivity(intent);
