@@ -36,11 +36,6 @@ public class MeetingManagerActivity extends SettingsActivity {
 
     }
 
-    public void testTest(View view){
-        Intent intent = new Intent(MeetingManagerActivity.this, ChangeUsername.class);
-        this.startActivity(intent);
-    }
-
     public boolean onTouchEvent(MotionEvent touchEvent){
         switch (touchEvent.getAction()){
             case MotionEvent.ACTION_DOWN:
