@@ -145,9 +145,7 @@ public class DatabaseHelper extends FragmentActivity{
             }
         });
     }
-
-    public void changePhoneNumber(final String username, final String number, final OnGetDataListener listener){
-
+    
     public void changePassword(final String username, final String newPassword, final OnGetDataListener listener) {
 
         final DatabaseReference userRef = ref.child("users").child(username);
@@ -245,9 +243,5 @@ public class DatabaseHelper extends FragmentActivity{
                 listener.onFailure("Error retrieving unread notifications.");
             }
         });
-    }
-
-    public void changeUsername(final String oldUsername, final String newUsername, final OnGetDataListener listener){
-        //TODO Get user and create accout for the user.
     }
 }
