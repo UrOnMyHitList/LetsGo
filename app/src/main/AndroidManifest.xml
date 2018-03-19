@@ -55,6 +55,7 @@
         <activity android:name=".ParentChildActivities.ParentChildManagerActivity" />
         <activity android:name=".MeetingActivities.ViewEditMeetingActivity" />
         <activity android:name=".AccountManagement.CreateAccountActivity" />
+
         <activity
             android:name=".AccountManagement.ForgotInfoActivity"
             android:parentActivityName=".AccountManagement.LogInActivity" />

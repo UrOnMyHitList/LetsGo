@@ -71,6 +71,7 @@ public class DatabaseHelper extends FragmentActivity{
     public void createAccount(final User user, final String password, final OnGetDataListener listener){
         String username = user.getUsername();
 
+
         //Add user and values to database
         ref.child("users").child(username).setValue(username);
         ref.child("users").child(username).child("email").setValue(user.getEmail_addr());
@@ -100,7 +101,55 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void checkForUsername(final String username, final OnGetDataListener listener){
+        ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.exists()){
+                    if(dataSnapshot.getKey().equals(username)){
+                        listener.onFailure("The username is taken. Please choose a different username.");
+                    }
+                }
+                else{
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                listener.onFailure(null);
+            }
+        });
+    }
+
+    public void changeUsername(final String old_username, final String new_username, final OnGetDataListener listener){
+        ref.child("users").child(old_username).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                if(dataSnapshot.exists()){
+                    //TODO change username, not the value
+                    //DatabaseReference user_ref = ref.child("users").child(old_username);
+                    //user_ref.setValue(new_username);
+                    //listener.onSuccess(dataSnapshot);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                listener.onFailure(null);
+            }
+        });
+    }
+
+    public void changePhoneNumber(final String username, final String number, final OnGetDataListener listener){
+
     public void changePassword(final String username, final String newPassword, final OnGetDataListener listener) {
+
         final DatabaseReference userRef = ref.child("users").child(username);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
