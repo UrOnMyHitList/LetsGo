@@ -24,7 +24,6 @@ public class DatabaseHelper extends FragmentActivity{
     public DatabaseHelper(){
         database = FirebaseDatabase.getInstance();
         ref = database.getReference();
-
     }
 
     public static DatabaseHelper getInstance() {
@@ -34,7 +33,6 @@ public class DatabaseHelper extends FragmentActivity{
         return mDatabaseHelper;
     }
 
-    //TODO: Delete?
     public void writeToDB(String str){
         ref.setValue(str);
     }
@@ -43,7 +41,6 @@ public class DatabaseHelper extends FragmentActivity{
 
     public void validateUser(final String username, final String password, final OnGetDataListener listener){
         ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
-
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -72,37 +69,34 @@ public class DatabaseHelper extends FragmentActivity{
     }
 
     public void createAccount(final User user, final String password, final OnGetDataListener listener){
-        final String username = user.getUsername();
+        String username = user.getUsername();
 
-        //System.out.println(ref.child("users").child(username).toString());
 
-        ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+        //Add user and values to database
+        ref.child("users").child(username).setValue(username);
+        ref.child("users").child(username).child("email").setValue(user.getEmail_addr());
+        ref.child("users").child(username).child("phone").setValue(user.getPhone_number());
+        //TODO add password
+
+    }
+
+    public void changePhoneNumber(final String username, final String number, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //TODO onDataChange is not being called
-
-                if(dataSnapshot.exists()){
-                    if(dataSnapshot.getKey().equals(username)){
-                        listener.onFailure("The username is taken. Please choose a different username.");
-                    }
+                if (dataSnapshot.exists()) {
+                    userRef.child("phone").setValue(number);
+                    listener.onSuccess(dataSnapshot);
                 }
                 else{
-                    DatabaseReference user_ref = ref.child("users").child(username);
-                    //Add user and values to database
-                    user_ref.setValue(username);
-                    user_ref.child("email").setValue(user.getEmail_addr());
-                    user_ref.child("phone").setValue(user.getPhone_number());
-                    user_ref.child("password").setValue(password);
-                    user_ref.child("friends").child("0").setValue("null");
-                    user_ref.child("meetings").child("0").setValue("null");
-                    listener.onSuccess(dataSnapshot);
+                    listener.onFailure("Error changing phone number.");
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                listener.onFailure(null);
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error changing phone number.");
             }
         });
     }
@@ -153,27 +147,9 @@ public class DatabaseHelper extends FragmentActivity{
     }
 
     public void changePhoneNumber(final String username, final String number, final OnGetDataListener listener){
-        final DatabaseReference userRef = ref.child("users").child(username);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    userRef.child("phone").setValue(number);
-                    listener.onSuccess(dataSnapshot);
-                }
-                else{
-                    listener.onFailure("Error changing phone number.");
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                listener.onFailure("Error changing phone number.");
-            }
-        });
-    }
 
     public void changePassword(final String username, final String newPassword, final OnGetDataListener listener) {
+
         final DatabaseReference userRef = ref.child("users").child(username);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -192,5 +168,86 @@ public class DatabaseHelper extends FragmentActivity{
                 listener.onFailure("Error changing password.");
             }
         });
+    }
+
+    public void getUserNotifications(final String username, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("notifications");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error retrieving notifications.");
+            }
+        });
+    }
+
+    public void getMeetingName(final String meetingId, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("meetings").child(meetingId);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error retrieving meeting name.");
+            }
+        });
+    }
+
+    public void notificationRepliedYes(final String username, final String id, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("notifications").child(id);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    userRef.child("read").setValue("Y");
+                    userRef.child("reply").setValue("Y");
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error with notifications.");
+            }
+        });
+    }
+
+
+    public void hasUnreadNotifs(final String username, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("notifications");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        if((snapshot.child("read").getValue(String.class)).toString().equals("N")){
+                            listener.onSuccess(dataSnapshot);
+                            return;
+                        }
+                    }
+                    listener.onFailure("Read");
+                }
+                else{
+                    listener.onFailure("Error retrieving unread notifications.");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error retrieving unread notifications.");
+            }
+        });
+    }
+
+    public void changeUsername(final String oldUsername, final String newUsername, final OnGetDataListener listener){
+        //TODO Get user and create accout for the user.
     }
 }

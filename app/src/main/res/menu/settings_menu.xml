@@ -4,6 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".SettingsActivity">
     <item
+        android:id="@+id/badge"
+        android:title="Notifications"
+        android:actionLayout="@layout/feed_update_count"
+        android:icon="@drawable/notif_bell"
+        app:showAsAction="always">
+
+    </item>
+
+    <item
         android:id="@+id/changeDisplayName"
         android:title="Change Display Name"
         android:orderInCategory="101"

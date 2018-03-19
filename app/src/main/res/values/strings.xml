@@ -25,4 +25,5 @@
     <string name="enter_email">Enter Email</string>
     <string name="enter_phone">Enter Phone Number</string>
     <string name="change_username">Change Username</string>
+    <string name="notificationTitle">Notifications: </string>>
 </resources>

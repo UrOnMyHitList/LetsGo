@@ -14,11 +14,11 @@ import t.systematic.letsgo.AccountManagement.ChangeUsername;
 import t.systematic.letsgo.AccountManagement.LogInActivity;
 import t.systematic.letsgo.FriendActivities.FriendsManagerActivity;
 import t.systematic.letsgo.R;
+import t.systematic.letsgo.SettingsActivity;
 
-public class MeetingManagerActivity extends AppCompatActivity {
+public class MeetingManagerActivity extends SettingsActivity {
 
     private Intent intent;
-
     private float x1,x2,y1,y2;
     private ListView meetings_listView;
 
