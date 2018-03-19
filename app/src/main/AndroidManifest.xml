@@ -58,7 +58,10 @@
         <activity
             android:name=".AccountManagement.ForgotInfoActivity"
             android:parentActivityName=".AccountManagement.LogInActivity" />
-        <activity android:name=".NotificationActivities.NotificationActivity"></activity>
+        <activity
+            android:name=".NotificationActivities.NotificationActivity"
+            android:launchMode="singleTask"
+            android:parentActivityName=".MeetingActivities.MeetingManagerActivity"></activity>
     </application>
 
 </manifest>
