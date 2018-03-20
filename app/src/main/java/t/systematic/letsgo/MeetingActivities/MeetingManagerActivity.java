@@ -11,15 +11,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-
 import t.systematic.letsgo.FriendActivities.FriendsManagerActivity;
-import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
+import t.systematic.letsgo.SettingsActivity;
 
-public class MeetingManagerActivity extends AppCompatActivity {
+
+public class MeetingManagerActivity extends SettingsActivity {
 
     private ListView meetings_listView;
     private User user;

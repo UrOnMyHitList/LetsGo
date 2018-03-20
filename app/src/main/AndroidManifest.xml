@@ -10,8 +10,11 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
-
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
@@ -45,12 +48,23 @@
             android:name=".MeetingActivities.MapActivity"
             android:label="@string/title_activity_map" />
         <activity android:name=".MeetingActivities.MeetingManagerActivity" />
-        <activity android:name=".AccountManagement.ChangeAccountInfoActivity" />
+        <activity
+            android:name=".AccountManagement.ChangeAccountInfoActivity"
+            android:parentActivityName=".MeetingActivities.MeetingManagerActivity" />
         <activity android:name=".FriendActivities.FriendsManagerActivity" />
         <activity android:name=".ParentChildActivities.ParentChildManagerActivity" />
         <activity android:name=".MeetingActivities.ViewEditMeetingActivity" />
         <activity android:name=".AccountManagement.CreateAccountActivity" />
         <activity android:name=".MeetingActivities.ViewCalendarActivity" />
+        <activity
+            android:name=".AccountManagement.ForgotInfoActivity"
+            android:parentActivityName=".AccountManagement.LogInActivity" />
+        <activity
+            android:name=".NotificationActivities.NotificationActivity"
+            android:launchMode="singleTask"
+            android:parentActivityName=".MeetingActivities.MeetingManagerActivity"></activity>
+        <activity android:name=".AccountManagement.ChangeUsername"/>
+
     </application>
 
 </manifest>

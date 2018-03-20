@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
         String defaultValue = "";
         String username = sharedPref.getString("username", defaultValue);
 
+        //TODO commented out for debugging - Ivan
+
         if(!username.equals(defaultValue)){
             mUsername = username;
             DatabaseHelper.getInstance().getUserInfo(username, this);
@@ -129,9 +131,6 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
             });//Database
             completed++;
         }//Forloop
-
-
-
 
     }
 
