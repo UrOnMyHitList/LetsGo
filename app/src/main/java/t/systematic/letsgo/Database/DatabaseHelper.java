@@ -11,18 +11,22 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 import t.systematic.letsgo.Meeting.Meeting;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import t.systematic.letsgo.UserObject.User;
 
@@ -138,45 +142,20 @@ public class DatabaseHelper extends FragmentActivity{
     /**
      * Query will be used to get all the meetings of a user. Converts JSON meeting into a Meeting as detailed
      * in meetings class.
-     * @param allMeetingNames - all meetings of a user.
+     * @param meetingName - all meetings of a user.
      * @param listener - listener.
      */
-    public void getUserMeetings(final ArrayList<String> allMeetingNames, final OnGetDataListener listener){
-        final ArrayList<Meeting> allUserMeetings = new ArrayList<Meeting>();
-        final int numOfMeetings = allMeetingNames.size();
+    public void getUserMeetings(String meetingName, final OnGetDataListener listener){
 
         /* Pull all meetings in ArrayList from DB and convert into a Meeting object. */
-        for(int i = 0; i < numOfMeetings; i++){
-            ref.child("meetings").child(allMeetingNames.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
+            ref.child("meetings").child(meetingName).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-
                     if(dataSnapshot.exists()){
-                        String meetingName = dataSnapshot.child("meetingName").getValue().toString();
-                        String calendarValues = dataSnapshot.child("startTime").getValue().toString();
-
-                        /* Set date into Calendar object. */
-                        Calendar calendar = Calendar.getInstance();
-                        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
-                        try {
-                            calendar.setTime(sdf.parse(calendarValues));// all done
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-
-                        /* Set meeting params. */
-                        Location location = new Location("meetingLocation");
-                        location.setLongitude(Double.parseDouble(dataSnapshot.child("Long").getValue().toString()));
-                        location.setLatitude(Double.parseDouble(dataSnapshot.child("Lat").getValue().toString()));
-
-                        ArrayList<String> participants = new ArrayList<String>();
-                        for(DataSnapshot dbParticipants : dataSnapshot.child("participants").getChildren()){
-                            participants.add(dbParticipants.getValue().toString());
-                        }
-                        listener.onSuccess_initializeUserMeetings(new Meeting(meetingName, participants, calendar, location), numOfMeetings);
-                        //
-                    }else{
-                        listener.onFailure("Failed to pull user meetings from Firebase.");
+                        listener.onSuccess(dataSnapshot);
+                    }
+                    else{
+                        listener.onFailure("Error pulling user meetings.");
                     }
                 }
 
@@ -187,7 +166,7 @@ public class DatabaseHelper extends FragmentActivity{
             });
 
 
-        }
+
     }
 
     public void changePassword(final String username, final String newPassword, final OnGetDataListener listener) {
@@ -207,6 +186,40 @@ public class DatabaseHelper extends FragmentActivity{
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 listener.onFailure("Error changing password.");
+            }
+        });
+    }
+
+
+    public void createUpdateMeeting(String meetingId, double Lat, double Long, String admin, final String newMeetingName,
+        ArrayList<String> participants, String startTime, final OnGetDataListener listener){
+
+        /* If there is no oldMeetingName then we know we are going to create a new meeting. */
+        ref.child("meetings").child(meetingId).child("Lat").setValue(Lat);
+        ref.child("meetings").child(meetingId).child("Long").setValue(Long);
+        ref.child("meetings").child(meetingId).child("admin").setValue(admin);
+        ref.child("meetings").child(meetingId).child("meetingName").setValue(newMeetingName);
+        for(int i = 0; i < participants.size(); i++){
+            ref.child("meetings").child(meetingId).child("participants").child(Integer.toString(i)).setValue(participants.get(i));
+        }
+        ref.child("meetings").child(meetingId).child("startTime").setValue(startTime);
+
+
+        //Then in success will need to send the requests to other users.
+    }
+
+    public void addMeetingToUser(final String meetingId, final String username){
+        Query query = ref.child("users").child(username).child("meetings");
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String lastMeetingKey = Long.toString(dataSnapshot.getChildrenCount());
+                ref.child("users").child(username).child("meetings").child(lastMeetingKey).setValue(meetingId);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }

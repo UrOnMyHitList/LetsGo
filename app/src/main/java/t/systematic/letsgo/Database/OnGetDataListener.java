@@ -15,5 +15,4 @@ public interface OnGetDataListener {
     //this is for callbacks
     void onSuccess(DataSnapshot dataSnapshot);
     void onFailure(String failure);
-    void onSuccess_initializeUserMeetings(Meeting allMeetings, int lastMeeting);
 }

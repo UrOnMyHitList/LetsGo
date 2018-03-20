@@ -11,6 +11,7 @@ import com.google.firebase.database.DataSnapshot;
 
 import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.Database.OnGetDataListener;
+import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.SettingsActivity;
 

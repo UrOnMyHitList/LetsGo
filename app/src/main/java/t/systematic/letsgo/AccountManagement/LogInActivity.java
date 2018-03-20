@@ -92,9 +92,4 @@ public class LogInActivity extends AppCompatActivity implements OnGetDataListene
             Toast.makeText(this, "Error Logging in, Please try again later.", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onSuccess_initializeUserMeetings(Meeting meetings, int lastMeeting) {
-
-    }
-
 }

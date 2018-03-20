@@ -89,5 +89,8 @@ public class User implements Serializable{
         }
         return false;
     }
+    public void removeMeeting(Meeting meeting){
+        mMeetings.remove(meeting);
+    }
 
 }
