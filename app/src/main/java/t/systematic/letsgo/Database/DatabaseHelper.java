@@ -69,15 +69,36 @@ public class DatabaseHelper extends FragmentActivity{
     }
 
     public void createAccount(final User user, final String password, final OnGetDataListener listener){
-        String username = user.getUsername();
+        final String username = user.getUsername();
+        ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                //TODO onDataChange is not being called
 
+                if(dataSnapshot.exists()){
+                    if(dataSnapshot.getKey().equals(username)){
+                        listener.onFailure("The username is taken. Please choose a different username.");
+                    }
+                }
+                else{
+                    DatabaseReference user_ref = ref.child("users").child(username);
+                    //Add user and values to database
+                    user_ref.setValue(username);
+                    user_ref.child("email").setValue(user.getEmail_addr());
+                    user_ref.child("phone").setValue(user.getPhone_number());
+                    user_ref.child("password").setValue(password);
+                    user_ref.child("friends").child("0").setValue("null");
+                    user_ref.child("meetings").child("0").setValue("null");
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
 
-        //Add user and values to database
-        ref.child("users").child(username).setValue(username);
-        ref.child("users").child(username).child("email").setValue(user.getEmail_addr());
-        ref.child("users").child(username).child("phone").setValue(user.getPhone_number());
-        //TODO add password
-
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                listener.onFailure(null);
+            }
+        });
     }
 
     public void changePhoneNumber(final String username, final String number, final OnGetDataListener listener){
