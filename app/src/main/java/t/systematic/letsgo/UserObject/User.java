@@ -1,5 +1,6 @@
 package t.systematic.letsgo.UserObject;
 
+import android.util.Log;
 import android.widget.CalendarView;
 
 import java.io.Serializable;
@@ -29,8 +30,6 @@ public class User implements Serializable{
         email_addr = email;
         phone_number = phone;
     }
-
-
 
     /* Setters */
     public void setFriends(ArrayList<String> friends){ mFriends = friends; }
@@ -89,6 +88,9 @@ public class User implements Serializable{
             return true;
         }
         return false;
+    }
+    public void removeMeeting(Meeting meeting){
+        mMeetings.remove(meeting);
     }
 
 }

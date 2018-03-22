@@ -55,7 +55,7 @@
         <activity android:name=".ParentChildActivities.ParentChildManagerActivity" />
         <activity android:name=".MeetingActivities.ViewEditMeetingActivity" />
         <activity android:name=".AccountManagement.CreateAccountActivity" />
-
+        <activity android:name=".MeetingActivities.ViewCalendarActivity" />
         <activity
             android:name=".AccountManagement.ForgotInfoActivity"
             android:parentActivityName=".AccountManagement.LogInActivity" />
@@ -64,6 +64,7 @@
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity"></activity>
         <activity android:name=".AccountManagement.ChangeUsername"/>
+
     </application>
 
 </manifest>
