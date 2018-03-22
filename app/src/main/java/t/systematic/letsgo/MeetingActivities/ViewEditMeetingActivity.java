@@ -170,7 +170,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             public void onClick(View view) {
 
                 if(mode.equals("EDIT_TEXT_MODE")){
-                    Log.d("RETT", "DF");
                     if(isEmpty(date_editText.getText().toString())|| isEmpty(meetingName_editText.getText().toString()) || isEmpty(time_editText.getText().toString()) ||
                             isEmpty(destination_editText.getText().toString())){
                         Toast.makeText(getApplicationContext(), "*** All fields must be filled in ***", Toast.LENGTH_LONG).show();
@@ -241,16 +240,11 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 builder.setMultiChoiceItems(friends, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position, boolean isChecked) {
-                        SparseBooleanArray ck = ((AlertDialog)dialogInterface).getListView().getCheckedItemPositions();
-                        Log.d("HERE: " , "" + ((AlertDialog)dialogInterface).getListView().getCheckedItemPositions());
-
                         if(isChecked){
                             if(! mUserSelected.contains(position)){
-                                Log.d("MMM", "Adding: " + friends[position]);
                                 mUserSelected.add(position);
                             }
                         }else if (mUserSelected.contains(position)){
-                            Log.d("MMM", "Removing: " + friends[position]);
                             mUserSelected.remove(mUserSelected.indexOf(position));
                         }
 
@@ -266,7 +260,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                             item = item + friends[mUserSelected.get(i)];
                             participants.add(friends[mUserSelected.get(i)]);
                         }
-                        Log.d("BBB", item);
                         /* Set listView usingcustom adapter. */
                         participants_listView = (ListView)findViewById(R.id.participants_listView);
                         participants_listView.setAdapter(new MyListAdapter(ViewEditMeetingActivity.this, R.layout.textview_with_button, participants));
@@ -409,8 +402,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
 
     @Override
     public void onSuccess(DataSnapshot dataSnapshot) {
-        Long temp = dataSnapshot.getChildrenCount();
-        Log.d("TRANS", ""+temp.toString());
     }
 
     @Override
@@ -445,7 +436,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                         Toast.makeText(getContext(), "Removed: " + position, Toast.LENGTH_LONG).show();
 
                         String userID = ((TextView)finalConvertView.findViewById(R.id.list_textView)).getText().toString();
-                        Log.d("USERID", userID);
                         int index = Arrays.asList(friendsPrev).indexOf(userID);
 
                         /* Update variables used for add/remove friends dialog and listView*/

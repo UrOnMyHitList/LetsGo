@@ -4,19 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.CalendarView;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +22,6 @@ import t.systematic.letsgo.MeetingActivities.MeetingManagerActivity;
 import t.systematic.letsgo.UserObject.User;
 
 public class MainActivity extends AppCompatActivity implements  OnGetDataListener{
-    private DatabaseReference ref;
     private User user;
     private String mUsername;
 
@@ -40,12 +30,12 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /* Gets user name from SharedPreferences for auto-login. */
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.shared_preference), Context.MODE_PRIVATE);
         String defaultValue = "";
         String username = sharedPref.getString("username", defaultValue);
 
-        //TODO commented out for debugging - Ivan
-
+        /* If username is valid get all of user's info, else take user to login activity. */
         if(!username.equals(defaultValue)){
             mUsername = username;
             DatabaseHelper.getInstance().getUserInfo(username, this);
@@ -58,27 +48,23 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
 
     @Override
     public void onSuccess(DataSnapshot dataSnapshot) {
+        /* Initialize user. */
         user = new User(mUsername, new ArrayList<String>(), new ArrayList<Meeting>(), dataSnapshot.child("email").toString(),
                 dataSnapshot.child("phone").toString());
+
         /* Add user's friends. */
         for(DataSnapshot friend : dataSnapshot.child("friends").getChildren()){
             user.addFriend(friend.getValue().toString());
         }
 
-        ArrayList<String> allUserMeetings = new ArrayList<>();
+        /* Logic below is to pull all of the user's meetings's information. */
         final int numOfMeetings = (int)dataSnapshot.child("meetings").getChildrenCount() - 1;
         int completed = 0;
-        String key;
         for(DataSnapshot meetings : dataSnapshot.child("meetings").getChildren()){
-            key = meetings.getKey().toString();
-            Log.d("MEETINGKEY", ""+ meetings.getKey().toString());
             final int current = completed;
-
             DatabaseHelper.getInstance().getUserMeetings(meetings.getValue().toString(), new OnGetDataListener() {
                 @Override
                 public void onSuccess(DataSnapshot dataSnapshot) {
-
-                    Log.d("FUCKING", "" + dataSnapshot);
                     if(dataSnapshot.exists()){
                         String meetingName = dataSnapshot.child("meetingName").getValue().toString();
                         String calendarValues = dataSnapshot.child("startTime").getValue().toString();
@@ -92,46 +78,34 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
                             e.printStackTrace();
                         }
 
-                        /* Set meeting params. */
-                        Location location = new Location("meetingLocation");
-                        location.setLongitude(Double.parseDouble(dataSnapshot.child("Long").getValue().toString()));
-                        location.setLatitude(Double.parseDouble(dataSnapshot.child("Lat").getValue().toString()));
-
                         ArrayList<String> participants = new ArrayList<String>();
                         for(DataSnapshot dbParticipants : dataSnapshot.child("participants").getChildren()){
                             participants.add(dbParticipants.getValue().toString());
                         }
-                        Log.d("FU1", "Meeting: " + meetingName);
-                        user.addNewMeeting(new Meeting(meetingName, participants, calendar, location.getLatitude(),
-                                location.getLongitude(), dataSnapshot.getKey().toString(), admin));
-
-
+                        /* Adding a new meeting with info pulled from DB. */
+                        user.addNewMeeting(new Meeting(meetingName, participants, calendar,
+                                Double.parseDouble(dataSnapshot.child("Lat").getValue().toString()),
+                                Double.parseDouble(dataSnapshot.child("Long").getValue().toString()),
+                                dataSnapshot.getKey().toString(), admin));
                     }else{
                         Toast.makeText(getApplicationContext(), "Failed to pull user meetings.", Toast.LENGTH_LONG).show();
                     }
-                    Log.d("FU2", ""+ user.getNumberOfMeetings());
-                    Log.d("CURRENT", "CUR: " + current + " Num: " + numOfMeetings);
-
+                    /* Once we are done pulling all info from user go to MeetingManangerActivity. */
                     if(current == numOfMeetings){
-
                         Intent i = new Intent(MainActivity.this, MeetingManagerActivity.class);
                         i.putExtra("USER_OBJECT", user);
                         startActivity(i);
+                    } else{
+                        Toast.makeText(getApplicationContext(), "ERROR PULLING USER INFO.", Toast.LENGTH_LONG).show();
                     }
-
-
-
                 }
-
                 @Override
                 public void onFailure(String failure) {
-
+                    Toast.makeText(getApplicationContext(), "ERROR PULLING USER INFO.", Toast.LENGTH_LONG).show();
                 }
-
             });//Database
             completed++;
         }//Forloop
-
     }
 
     @Override
