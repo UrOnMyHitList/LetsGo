@@ -38,6 +38,8 @@ public class MeetingManagerActivity extends SettingsActivity {
         init_viewScheduledMeetingsButton();
         /* Add listener to Schedule Meeting button. */
         init_createNewMeetingButton();
+
+        init_viewActiveMeetingButton();
     }
 
     public boolean onTouchEvent(MotionEvent touchEvent){
@@ -72,6 +74,18 @@ public class MeetingManagerActivity extends SettingsActivity {
                 intent.putExtra("ACTIVITY_MODE", "TEXT_VIEW_MODE");
                 intent.putExtra("USER_OBJECT", user);
                 intent.putExtra("MEETING_NAME", (String)meetings_listView.getItemAtPosition(i));
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void init_viewActiveMeetingButton(){
+        Button button = (Button) findViewById(R.id.viewActiveMeetingButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
+              //  intent.putExtra("USER_OBJECT", user);
                 startActivity(intent);
             }
         });

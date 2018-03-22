@@ -78,7 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
     /**
      * This method checks both notifications for friend requests and meetings and chnages the icon on Action bar accordingly.
      * @param menu
