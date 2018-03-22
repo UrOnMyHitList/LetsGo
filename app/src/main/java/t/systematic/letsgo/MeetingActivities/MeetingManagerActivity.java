@@ -101,4 +101,8 @@ public class MeetingManagerActivity extends SettingsActivity {
             }
         });
     }
+
+    private void init_viewActiviteMeetingButton(){
+
+    }
 }
