@@ -1,5 +1,6 @@
 package t.systematic.letsgo.NotificationActivities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 
 import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.Database.OnGetDataListener;
+import t.systematic.letsgo.MainActivity;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.SettingsActivity;
 
@@ -58,5 +60,13 @@ public class NotificationActivity extends SettingsActivity {
 
 
 
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        finish();
+        Intent intent = new Intent(NotificationActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 }
