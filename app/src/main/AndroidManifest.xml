@@ -50,20 +50,21 @@
         <activity android:name=".MeetingActivities.MeetingManagerActivity" />
         <activity
             android:name=".AccountManagement.ChangeAccountInfoActivity"
-            android:parentActivityName=".MeetingActivities.MeetingManagerActivity" />
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".FriendActivities.FriendsManagerActivity" />
         <activity android:name=".ParentChildActivities.ParentChildManagerActivity" />
         <activity android:name=".MeetingActivities.ViewEditMeetingActivity" />
         <activity android:name=".AccountManagement.CreateAccountActivity" />
-
+        <activity android:name=".MeetingActivities.ViewCalendarActivity" />
         <activity
             android:name=".AccountManagement.ForgotInfoActivity"
             android:parentActivityName=".AccountManagement.LogInActivity" />
         <activity
             android:name=".NotificationActivities.NotificationActivity"
             android:launchMode="singleTask"
-            android:parentActivityName=".MeetingActivities.MeetingManagerActivity"></activity>
+            android:parentActivityName=".MainActivity"></activity>
         <activity android:name=".AccountManagement.ChangeUsername"/>
+
     </application>
 
 </manifest>
