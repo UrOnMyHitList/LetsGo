@@ -78,13 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void onBackPressed() {
-        finish();
-        Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
+    
     /**
      * This method checks both notifications for friend requests and meetings and chnages the icon on Action bar accordingly.
      * @param menu

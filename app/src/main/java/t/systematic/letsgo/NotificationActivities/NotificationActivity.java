@@ -61,12 +61,4 @@ public class NotificationActivity extends SettingsActivity {
 
 
     }
-
-    @Override
-    public void onBackPressed() {
-
-        finish();
-        Intent intent = new Intent(NotificationActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
 }
