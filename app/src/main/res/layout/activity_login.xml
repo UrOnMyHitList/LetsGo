@@ -3,12 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/background">
 
     <EditText
         android:id="@+id/userLoginEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColorHint="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/royalAway"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
@@ -21,7 +25,9 @@
         android:id="@+id/userPasswordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
+        android:textColorHint="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/royalAway"
         android:layout_alignStart="@+id/userLoginEditText"
         android:layout_below="@+id/userLoginEditText"
         android:layout_marginEnd="15dp"
@@ -45,7 +51,7 @@
             android:onClick="startForgotInfoActivity"
             android:background="@color/royalAway"
             android:layout_marginEnd="5dp"
-            android:textColor="#FFF"
+            android:textColor="@color/background"
             android:text="Forgot Password?" />
 
         <Button
@@ -56,8 +62,8 @@
             android:onClick="startForgotInfoActivity"
             android:background="@color/royalAway"
             android:layout_marginStart="5dp"
-            android:textColor="#FFF"
-            android:text="Forgot Username?" />
+            android:textColor="@color/background"
+            android:text="Forgot Login ID?" />
 
     </LinearLayout>
 
@@ -74,7 +80,7 @@
         android:background="@color/colorPrimary"
         android:onClick="validateLogin"
         android:text="Log In"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textColor="@color/background"
         android:textSize="18sp" />
 
     <Button
@@ -87,7 +93,7 @@
         android:layout_marginRight="15dp"
         android:onClick="sendToCreateAccActivity"
         android:background="@color/royalAway"
-        android:textColor="#FFF"
+        android:textColor="@color/background"
         android:text="Create Account" />
 
 

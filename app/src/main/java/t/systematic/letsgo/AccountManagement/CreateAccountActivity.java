@@ -37,7 +37,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnGetDat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
 
-        username = findViewById(R.id.createAccountUserName);
+        username = findViewById(R.id.createAccountLoginID);
         password = findViewById(R.id.createAccountEnterPassword);
         confirm_pw = findViewById(R.id.createAccountConfirmPassword);
         email = findViewById(R.id.createAccountEmail);

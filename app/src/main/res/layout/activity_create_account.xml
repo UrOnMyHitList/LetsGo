@@ -16,41 +16,42 @@ android:orientation="vertical">
         android:id="@+id/textView" />
 
     <EditText
-        android:id="@+id/createAccountUserName"
+        android:id="@+id/createAccountLoginID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/textView"
         android:layout_below="@+id/textView"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="@string/enter_username"
         android:inputType="textPersonName" />
 
-        <EditText
-            android:id="@+id/createAccountEmail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/createAccountConfirmPassword"
-            android:layout_below="@+id/createAccountConfirmPassword"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="15dp"
-            android:ems="10"
-            android:hint="@string/enter_email"
-            android:inputType="textEmailAddress" />
+    <EditText
+        android:id="@+id/createDisplayName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/createAccountLoginID"
+        android:layout_alignStart="@+id/createAccountLoginID"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="15dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="@string/enter_displayname" />
 
     <EditText
         android:id="@+id/createAccountEnterPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/createAccountUserName"
-        android:layout_below="@+id/createAccountUserName"
+        android:layout_alignStart="@+id/createAccountLoginID"
+        android:layout_below="@+id/createDisplayName"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="15dp"
         android:ems="10"
         android:hint="@string/enter_password"
         android:inputType="textPassword" />
+
 
     <EditText
         android:id="@+id/createAccountConfirmPassword"
@@ -64,17 +65,17 @@ android:orientation="vertical">
         android:hint="@string/confirm_password"
         android:inputType="textPassword" />
 
-    <Button
-        android:id="@+id/createAccountSubmitButton"
+    <EditText
+        android:id="@+id/createAccountEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerVertical="true"
-        android:layout_margin="15dp"
-        android:background="@color/colorPrimary"
-        android:onClick="createAccount"
-        android:text="@string/create_account"
-        android:textColor="#FFFFFF" />
+        android:layout_alignStart="@+id/createAccountConfirmPassword"
+        android:layout_below="@+id/createAccountConfirmPassword"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="15dp"
+        android:ems="10"
+        android:hint="@string/enter_email"
+        android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/enterPhone"
@@ -86,4 +87,20 @@ android:orientation="vertical">
         android:ems="10"
         android:inputType="phone"
         android:hint="@string/enter_phone" />
+
+
+    <Button
+        android:id="@+id/createAccountSubmitButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="15dp"
+        android:background="@color/colorPrimary"
+        android:onClick="createAccount"
+        android:text="@string/create_account"
+        android:textColor="@color/background" />
+
+
+
 </RelativeLayout>
