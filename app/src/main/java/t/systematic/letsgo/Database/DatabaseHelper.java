@@ -108,7 +108,6 @@ public class DatabaseHelper extends FragmentActivity{
         ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //TODO onDataChange is not being called
 
                 if(dataSnapshot.exists()){
                     if(dataSnapshot.getKey().equals(username)){
@@ -124,6 +123,7 @@ public class DatabaseHelper extends FragmentActivity{
                     user_ref.child("password").setValue(password);
                     user_ref.child("friends").child("0").setValue("null");
                     user_ref.child("meetings").child("0").setValue("null");
+                    user_ref.child("notifications").child("null").child("type").setValue("null");
                     listener.onSuccess(dataSnapshot);
                 }
             }
@@ -173,7 +173,7 @@ public class DatabaseHelper extends FragmentActivity{
                 if (dataSnapshot.exists()) {
                     listener.onSuccess(dataSnapshot);
                 } else {
-                    listener.onFailure("Error pulling user meetings.");
+                    listener.onFailure("Error pulling user meetings. Snapshot does not exist.");
                 }
             }
 
@@ -340,9 +340,11 @@ public class DatabaseHelper extends FragmentActivity{
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                        if((snapshot.child("read").getValue(String.class)).toString().equals("N")){
-                            listener.onSuccess(dataSnapshot);
-                            return;
+                        if(!snapshot.child("type").getValue().toString().equals("null")){
+                            if((snapshot.child("read").getValue()).toString().equals("N")){
+                                listener.onSuccess(dataSnapshot);
+                                return;
+                            }
                         }
                     }
                     listener.onFailure("Read");

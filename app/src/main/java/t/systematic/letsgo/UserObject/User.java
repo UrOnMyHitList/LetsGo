@@ -49,6 +49,11 @@ public class User implements Serializable{
         }
         return meetingNames;
     }
+
+    public boolean hasMeetings(){
+        return !mMeetings.isEmpty();
+    }
+
     public Meeting getMeeting(String meetingName){
         for(int i = 0; i < mMeetings.size(); i++){
             if(mMeetings.get(i).getMeetingName().equals(meetingName)){

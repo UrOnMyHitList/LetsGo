@@ -78,7 +78,8 @@ public class CreateAccountActivity extends AppCompatActivity implements OnGetDat
                     new ArrayList<String>(),
                     new ArrayList<Meeting>(),
                     email.getText().toString(),
-                    phone.getText().toString());
+                    phone.getText().toString()
+            );
 
             //TODO decide if to user input for phone number or use the phone iteself
 

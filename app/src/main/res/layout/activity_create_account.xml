@@ -23,29 +23,17 @@ android:orientation="vertical">
         android:layout_below="@+id/textView"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:ems="10"
         android:hint="@string/enter_username"
         android:inputType="textPersonName" />
-
-    <EditText
-        android:id="@+id/createDisplayName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/createAccountLoginID"
-        android:layout_alignStart="@+id/createAccountLoginID"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="15dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="@string/enter_displayname" />
 
     <EditText
         android:id="@+id/createAccountEnterPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/createAccountLoginID"
-        android:layout_below="@+id/createDisplayName"
+        android:layout_below="@+id/createAccountLoginID"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="15dp"
         android:ems="10"

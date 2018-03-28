@@ -13,13 +13,19 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.Database.OnGetDataListener;
+import t.systematic.letsgo.MainActivity;
 import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.MeetingActivities.MeetingManagerActivity;
 import t.systematic.letsgo.R;
+import t.systematic.letsgo.UserObject.User;
 
 /**
  * Created by Ivan on 2/8/18.
@@ -73,16 +79,70 @@ public class LogInActivity extends AppCompatActivity implements OnGetDataListene
 
     @Override
     public void onSuccess(DataSnapshot dataSnapshot) {
-        //Toast.makeText(getApplicationContext(), "Logging in", Toast.LENGTH_LONG).show();
+
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.shared_preference), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("username", username.getText().toString());
         editor.commit();
 
-        Intent goToMainMenu = new Intent(LogInActivity.this, MeetingManagerActivity.class);
-        goToMainMenu.putExtra("username", username.getText().toString());
-        LogInActivity.this.startActivity(goToMainMenu);
-        finish();
+        final User user = new User(dataSnapshot.getKey(), new ArrayList<String>(), new ArrayList<Meeting>(), dataSnapshot.child("email").toString(),
+                dataSnapshot.child("phone").toString());
+
+        /* Add user's friends. */
+        for(DataSnapshot friend : dataSnapshot.child("friends").getChildren()){
+            user.addFriend(friend.getValue().toString());
+        }
+
+        /* Logic below is to pull all of the user's meetings's information. */
+        final int numOfMeetings = (int)dataSnapshot.child("meetings").getChildrenCount() - 1;
+        int completed = 0;
+        for(DataSnapshot meetings : dataSnapshot.child("meetings").getChildren()){
+            final int current = completed;
+            DatabaseHelper.getInstance().getUserMeetings(meetings.getValue().toString(), new OnGetDataListener() {
+                @Override
+                public void onSuccess(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        String meetingName = dataSnapshot.child("meetingName").getValue().toString();
+                        String calendarValues = dataSnapshot.child("startTime").getValue().toString();
+                        String admin = dataSnapshot.child("admin").getValue().toString();
+                        /* Set date into Calendar object. */
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+                        try {
+                            calendar.setTime(sdf.parse(calendarValues));// all done
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        ArrayList<String> participants = new ArrayList<String>();
+                        for(DataSnapshot dbParticipants : dataSnapshot.child("participants").getChildren()){
+                            participants.add(dbParticipants.getValue().toString());
+                        }
+                        /* Adding a new meeting with info pulled from DB. */
+                        user.addNewMeeting(new Meeting(meetingName, participants, calendar,
+                                Double.parseDouble(dataSnapshot.child("Lat").getValue().toString()),
+                                Double.parseDouble(dataSnapshot.child("Long").getValue().toString()),
+                                dataSnapshot.getKey(), admin));
+                    }else{
+                        Toast.makeText(getApplicationContext(), "Failed to pull user meetings.", Toast.LENGTH_LONG).show();
+                    }
+                    /* Once we are done pulling all info from user go to MeetingManangerActivity. */
+                    if(current == numOfMeetings){
+                        Intent i = new Intent(LogInActivity.this, MeetingManagerActivity.class);
+                        i.putExtra("USER_OBJECT", user);
+                        startActivity(i);
+                    }
+                }
+                @Override
+                public void onFailure(String failure) {
+                    //TODO: onFailure - go to MeetingsManagerActivity with no meetings for the user
+                    Intent i = new Intent(LogInActivity.this, MeetingManagerActivity.class);
+                    i.putExtra("USER_OBJECT", user);
+                    startActivity(i);
+                }
+            });//Database
+            completed++;
+        }//Forloop
     }
 
     @Override
