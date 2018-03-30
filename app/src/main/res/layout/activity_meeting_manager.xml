@@ -23,12 +23,12 @@
     <ListView
         android:id="@+id/upComingMeetingListView"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/upComingTextView"
+        android:layout_above="@id/linearLayout"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
-
         android:scrollbarAlwaysDrawVerticalTrack="true" />
 
     <LinearLayout

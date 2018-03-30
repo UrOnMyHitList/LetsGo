@@ -48,6 +48,7 @@
         android:ems="10"
         android:hint="@string/forgot_username_text"
         android:textColorHint="@color/colorAccent"
+        android:textColor="@color/royalAway"
         android:inputType="textEmailAddress"
         android:layout_below="@id/ForgotLoginTextView"
         android:visibility="invisible"
