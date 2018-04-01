@@ -170,12 +170,15 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             public void onClick(View view) {
 
                 if(mode.equals("EDIT_TEXT_MODE")){
+                    Log.d("LLL", "IN EDIT");
                     if(isEmpty(date_editText.getText().toString())|| isEmpty(meetingName_editText.getText().toString()) || isEmpty(time_editText.getText().toString()) ||
                             isEmpty(destination_editText.getText().toString())){
                         Toast.makeText(getApplicationContext(), "*** All fields must be filled in ***", Toast.LENGTH_LONG).show();
                         return;
                     }
                 } else if(mode.equals("TEXT_VIEW_MODE")){
+                    Log.d("L2", "IN TEXT");
+                    Log.d("L2", "" + meetingName_textView.getText().toString());
                     if(isEmpty(date_textView.getText().toString())|| isEmpty(meetingName_textView.getText().toString()) ||
                             isEmpty(time_textView.getText().toString()) || isEmpty(destination_textView.getText().toString())){
                         Toast.makeText(getApplicationContext(), "*** All fields must be filled in ***", Toast.LENGTH_LONG).show();
@@ -205,10 +208,18 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 calendar.set(Calendar.HOUR_OF_DAY, 3);
                 calendar.set(Calendar.MINUTE, 42);
 
-                DatabaseHelper.getInstance().createUpdateMeeting(meetingId, 43.0, 34.0,user.getUsername(), meetingName_editText.getText().toString(),
+
+                String meetingName = "ERROR GETTING MEETING NAME";
+                if(mode.equals("EDIT_TEXT_MODE")){
+                    meetingName = meetingName_editText.getText().toString();
+                } else if(mode.equals("TEXT_VIEW_MODE")){
+                    meetingName = meetingName_textView.getText().toString();
+                }
+
+                DatabaseHelper.getInstance().createUpdateMeeting(meetingId, 43.0, 34.0,user.getUsername(), meetingName,
                         participants, "FIGURE OUT HOW WE ARE GOING TO DETECT WHEN MEETING IS SET TO ACTIVE", ViewEditMeetingActivity.this);
 
-                Meeting modMeeting = new Meeting(meetingName_editText.getText().toString(), participants, calendar, 43.0, 32.0, meetingId, user.getUsername() );
+                Meeting modMeeting = new Meeting(meetingName, participants, calendar, 43.0, 32.0, meetingId, user.getUsername() );
                 if(meeting == null){
                     DatabaseHelper.getInstance().addMeetingToUser(meetingId, user.getUsername());
                 }
@@ -219,6 +230,8 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 }
                 user.addNewMeeting(modMeeting);
 
+                Log.d("MEETINGNAME", meetingName_editText.getText().toString());
+                Log.d("MEETINGNAME", modMeeting.getMeetingName());
                 Intent i = new Intent(ViewEditMeetingActivity.this, MeetingManagerActivity.class);
                 i.putExtra("USER_OBJECT", user);
                 startActivity(i);
@@ -289,9 +302,12 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     }
 
     private void init_TextViewMode(Intent intent){
-        init_editAndTextViewListeners();
         originalMeetingName = intent.getStringExtra("MEETING_NAME");
         meeting = user.getMeeting(originalMeetingName);
+
+        if(meeting.getMeetingName().equals(user.getUsername())){
+            init_editAndTextViewListeners();
+        }
 
         /* 0 - day of week, 1 - month, 2 - day, 3 - military time, 4 - time zone, 5 - year */
         String[] splitCalendarVal = meeting.getDateTime().getTime().toString().split(" ");

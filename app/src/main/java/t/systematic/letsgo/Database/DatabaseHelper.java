@@ -268,11 +268,17 @@ public class DatabaseHelper extends FragmentActivity{
     }
 
     public void addMeetingToUser(final String meetingId, final String username){
+
+
+
         Query query = ref.child("users").child(username).child("meetings");
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String lastMeetingKey = Long.toString(dataSnapshot.getChildrenCount());
+                if(dataSnapshot.child("0").getValue().equals("null")){
+                    lastMeetingKey = "0";
+                }
                 ref.child("users").child(username).child("meetings").child(lastMeetingKey).setValue(meetingId);
             }
             @Override

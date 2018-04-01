@@ -63,10 +63,17 @@ public class MeetingManagerActivity extends SettingsActivity {
     }
 
     private void init_listView(ArrayList<String> meetingNames){
+        if(meetingNames.size() == 0){
+            meetingNames.add("No meetings scheduled!");
+        }
         meetings_listView = (ListView)findViewById(R.id.upComingMeetingListView);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 R.layout.up_coming_meeting_list, R.id.singleMeetingRow, meetingNames);
         meetings_listView.setAdapter(adapter);
+
+        if(meetingNames.get(0).equals("No meetings scheduled!")){
+            return;
+        }
         meetings_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -85,7 +92,7 @@ public class MeetingManagerActivity extends SettingsActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
-              //  intent.putExtra("USER_OBJECT", user);
+                //  intent.putExtra("USER_OBJECT", user);
                 startActivity(intent);
             }
         });
@@ -116,7 +123,4 @@ public class MeetingManagerActivity extends SettingsActivity {
         });
     }
 
-    private void init_viewActiviteMeetingButton(){
-
-    }
 }
