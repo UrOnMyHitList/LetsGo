@@ -1,6 +1,7 @@
 package t.systematic.letsgo.MeetingActivities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
@@ -68,6 +70,7 @@ public class ViewCalendarActivity extends AppCompatActivity {
      */
     private void init_calendarView(){
         CalendarView calendarView = (CalendarView)findViewById(R.id.calendarView);
+
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int dayOfMonth) {

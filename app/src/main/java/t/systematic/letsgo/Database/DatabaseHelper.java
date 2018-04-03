@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -268,11 +269,17 @@ public class DatabaseHelper extends FragmentActivity{
     }
 
     public void addMeetingToUser(final String meetingId, final String username){
+
+
+
         Query query = ref.child("users").child(username).child("meetings");
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String lastMeetingKey = Long.toString(dataSnapshot.getChildrenCount());
+                if(dataSnapshot.child("0").getValue().equals("null")){
+                    lastMeetingKey = "0";
+                }
                 ref.child("users").child(username).child("meetings").child(lastMeetingKey).setValue(meetingId);
             }
             @Override
@@ -356,6 +363,36 @@ public class DatabaseHelper extends FragmentActivity{
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    public void getUserLocation(String username, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("latlng");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                listener.onSuccess(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void addOnDataChangeListenerToUserlatlng(String username, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("latlng");
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                listener.onSuccess(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }

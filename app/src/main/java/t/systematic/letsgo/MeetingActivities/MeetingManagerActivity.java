@@ -1,5 +1,6 @@
 package t.systematic.letsgo.MeetingActivities;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+
 import java.util.ArrayList;
 import t.systematic.letsgo.FriendActivities.FriendsManagerActivity;
 import t.systematic.letsgo.R;
@@ -69,10 +74,17 @@ public class MeetingManagerActivity extends SettingsActivity {
     }
 
     private void init_listView(ArrayList<String> meetingNames){
+        if(meetingNames.size() == 0){
+            meetingNames.add("No meetings scheduled!");
+        }
         meetings_listView = (ListView)findViewById(R.id.upComingMeetingListView);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 R.layout.up_coming_meeting_list, R.id.singleMeetingRow, meetingNames);
         meetings_listView.setAdapter(adapter);
+
+        if(meetingNames.get(0).equals("No meetings scheduled!")){
+            return;
+        }
         meetings_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -91,7 +103,8 @@ public class MeetingManagerActivity extends SettingsActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
-              //  intent.putExtra("USER_OBJECT", user);
+                intent.putExtra("USER_OBJECT", user);
+                intent.putExtra("MEETING_NAME", "Demo");
                 startActivity(intent);
             }
         });
@@ -114,11 +127,40 @@ public class MeetingManagerActivity extends SettingsActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MeetingManagerActivity.this, ViewEditMeetingActivity.class);
-                intent.putExtra("ACTIVITY_MODE", "EDIT_TEXT_MODE");
-                intent.putExtra("USER_OBJECT", user);
-                startActivity(intent);
+                if(isServicesOK()){
+                    Intent intent = new Intent(MeetingManagerActivity.this, ViewEditMeetingActivity.class);
+                    intent.putExtra("ACTIVITY_MODE", "EDIT_TEXT_MODE");
+                    intent.putExtra("USER_OBJECT", user);
+                    startActivity(intent);
+                }
+
             }
         });
     }
+
+
+    /*    GOOGLE SERVICES CHECKS    */
+    private static final String TAG = "MeetingManagerActivity";
+    private static final int ERROR_DAILOG_REQUEST = 9001;
+
+    public boolean isServicesOK(){
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MeetingManagerActivity.this);
+        if(available == ConnectionResult.SUCCESS){
+            //Everything is fine and user can make map requests.
+            Log.d(TAG, "Connection was available for Google API.");
+            return true;
+        }else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            //Error occured but user can fix it.
+            Log.d(TAG, "Google API error, dialog invoked.");
+            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MeetingManagerActivity.this, available, ERROR_DAILOG_REQUEST);
+            dialog.show();
+        } else {
+            //Failure, nothing we can do.
+            Log.d(TAG, "Google API failure.");
+            Toast.makeText(this, "ERROR: MAP REQUESTS FAILURE", Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }
+
+
 }
