@@ -61,7 +61,7 @@ public class CustomNotificationAdapter extends BaseAdapter implements ListAdapte
         if(list.get(position).getNotifType().equals("friendRequest")) {
             listItemText.setText(list.get(position).getRequestor() + " wants to\nadd you as a friend!");
         }
-        else{
+        else if (list.get(position).getNotifType().equals("meetingRequest")){
             listItemText.setText(list.get(position).getRequestor() + " wants to\nadd you to a meeting!");
         }
 

@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
     <color name="colorPrimary">#B64926</color>
     <color name="colorPrimaryDark">#FFB03B</color>
     <color name="colorAccent">#8E2800</color>
     <color name="royalHome">#FFF0A5</color>
     <color name="royalAway">#468966</color>
+    <color name="background">#FFF8ED</color>
 </resources>
+
 <!--
+<resources>
+    <color name="colorPrimary">#1695A3</color>
+    <color name="colorPrimaryDark">#EB7F00</color>
+    <color name="colorAccent">#ACF0F2</color>
+    <color name="royalHome">#F3FFE2</color>
+    <color name="royalAway">#225378</color>
+</resources>
 <resources>
     <color name="colorPrimary">#1e90ff</color>
     <color name="colorPrimaryDark">#1f2e42</color>

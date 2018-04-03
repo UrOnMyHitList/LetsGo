@@ -32,13 +32,19 @@ public class MeetingManagerActivity extends SettingsActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting_manager);
-        Toast.makeText(getApplicationContext(), "Meeting Manager Activity", Toast.LENGTH_LONG).show();
 
         Intent intent = getIntent();
         user = (User)intent.getSerializableExtra("USER_OBJECT");
+        if(user == null){
+            System.out.print("Nothing passed");
+        }
 
         /* Get name of meetings to display in listView. */
-        init_listView(user.getAllMeetingNames());
+        if (user.hasMeetings())
+            init_listView(user.getAllMeetingNames());
+        else{
+            //TODO: write "No Meetings Scheduled" to listView
+        }
         /* Add listener to Scheduled Meeting button. */
         init_viewScheduledMeetingsButton();
         /* Add listener to Schedule Meeting button. */

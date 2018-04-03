@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import t.systematic.letsgo.MeetingActivities.MeetingManagerActivity;
@@ -18,6 +19,14 @@ public class FriendsManagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_manager);
         Toast.makeText(getApplicationContext(), "Friends Manager Activity", Toast.LENGTH_LONG).show();
+    }
+
+    public void addFriendButtonClicked(View view){
+
+    }
+
+    public void removeFriendButtonClicked(View view){
+
     }
 
     public boolean onTouchEvent(MotionEvent touchEvent){
