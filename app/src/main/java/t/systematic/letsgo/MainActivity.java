@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
                 }
                 @Override
                 public void onFailure(String failure) {
-                    
+
                 }
             });//Database
             completed++;
