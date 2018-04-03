@@ -78,6 +78,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         getLocationPermission();
+        getDeviceLocation();
         //Time is in milliseconds, distance in meters.
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -89,7 +90,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             pullUserLatlngFromDB(participants.get(i));
         }
 
-        //getDeviceLocation();
+       // getDeviceLocation();
     }
 
     private void pullUserLatlngFromDB(final String username){
@@ -146,7 +147,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
-        int padding = 100;
+        int padding = 70;
+        Log.d("NUMBEROFUSERS", "" + hashMapMarkers.size());
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         mMap.moveCamera(cu);
     }
@@ -220,6 +222,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
+            Log.d("SETTINGLOCATION", "DF");
             mMap.setMyLocationEnabled(true);
 
         }
@@ -285,7 +288,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(username));
         hashMapMarkers.put(username, marker);
-        marker.showInfoWindow();
         moveCamera(new LatLng(latitude, longitude), 14f);
         Log.d("ADDUSERMARKER", username + " " + latitude.toString() + " " + longitude.toString());
     }
@@ -293,17 +295,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
-        mMap.clear();
         Double lat, lng;
         lat = location.getLatitude();
         lng = location.getLongitude();
         user.setLocation(lat, lng);
 
         LatLng userLoc = user.getLatLng();
-        mMap.addMarker(new MarkerOptions().position(userLoc).title("Your position")).showInfoWindow();
 
 
-        moveCamera(userLoc, 14);
+
     }
 
     @Override
