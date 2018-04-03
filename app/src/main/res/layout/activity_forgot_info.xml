@@ -1,54 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context="t.systematic.letsgo.AccountManagement.ForgotInfoActivity">
-
-    <EditText
-        android:id="@+id/enterInfoBox"
-        android:layout_width="0dp"
-        android:layout_height="46dp"
-        android:layout_marginTop="32dp"
-        android:ems="10"
-        android:hint="@string/forgot_password_text"
-        android:inputType="textPersonName"
-        android:visibility="invisible"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ForgotLoginTextView" />
 
     <TextView
         android:id="@+id/ForgotLoginTextView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="48dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/royalAway"
+        />
+
+    <EditText
+        android:id="@+id/enterInfoBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:hint="@string/forgot_password_text"
+        android:textColorHint="@color/colorAccent"
+        android:textColor="@color/royalAway"
+        android:inputType="textPersonName"
+        android:layout_below="@id/ForgotLoginTextView"
+        android:visibility="invisible"
+        />
+
+
 
     <EditText
         android:id="@+id/enterEmailBox"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="30dp"
         android:ems="10"
         android:hint="@string/forgot_username_text"
+        android:textColorHint="@color/colorAccent"
+        android:textColor="@color/royalAway"
         android:inputType="textEmailAddress"
+        android:layout_below="@id/ForgotLoginTextView"
         android:visibility="invisible"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ForgotLoginTextView" />
+        />
 
     <Button
         android:id="@+id/forgotLoginButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:textColor="#FFF"
+        android:textSize="18sp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="80dp"
+        android:layout_alignParentBottom="true"
         android:text="@string/submit_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        />
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

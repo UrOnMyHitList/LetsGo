@@ -52,7 +52,7 @@ public class ChangeUsername extends AppCompatActivity implements OnGetDataListen
 
     @Override
     public void onSuccess(DataSnapshot dataSnapshot) {
-        String s = "Username is available!";
+        String s = "Display Name is available!";
         message.setText(s);
 
     }

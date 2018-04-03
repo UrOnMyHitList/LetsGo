@@ -35,7 +35,12 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
         String defaultValue = "";
         String username = sharedPref.getString("username", defaultValue);
 
-        /* If username is valid get all of user's info, else take user to login activity. */
+        //TODO remove when committing
+        //Intent i = new Intent(MainActivity.this, LogInActivity.class);
+        //startActivity(i);
+        //TODO reimplement after bug fixing
+
+        //If username is valid get all of user's info, else take user to login activity.
         if(!username.equals(defaultValue)){
             mUsername = username;
             DatabaseHelper.getInstance().getUserInfo(username, this);
@@ -44,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
             Intent i = new Intent(MainActivity.this, LogInActivity.class);
             startActivity(i);
         }
+
+
     }
 
     @Override
@@ -95,13 +102,14 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
                         Intent i = new Intent(MainActivity.this, MeetingManagerActivity.class);
                         i.putExtra("USER_OBJECT", user);
                         startActivity(i);
-                    } else{
-                        Toast.makeText(getApplicationContext(), "ERROR PULLING USER INFO.", Toast.LENGTH_LONG).show();
                     }
                 }
                 @Override
                 public void onFailure(String failure) {
-                    Toast.makeText(getApplicationContext(), "ERROR PULLING USER INFO.", Toast.LENGTH_LONG).show();
+                    //TODO: onFailure - go to MeetingsManagerActivity with no meetings for the user
+                    Intent i = new Intent(MainActivity.this, MeetingManagerActivity.class);
+                    i.putExtra("USER_OBJECT", user);
+                    startActivity(i);
                 }
             });//Database
             completed++;

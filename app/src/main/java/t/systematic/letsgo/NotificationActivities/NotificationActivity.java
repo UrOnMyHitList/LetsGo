@@ -34,12 +34,15 @@ public class NotificationActivity extends SettingsActivity {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    if(snapshot.child("reply").getValue(String.class).toString().equals("N")){
-                        list.add(new Notification(snapshot.child("requestor").getValue(String.class).toString(),
-                                                          snapshot.child("type").getValue(String.class).toString(),
-                                                          snapshot.getKey().toString(),
-                                                          snapshot.child("read").getValue(String.class).toString(),
-                                                          snapshot.child("reply").getValue(String.class).toString()));
+
+                    if(!snapshot.child("type").getValue().toString().equals("null")){
+                        if(snapshot.child("reply").getValue(String.class).toString().equals("N")){
+                            list.add(new Notification(snapshot.child("requestor").getValue(String.class).toString(),
+                                    snapshot.child("type").getValue(String.class).toString(),
+                                    snapshot.getKey().toString(),
+                                    snapshot.child("read").getValue(String.class).toString(),
+                                    snapshot.child("reply").getValue(String.class).toString()));
+                        }
                     }
                 }
                 //Toast.makeText(this, ""+list.size(), Toast.LENGTH_SHORT).show();
