@@ -3,35 +3,37 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/background">
 
     <EditText
         android:id="@+id/userLoginEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColorHint="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/royalAway"
         android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="35dp"
         android:ems="10"
         android:hint="@string/enter_username"
-        android:inputType="textPersonName"
-        android:textColorHighlight="#1E90FF"
-        android:textColorLink="#1E90FF" />
+        android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/userPasswordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
+        android:textColorHint="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/royalAway"
         android:layout_alignStart="@+id/userLoginEditText"
         android:layout_below="@+id/userLoginEditText"
         android:layout_marginEnd="15dp"
         android:hint="@string/enter_password"
         android:inputType="textPassword"
-        android:singleLine="true"
-        android:textColorHighlight="#1E90FF"
-        android:textColorLink="#1E90FF" />
+        android:singleLine="true" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,6 +41,7 @@
         android:layout_alignStart="@id/loginButton"
         android:layout_alignEnd="@id/loginButton"
         android:layout_above="@id/createAccountButton"
+        android:layout_marginBottom="10dp"
         android:id="@+id/linearLayout">
         <Button
             android:id="@+id/forgotPasswordButton"
@@ -46,6 +49,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="startForgotInfoActivity"
+            android:background="@color/royalAway"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/background"
             android:text="Forgot Password?" />
 
         <Button
@@ -54,7 +60,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="startForgotInfoActivity"
-            android:text="Forgot Username?" />
+            android:background="@color/royalAway"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/background"
+            android:text="Forgot Login ID?" />
 
     </LinearLayout>
 
@@ -71,8 +80,8 @@
         android:background="@color/colorPrimary"
         android:onClick="validateLogin"
         android:text="Log In"
-        android:textColor="@color/common_google_signin_btn_text_dark_default"
-        android:textSize="18dp" />
+        android:textColor="@color/background"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/createAccountButton"
@@ -83,6 +92,8 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:onClick="sendToCreateAccActivity"
+        android:background="@color/royalAway"
+        android:textColor="@color/background"
         android:text="Create Account" />
 
 

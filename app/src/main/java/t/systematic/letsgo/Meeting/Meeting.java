@@ -3,6 +3,7 @@ package t.systematic.letsgo.Meeting;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -17,41 +18,50 @@ import t.systematic.letsgo.UserObject.User;
  */
 
 public class Meeting implements Comparable<Meeting>, Serializable{
-
+    /* Unique ID of meeting. */
+    private final String mMeetingId;
     /* Name of the meeting given by Admin of meeting.*/
     private final String mMeetingName;
-
+    /* All users in the meeting. */
     private ArrayList<String> mParticipants;
-    /* We can do something like the top answer below to hold the date and time.
-    *  We can separate them with a character like _ to parse when we only need one.
-    *
-    *  https://stackoverflow.com/questions/36257085/set-date-and-desired-time-in-android
-    */
+    /* Date info of when meeting is scheduled to take place.*/
     private Calendar mDateTime;
     /* Don't remember which exactly was best, can change dataType once we get there. */
-    private transient Location mLocation;
+    private Double mLat, mLong;
     /* The user name of */
-    private String admin;
+    private String mAdmin;
 
     /* Constructor  */
     public Meeting(String meetingName, ArrayList<String> participants, Calendar dateTime,
-                    Location location){
+                    Double Lat, Double Long, String meetingId, String admin){
         mMeetingName = meetingName;
         mParticipants = participants;
         mDateTime = dateTime;
-        mLocation = location;
+        mLat = Lat;
+        mLong = Long;
+        mMeetingId = meetingId;
+        mAdmin = admin;
     }
 
     /* Setters */
     public void setParticipants(ArrayList<String> participants){ mParticipants = participants; }
     public void setDateTime(Calendar dateTime){ mDateTime = dateTime; }
-    public void setLocation(Location location){ mLocation = location; }
+    public void setLocation(Location location){ mLong = location.getLongitude(); mLat = location.getLatitude(); }
 
     /* Getters*/
     public ArrayList<String> getParticipants(){ return mParticipants; }
     public Calendar getDateTime() { return mDateTime; }
-    public Location getLocation() { return mLocation; }
+    public Double getLong() { return mLong; }
+    public Double getLat() { return mLat; }
     public String getMeetingName() { return mMeetingName; }
+    public String getMeetingId() { return mMeetingId; }
+    public String getAdmin() { return mAdmin; }
+    public Location getLocation() {
+        Location loc = new Location("MEETING_LOC");
+        loc.setLatitude(mLat);
+        loc.setLongitude(mLong);
+        return loc;
+    }
 
     /* Functions */
     public int numberOfUsersInMeeting(){
