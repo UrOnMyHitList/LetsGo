@@ -62,6 +62,9 @@ public class Meeting implements Comparable<Meeting>, Serializable{
         loc.setLongitude(mLong);
         return loc;
     }
+    public LatLng getLatLng(){
+        return new LatLng(mLat, mLong);
+    }
 
     /* Functions */
     public int numberOfUsersInMeeting(){

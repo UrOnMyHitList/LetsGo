@@ -4,10 +4,12 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -28,20 +30,33 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.Database.OnGetDataListener;
 import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
+import t.systematic.letsgo.Utils.DirectionsParser;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
@@ -69,22 +84,29 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
 
+
+        //TODO add logic in the case that the user is not the admin but instead a participant.
         Intent intent = getIntent();
         user = (User) intent.getSerializableExtra("USER_OBJECT");
         String meetingName = (String) intent.getSerializableExtra("MEETING_NAME");
-
         mMeeting = user.getMeeting(meetingName);
         participants = mMeeting.getParticipants();
 
+        /* In the case the user is not admin, remove user from 'participants' and add admin. */
+        if(!mMeeting.getAdmin().equals(user.getUsername())){
+            participants.remove(user.getUsername());
+            participants.add(mMeeting.getAdmin());
+        }
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         getLocationPermission();
-        getDeviceLocation();
-        //Time is in milliseconds, distance in meters.
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             return;
         }
+        /* Time is in milliseconds, distance in meters. */
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 20, (android.location.LocationListener) this);
-
         for(int i = 0; i < participants.size(); i++){
             initParticipantsLocationOnDataChangeListeners(participants.get(i));
             pullUserLatlngFromDB(participants.get(i));
@@ -93,20 +115,26 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
        // getDeviceLocation();
     }
 
+    private void displayUserRoute(LatLng latLng){
+        String url = getRequestUrl(latLng, mMeeting.getLatLng());
+        TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
+        taskRequestDirections.execute(url);
+    }
+
     private void pullUserLatlngFromDB(final String username){
         DatabaseHelper.getInstance().getUserLocation(username, new OnGetDataListener() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
-                Log.d("ADDING", "MARKER " + username + " with lat: " + dataSnapshot.child("latitude").getValue().toString() + " long: "
-                + dataSnapshot.child("longitude").getValue().toString());
-                Log.d("DOUBLE", "" + Double.parseDouble(dataSnapshot.child("longitude").getValue().toString()));
                 addUserMarker(Double.parseDouble(dataSnapshot.child("latitude").getValue().toString()),
-                        Double.parseDouble(dataSnapshot.child("longitude").getValue().toString()), username);
+                        Double.parseDouble(dataSnapshot.child("longitude").getValue().toString()), username, true);
+
+                displayUserRoute(new LatLng(Double.parseDouble(dataSnapshot.child("latitude").getValue().toString()),
+                        Double.parseDouble(dataSnapshot.child("longitude").getValue().toString())));
             }
 
             @Override
             public void onFailure(String failure) {
-
+                Toast.makeText(getApplicationContext(), "Failed to get " + username + "'s location!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -218,17 +246,71 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap = googleMap;
 
         if (mLocationPermissionsGranted) {
-            getDeviceLocation();
+            //getDeviceLocation();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
                 return;
             }
-            Log.d("SETTINGLOCATION", "DF");
             mMap.setMyLocationEnabled(true);
 
         }
+        addMeetingMarker(mMeeting.getLat(), mMeeting.getLong(), mMeeting.getMeetingName());
 
+    }
 
+    private String requestDirection(String reqUrl) throws IOException {
+        String responseString = "";
+        InputStream inputStream = null;
+        HttpURLConnection httpURLConnection = null;
+        try{
+            URL url = new URL(reqUrl);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.connect();
 
+            /* Get response result. */
+            inputStream = httpURLConnection.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            StringBuffer stringBuffer = new StringBuffer();
+            String line = "";
+            while((line = bufferedReader.readLine()) != null){
+                stringBuffer.append(line);
+            }
+
+            responseString = stringBuffer.toString();
+            bufferedReader.close();
+            inputStreamReader.close();
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null){
+                inputStream.close();
+            }
+            httpURLConnection.disconnect();
+        }
+        return responseString;
+    }
+
+    private String getRequestUrl(LatLng origin, LatLng destination){
+        /* Value of origin. */
+        String str_org = "origin=" + origin.latitude +"," + origin.longitude;
+        /* Value of destination. */
+        String str_destin = "destination=" + destination.latitude +"," + destination.longitude;
+        /* Set value. */
+        String sensor = "sensor=false";
+        /* Mode for finding direction. */
+        String mode = "mode=driving";
+        /* Build the full params. */
+        String param = str_org + "&" + str_destin + "&" + sensor + "&" + mode;
+        /* Output format. */
+        String output = "json";
+        /* Create url to request. */
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + param;
+        return url;
     }
 
     @Override
@@ -241,13 +323,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     protected void onResume() {
         super.onResume();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             return;
         }
         //Time is in milliseconds, distance is in meters.
@@ -264,7 +340,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         Double.parseDouble(dataSnapshot.child("longitude").getValue().toString()));
 
                 Log.d("USERNAME", userName + " Lat: " + userLoc.latitude + " Long: " + userLoc.longitude);
-                addUserMarker(userLoc.latitude, userLoc.longitude, userName);
+                addUserMarker(userLoc.latitude, userLoc.longitude, userName, true);
             }
 
             @Override
@@ -277,7 +353,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     /* When users's location changes, rather than clearing entire map of markers, we simply clear/delete specific user marker and add a new one
     *  in the updated location. Marks for entire map is stored in hasMapMarkers. */
-    public void addUserMarker(Double latitude, Double longitude, String username){
+    public void addUserMarker(Double latitude, Double longitude, String username, boolean visible){
 
         if(hashMapMarkers.containsKey(username)){
             Log.d("ADDUSERMARKER", "HashMap already contained: " + username + ". Removing marker.");
@@ -286,12 +362,17 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             hashMapMarkers.remove(username);
         }
 
-        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(username));
+        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(username).visible(visible));
         hashMapMarkers.put(username, marker);
         moveCamera(new LatLng(latitude, longitude), 14f);
         Log.d("ADDUSERMARKER", username + " " + latitude.toString() + " " + longitude.toString());
     }
 
+    public void addMeetingMarker(Double latitude, Double longitude, String meetingName){
+        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(meetingName).visible(true));
+        marker.showInfoWindow();
+        hashMapMarkers.put(meetingName, marker);
+    }
 
     @Override
     public void onLocationChanged(Location location) {
@@ -300,10 +381,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         lng = location.getLongitude();
         user.setLocation(lat, lng);
 
-        LatLng userLoc = user.getLatLng();
+        /* User will have the blue dot, so set marker visibility to false. Need the marker to calculate the
+        *  camera zoom. */
+        addUserMarker(lat, lng, user.getUsername(), false);
+        displayUserRoute(new LatLng(lat,lng));
 
-
-
+        /* Update user location into the database for other participants to see. */
+        DatabaseHelper.getInstance().updateUserLocation(user.getUsername(), lat, lng);
     }
 
     @Override
@@ -320,4 +404,77 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     public void onProviderDisabled(String s) {
 
     }
+
+
+
+    public class TaskRequestDirections extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String responseString = "";
+            try {
+                responseString = requestDirection(strings[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return responseString;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            /* Parse JSON. */
+            TaskParser taskParser = new TaskParser();
+            taskParser.execute(s);
+        }
+    }
+
+    public class TaskParser extends AsyncTask<String, Void, List<List<HashMap<String, String>>>> {
+
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... strings) {
+            JSONObject jsonObject = null;
+            List<List<HashMap<String, String>>> routes = null;
+            try {
+                jsonObject = new JSONObject(strings[0]);
+                DirectionsParser directionsParser = new DirectionsParser();
+                routes = directionsParser.parse(jsonObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> lists) {
+            /* Get list route and display it into the map. */
+            Log.d("DIDROUTE", "DID");
+            ArrayList points = null;
+            PolylineOptions polylineOptions = null;
+
+            for(List<HashMap<String,String>> path : lists){
+                points = new ArrayList();
+                polylineOptions = new PolylineOptions();
+
+                for(HashMap<String,String> point : path){
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lon = Double.parseDouble(point.get("lon"));
+
+                    points.add(new LatLng(lat, lon));
+                }
+
+                polylineOptions.addAll(points);
+                polylineOptions.width(15);
+                polylineOptions.color(Color.CYAN);
+                polylineOptions.geodesic(true);
+            }
+
+            if(polylineOptions != null){
+                mMap.addPolyline(polylineOptions);
+            } else {
+                Toast.makeText(getApplicationContext(), "Directions not found!", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
 }
