@@ -1,7 +1,10 @@
 package t.systematic.letsgo.UserObject;
 
+import android.location.Location;
 import android.util.Log;
 import android.widget.CalendarView;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,6 +24,9 @@ public class User implements Serializable{
     private ArrayList<Meeting> mMeetings;
     private String email_addr;
     private String phone_number;
+    private double mLatitude;
+    private double mLongitude;
+
 
     /* Constructor */
     public User (String userName, ArrayList<String> friends, ArrayList<Meeting> meetings, String email, String phone){
@@ -34,6 +40,7 @@ public class User implements Serializable{
     /* Setters */
     public void setFriends(ArrayList<String> friends){ mFriends = friends; }
     public void setMeetings(ArrayList<Meeting> meetings){ mMeetings = meetings; }
+    public void setLocation(double latitude, double longitude) { mLatitude = latitude; mLongitude = longitude; }
 
     /* Getters */
     public String getUsername(){ return mUserName; }
@@ -75,6 +82,9 @@ public class User implements Serializable{
             }
         }
         return meetingsNamesToday;
+    }
+    public LatLng getLatLng(){
+        return new LatLng(mLatitude, mLongitude);
     }
 
     /* Functions */

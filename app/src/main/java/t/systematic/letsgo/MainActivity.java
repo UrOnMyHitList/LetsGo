@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 import com.google.firebase.database.DataSnapshot;
 import java.text.ParseException;
@@ -64,6 +65,14 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
             user.addFriend(friend.getValue().toString());
         }
 
+        String checkForPlaceHolder  = dataSnapshot.child("meetings").child("0").getValue().toString();
+        /* In the event the user doesn't have any meetings. */
+        if(checkForPlaceHolder.equals("null")){
+            Intent i = new Intent(MainActivity.this, MeetingManagerActivity.class);
+            i.putExtra("USER_OBJECT", user);
+            startActivity(i);
+            return;
+        }
         /* Logic below is to pull all of the user's meetings's information. */
         final int numOfMeetings = (int)dataSnapshot.child("meetings").getChildrenCount() - 1;
         int completed = 0;
@@ -106,10 +115,7 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
                 }
                 @Override
                 public void onFailure(String failure) {
-                    //TODO: onFailure - go to MeetingsManagerActivity with no meetings for the user
-                    Intent i = new Intent(MainActivity.this, MeetingManagerActivity.class);
-                    i.putExtra("USER_OBJECT", user);
-                    startActivity(i);
+
                 }
             });//Database
             completed++;
