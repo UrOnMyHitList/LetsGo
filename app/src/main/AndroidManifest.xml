@@ -58,12 +58,16 @@
         <activity
             android:name=".ParentChildActivities.ParentChildManagerActivity" />
         <activity
-            android:name=".MeetingActivities.ViewEditMeetingActivity" />
+            android:name=".MeetingActivities.ViewEditMeetingActivity"
+            android:configChanges="orientation"
+            android:hardwareAccelerated="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".AccountManagement.CreateAccountActivity"
             android:parentActivityName=".AccountManagement.LogInActivity"/>
         <activity 
         	android:name=".MeetingActivities.ViewCalendarActivity" />
+            <!--TODO add proper way to go back - android:parentActivityName=".MeetingActivities.MeetingManagerActivity"-->
         <activity
             android:name=".AccountManagement.ForgotInfoActivity"
             android:parentActivityName=".AccountManagement.LogInActivity" />
