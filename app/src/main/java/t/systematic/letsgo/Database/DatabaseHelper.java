@@ -397,4 +397,11 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void updateUserLocation(String username, Double lat, Double lng){
+        DatabaseReference userRef = ref.child("users").child(username).child("latlng").child("latitude");
+        userRef.setValue(lat);
+        userRef = ref.child("users").child(username).child("latlng").child("longitude");
+        userRef.setValue(lng);
+    }
+
 }
