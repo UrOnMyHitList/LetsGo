@@ -94,7 +94,6 @@
         android:inputType="textPersonName"
         android:visibility="invisible"
         android:layout_below="@id/meetingName_editText"/>
->>>>>>> 795464c2d43f7f3d5acdc43589ab4912e2aead0e
 
     <EditText
         android:id="@+id/date_editText"
