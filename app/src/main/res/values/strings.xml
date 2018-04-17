@@ -26,5 +26,6 @@
     <string name="enter_email">Enter Email</string>
     <string name="enter_phone">Enter Phone Number</string>
     <string name="change_username">Change Display Name</string>
-    <string name="notificationTitle">Notifications: </string>>
+    <string name="notificationTitle">Notifications: </string>
+    <string name="title_activity_meeting_destination">Map</string>>
 </resources>
