@@ -305,7 +305,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         originalMeetingName = intent.getStringExtra("MEETING_NAME");
         meeting = user.getMeeting(originalMeetingName);
 
-        if(meeting.getMeetingName().equals(user.getUsername())){
+        if(meeting.getAdmin().equals(user.getUsername())){
             init_editAndTextViewListeners();
         }
 
