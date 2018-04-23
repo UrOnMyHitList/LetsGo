@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.Database.OnGetDataListener;
@@ -86,6 +87,12 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     boolean[] checkedItems;
     private String[] friendsPrev;
 
+    /* Needed for date/time. */
+    Calendar calendar;
+    DateFormat dateFormat;
+    /* Think of getting updated timeZone. */
+    TimeZone timeZone = TimeZone.getDefault();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,19 +117,25 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             /* If time, create error logs table in some local DB. */
         }
         init_PageButtons();
-
     }
 
+    /* Both methods are simply listeners to bring up the calendar and timepicker UI. When user selects
+    *  a date/time it will appear in the approriate editText. */
     private void addEditTextListeners(){
         date_editText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Calendar calendar = Calendar.getInstance();
+                if(calendar == null){
+                    calendar = Calendar.getInstance();
+                }
                 DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener(){
-
                     @Override
-                    public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                        date_editText.setText(calendar.getTime().toString());
+                    public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                        SimpleDateFormat simpledateformat = new SimpleDateFormat("EEEE, d MMM yyyy");
+                        /* As per docs, need to subtract 1900. */
+                        Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
+                        String dayOfWeek = simpledateformat.format(date);
+                        date_editText.setText(dayOfWeek);
                     }
                 };
                 new DatePickerDialog(ViewEditMeetingActivity.this, date, calendar.get(Calendar.YEAR),
@@ -141,14 +154,15 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                         calendar.set(Calendar.MINUTE, minute);
                         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.US);
                         String formatedTime = sdf.format(calendar.getTime());
-
                         time_editText.setText(formatedTime);
 
                     }
                 };
-                Calendar now = Calendar.getInstance();
-                int hour = now.get(Calendar.HOUR_OF_DAY);
-                int minute = now.get(Calendar.MINUTE);
+                if(calendar == null){
+                    calendar = Calendar.getInstance();
+                }
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                int minute = calendar.get(Calendar.MINUTE);
                 boolean is24hour = false;
                 TimePickerDialog timePickerDialog = new TimePickerDialog(ViewEditMeetingActivity.this, onTimeSetListener, hour, minute, is24hour);
                 timePickerDialog.setTitle("Select Time");
@@ -177,8 +191,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                         return;
                     }
                 } else if(mode.equals("TEXT_VIEW_MODE")){
-                    Log.d("L2", "IN TEXT");
-                    Log.d("L2", "" + meetingName_textView.getText().toString());
                     if(isEmpty(date_textView.getText().toString())|| isEmpty(meetingName_textView.getText().toString()) ||
                             isEmpty(time_textView.getText().toString()) || isEmpty(destination_textView.getText().toString())){
                         Toast.makeText(getApplicationContext(), "*** All fields must be filled in ***", Toast.LENGTH_LONG).show();
@@ -187,7 +199,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                         return;
                     }
                 }
-
                 String meetingId = "";
                 if(meeting == null){
                     meetingId = user.getUsername() + System.currentTimeMillis() + (new Date(System.currentTimeMillis())).toString();
@@ -200,26 +211,29 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                     meetingId = meetingId.replace(".","");
                 }
 
-
-
-                /* TODO - FIGURE OUT HOW WE ARE GOING TO LINK DATE/TIME WITH COUNTER ON THE PHONE!!!  THAT FORMAT WILL DIciTATE  HOW WE
-                * STORE THE INFO INTO THE DB */
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.HOUR_OF_DAY, 3);
-                calendar.set(Calendar.MINUTE, 42);
-
+                String meetingDate = "";
+                String meetingTime = "";
 
                 String meetingName = "ERROR GETTING MEETING NAME";
                 if(mode.equals("EDIT_TEXT_MODE")){
+                    meetingDate = date_editText.getText().toString();
                     meetingName = meetingName_editText.getText().toString();
+                    meetingTime = time_editText.getText().toString();
+
+
                 } else if(mode.equals("TEXT_VIEW_MODE")){
+                    meetingDate = date_textView.getText().toString();
                     meetingName = meetingName_textView.getText().toString();
+                    meetingTime = time_textView.getText().toString();
                 }
 
+
+                //TODO NEED TO GET LOCATION POINTS AND ADD THEM TO ARGUMENTS BELOW
                 DatabaseHelper.getInstance().createUpdateMeeting(meetingId, 43.0, 34.0,user.getUsername(), meetingName,
-                        participants, "FIGURE OUT HOW WE ARE GOING TO DETECT WHEN MEETING IS SET TO ACTIVE", ViewEditMeetingActivity.this);
+                        participants, meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
 
                 Meeting modMeeting = new Meeting(meetingName, participants, calendar, 43.0, 32.0, meetingId, user.getUsername() );
+                Log.d("CHECKING2", "" + calendar.getTime());
                 if(meeting == null){
                     DatabaseHelper.getInstance().addMeetingToUser(meetingId, user.getUsername());
                 }
@@ -230,8 +244,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 }
                 user.addNewMeeting(modMeeting);
 
-                Log.d("MEETINGNAME", meetingName_editText.getText().toString());
-                Log.d("MEETINGNAME", modMeeting.getMeetingName());
                 Intent i = new Intent(ViewEditMeetingActivity.this, MeetingManagerActivity.class);
                 i.putExtra("USER_OBJECT", user);
                 startActivity(i);
@@ -302,15 +314,14 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     }
 
     private void init_TextViewMode(Intent intent){
+        /* Get the name of meeting, and then details from User Obj. */
         originalMeetingName = intent.getStringExtra("MEETING_NAME");
         meeting = user.getMeeting(originalMeetingName);
 
+        /* If the user is an admin allow him/her to update the meeting info. */
         if(meeting.getAdmin().equals(user.getUsername())){
             init_editAndTextViewListeners();
         }
-
-        /* 0 - day of week, 1 - month, 2 - day, 3 - military time, 4 - time zone, 5 - year */
-        String[] splitCalendarVal = meeting.getDateTime().getTime().toString().split(" ");
 
         destination_textView.setText(Double.toString(meeting.getLat()) + " " +
                 Double.toString(meeting.getLong()));
@@ -319,9 +330,8 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         meetingName_textView.setText(originalMeetingName);
         participants = meeting.getParticipants();
 
-        date_textView.setText(splitCalendarVal[0] + " " + splitCalendarVal[1] + " " + splitCalendarVal[2] + " "
-                + splitCalendarVal[5]);
-        time_textView.setText(splitCalendarVal[3] + " " + splitCalendarVal[4]);
+        date_textView.setText(meeting.getMeetingDate());
+        time_textView.setText(meeting.getMeetingTime());
 
         /* Set listView using custom adapter. */
         participants_listView = (ListView)findViewById(R.id.participants_listView);
