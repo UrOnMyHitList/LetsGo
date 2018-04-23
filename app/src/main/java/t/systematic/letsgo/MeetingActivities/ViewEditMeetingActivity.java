@@ -87,9 +87,10 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     boolean[] checkedItems;
     private String[] friendsPrev;
 
-    /* Needed for date/time. */
+    /* Used to get current date and time. */
     Calendar calendar;
-    DateFormat dateFormat;
+    /* Used to record last/current date and time. */
+    Calendar newMeetingCalendar;
     /* Think of getting updated timeZone. */
     TimeZone timeZone = TimeZone.getDefault();
 
@@ -117,7 +118,14 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             /* If time, create error logs table in some local DB. */
         }
         init_PageButtons();
+
+        calendar = Calendar.getInstance();
+        calendar.setTimeZone(timeZone);
+        newMeetingCalendar = Calendar.getInstance();
+        newMeetingCalendar.setTimeZone(timeZone);
+
     }
+
 
     /* Both methods are simply listeners to bring up the calendar and timepicker UI. When user selects
     *  a date/time it will appear in the approriate editText. */
@@ -125,21 +133,21 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         date_editText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(calendar == null){
-                    calendar = Calendar.getInstance();
-                }
                 DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener(){
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
                         SimpleDateFormat simpledateformat = new SimpleDateFormat("EEEE, d MMM yyyy");
                         /* As per docs, need to subtract 1900. */
                         Date date = new Date(year - 1900, monthOfYear, dayOfMonth);
+                        newMeetingCalendar.setTime(date);
                         String dayOfWeek = simpledateformat.format(date);
                         date_editText.setText(dayOfWeek);
                     }
                 };
-                new DatePickerDialog(ViewEditMeetingActivity.this, date, calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+                DatePickerDialog popUpCalendar = new DatePickerDialog(ViewEditMeetingActivity.this, date, calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                popUpCalendar.getDatePicker().setMinDate(calendar.getTimeInMillis() - 1000);
+                popUpCalendar.show();
             }
         });
 
@@ -149,18 +157,16 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.set(Calendar.HOUR_OF_DAY, hour);
-                        calendar.set(Calendar.MINUTE, minute);
+
+                        newMeetingCalendar.set(Calendar.HOUR_OF_DAY, hour);
+                        newMeetingCalendar.set(Calendar.MINUTE, minute);
                         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.US);
-                        String formatedTime = sdf.format(calendar.getTime());
+                        String formatedTime = sdf.format(newMeetingCalendar.getTime());
                         time_editText.setText(formatedTime);
 
                     }
                 };
-                if(calendar == null){
-                    calendar = Calendar.getInstance();
-                }
+
                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
                 int minute = calendar.get(Calendar.MINUTE);
                 boolean is24hour = false;
@@ -232,8 +238,8 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 DatabaseHelper.getInstance().createUpdateMeeting(meetingId, 43.0, 34.0,user.getUsername(), meetingName,
                         participants, meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
 
-                Meeting modMeeting = new Meeting(meetingName, participants, calendar, 43.0, 32.0, meetingId, user.getUsername() );
-                Log.d("CHECKING2", "" + calendar.getTime());
+                Meeting modMeeting = new Meeting(meetingName, participants, newMeetingCalendar, 43.0, 32.0, meetingId, user.getUsername() );
+                Log.d("CHECKING2", "" + newMeetingCalendar.getTime());
                 if(meeting == null){
                     DatabaseHelper.getInstance().addMeetingToUser(meetingId, user.getUsername());
                 }

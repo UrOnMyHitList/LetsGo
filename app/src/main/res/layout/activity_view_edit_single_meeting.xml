@@ -91,7 +91,7 @@
         android:layout_marginBottom="10dp"
         android:ems="10"
         android:hint="Destination"
-        android:inputType="textPersonName"
+        android:inputType="none"
         android:visibility="invisible"
         android:layout_below="@id/meetingName_editText"/>
 
@@ -106,7 +106,8 @@
         android:layout_marginBottom="10dp"
         android:ems="10"
         android:hint="Date"
-        android:inputType="textPersonName"
+        android:focusable="false"
+        android:inputType="none"
         android:visibility="invisible"
         android:layout_below="@id/destination_editText" />
 
@@ -121,7 +122,8 @@
         android:layout_marginBottom="10dp"
         android:ems="10"
         android:hint="Time"
-        android:inputType="textPersonName"
+        android:focusable="false"
+        android:inputType="none"
         android:visibility="invisible"
         android:layout_below="@id/date_editText" />
 

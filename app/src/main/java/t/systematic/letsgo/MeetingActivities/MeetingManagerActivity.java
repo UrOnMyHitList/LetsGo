@@ -17,7 +17,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 import t.systematic.letsgo.FriendActivities.FriendsManagerActivity;
+import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
 import t.systematic.letsgo.SettingsActivity;
@@ -102,10 +106,33 @@ public class MeetingManagerActivity extends SettingsActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
-                intent.putExtra("USER_OBJECT", user);
-                intent.putExtra("MEETING_NAME", "Demo");
-                startActivity(intent);
+
+                ArrayList<Meeting> userMeetings = user.getMeetings();
+                Log.d("NUMBEROFMEETINGS", "" + userMeetings.size());
+                int me = userMeetings.size();
+                for(int i = 0; i < me; i++){
+                    Log.d("CHECKINGMEETINGITER", "IN");
+                    Date x = Calendar.getInstance().getTime();
+
+                    long ONE_MINUTE_IN_MILLIS=60000;//millisecs
+
+                    long t= userMeetings.get(i).getDateTime().getTimeInMillis();
+                    Date afterAddingOneMin = new Date(t + ONE_MINUTE_IN_MILLIS);
+
+                    if (x.after(userMeetings.get(i).getDateTime().getTime()) && x.before(afterAddingOneMin)) {
+                        Log.d("CHECKING MEETING!", userMeetings.get(i).getMeetingName());
+                    }
+
+
+
+                }
+
+
+
+//                Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
+//                intent.putExtra("USER_OBJECT", user);
+//                intent.putExtra("MEETING_NAME", "Demo");
+//                startActivity(intent);
             }
         });
     }
@@ -133,7 +160,6 @@ public class MeetingManagerActivity extends SettingsActivity {
                     intent.putExtra("USER_OBJECT", user);
                     startActivity(intent);
                 }
-
             }
         });
     }
