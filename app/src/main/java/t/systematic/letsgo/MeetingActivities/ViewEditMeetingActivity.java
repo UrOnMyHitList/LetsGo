@@ -83,9 +83,11 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
 
     private String mode;
 
-    private ArrayList<Integer> mUserSelected = new ArrayList<>();
+
+
+    private HashMap<String, Integer> selectedFriends;
+    ArrayList<String> friends;
     boolean[] checkedItems;
-    private String[] friendsPrev;
 
     /* Used to get current date and time. */
     Calendar calendar;
@@ -98,7 +100,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_edit_single_meeting);
-
         init_layoutElements();
 
         Intent intent = getIntent();
@@ -109,20 +110,50 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         if(mode.equals("EDIT_TEXT_MODE")){
             init_EditTextMode(intent);
             addEditTextListeners();
-            participants = new ArrayList<>();
-            checkedItems = new boolean[user.getFriends().size()];
+
+
         } else if(mode.equals("TEXT_VIEW_MODE")){
             init_TextViewMode(intent);
         } else {
             Log.d("ERROR", "VIEWEDITMEETINGACTIVITY - onCreate");
             /* If time, create error logs table in some local DB. */
         }
+        init_SelectFriendsVars();
         init_PageButtons();
 
         calendar = Calendar.getInstance();
         calendar.setTimeZone(timeZone);
         newMeetingCalendar = Calendar.getInstance();
         newMeetingCalendar.setTimeZone(timeZone);
+
+    }
+
+
+    private void init_SelectFriendsVars(){
+        friends = user.getFriends();
+        Collections.sort(friends);
+        selectedFriends = new HashMap<>();
+        participants = meeting.getParticipants();
+        for(int i = 0; i < participants.size(); i++){
+            selectedFriends.put(participants.get(i), i);
+        }
+        int numberOfFriends = friends.size();
+        checkedItems = new boolean[numberOfFriends];
+
+        ArrayList<String> prevSetUsers = new ArrayList<>();
+        for(int i = 0; i < participants_listView.getCount(); i++){
+            prevSetUsers.add(participants_listView.getItemAtPosition(i).toString());
+        }
+
+        for(int i = 0; i < friends.size(); i++){
+            for(int k = 0; k < prevSetUsers.size(); k++){
+                if(friends.get(i).equals(prevSetUsers.get(k))){
+                    Log.d("PREVUSERS", friends.get(i) + " " + i);
+                    selectedFriends.put(friends.get(i), i);
+                    checkedItems[i] = true;
+                }
+            }
+        }
 
     }
 
@@ -259,38 +290,45 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
 
         addFriendsButton.setOnClickListener(new View.OnClickListener() {
 
-            String[] friends = new String[user.getFriends().size()];
+            String[] friendsArr = new String[friends.size()];
 
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ViewEditMeetingActivity.this);
                 builder.setTitle("Select friends to invite");
 
-                friends = user.getFriends().toArray(friends);
-                friendsPrev = friends;
-                builder.setMultiChoiceItems(friends, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+
+                /* Sets the friendsArr values same as friends arrayList. */
+                friends.toArray(friendsArr);
+                Arrays.sort(friendsArr);
+
+
+
+
+                builder.setMultiChoiceItems(friendsArr, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int position, boolean isChecked) {
                         if(isChecked){
-                            if(! mUserSelected.contains(position)){
-                                mUserSelected.add(position);
+                            if(! selectedFriends.containsKey(friendsArr[position])){
+                                selectedFriends.put(friendsArr[position], position);
                             }
-                        }else if (mUserSelected.contains(position)){
-                            mUserSelected.remove(mUserSelected.indexOf(position));
+                        }else if (selectedFriends.containsKey(friendsArr[position])){
+                            selectedFriends.remove(friendsArr[position]);
                         }
 
                     }
                 });
+                /* This is for the select freinds pop up. Logic applied when user selects OK and is finished selecting friends. */
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                        // participants_listView.setAdapter(new MyListAdapter(this, R.layout.textview_with_button, friends[i]));
-                        String item = "";
                         participants.clear();
-                        for(int i = 0; i < mUserSelected.size(); i++){
-                            item = item + friends[mUserSelected.get(i)];
-                            participants.add(friends[mUserSelected.get(i)]);
+                        for(String userNames : selectedFriends.keySet()){
+                            participants.add(userNames);
                         }
+
+                        Collections.sort(participants);
                         /* Set listView usingcustom adapter. */
                         participants_listView = (ListView)findViewById(R.id.participants_listView);
                         participants_listView.setAdapter(new MyListAdapter(ViewEditMeetingActivity.this, R.layout.textview_with_button, participants));
@@ -302,6 +340,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             }
         });
     }
+
 
     private void init_EditTextMode(Intent intent){
         setCreateMeetingLayout(meetingName_editText, meetingName_textView, "Meeting name");
@@ -342,6 +381,8 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         /* Set listView using custom adapter. */
         participants_listView = (ListView)findViewById(R.id.participants_listView);
         if(meeting.getAdmin().equals(user.getUsername())){
+            Log.d("ORDEROFPARTS", "" + participants);
+            Collections.sort(participants, String.CASE_INSENSITIVE_ORDER);
             participants_listView.setAdapter(new MyListAdapter(this, R.layout.textview_with_button, participants));
 
             updateCreateButton.setText("Update Meeting");
@@ -468,11 +509,11 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                         Toast.makeText(getContext(), "Removed: " + position, Toast.LENGTH_LONG).show();
 
                         String userID = ((TextView)finalConvertView.findViewById(R.id.list_textView)).getText().toString();
-                        int index = Arrays.asList(friendsPrev).indexOf(userID);
 
                         /* Update variables used for add/remove friends dialog and listView*/
-                        checkedItems[index] = false;
-                        mUserSelected.remove(index);
+                        Log.d("ARRAYPOSITION", userID + " " + selectedFriends.get(userID));
+                        checkedItems[selectedFriends.get(userID)] = false;
+                        selectedFriends.remove(userID);
                         participants.remove(position);
                         notifyDataSetChanged();
                     }

@@ -110,6 +110,7 @@ public class MeetingManagerActivity extends SettingsActivity {
                 ArrayList<Meeting> userMeetings = user.getMeetings();
                 Log.d("NUMBEROFMEETINGS", "" + userMeetings.size());
                 int me = userMeetings.size();
+
                 for(int i = 0; i < me; i++){
                     Log.d("CHECKINGMEETINGITER", "IN");
                     Date x = Calendar.getInstance().getTime();
@@ -122,9 +123,6 @@ public class MeetingManagerActivity extends SettingsActivity {
                     if (x.after(userMeetings.get(i).getDateTime().getTime()) && x.before(afterAddingOneMin)) {
                         Log.d("CHECKING MEETING!", userMeetings.get(i).getMeetingName());
                     }
-
-
-
                 }
 
 
