@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -102,22 +103,38 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            Log.d("PERMISSIONSCHECK", "TRIGGERED");
             return;
         }
         /* Time is in milliseconds, distance in meters. */
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 20, (android.location.LocationListener) this);
-        for(int i = 0; i < participants.size(); i++){
-            initParticipantsLocationOnDataChangeListeners(participants.get(i));
-            pullUserLatlngFromDB(participants.get(i));
-        }
 
-       // getDeviceLocation();
+        /* Noticed the logs say: Skipped 34 frames!
+            The application may be doing too
+            much work on its main thread.
+
+           So I added this part in a new thread. */
+        Thread t = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                for(int i = 0; i < participants.size(); i++){
+                    initParticipantsLocationOnDataChangeListeners(participants.get(i));
+                    pullUserLatlngFromDB(participants.get(i));
+                }
+            }
+        });
+
+        t.start();
+        Log.d("ONCREATEFINISH", "TRIGGERED");
+        //getDeviceLocation();
     }
 
     private void displayUserRoute(LatLng latLng){
+        Log.d("DISPLAYROUTE", "TRIGGERED with values " + latLng.latitude + " " + latLng.longitude + " meeting " + mMeeting.getLatLng());
         String url = getRequestUrl(latLng, mMeeting.getLatLng());
         TaskRequestDirections taskRequestDirections = new TaskRequestDirections();
         taskRequestDirections.execute(url);
+        Log.d("DISPLAYROUTE", "END");
     }
 
     private void pullUserLatlngFromDB(final String username){
@@ -126,9 +143,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             public void onSuccess(DataSnapshot dataSnapshot) {
                 addUserMarker(Double.parseDouble(dataSnapshot.child("latitude").getValue().toString()),
                         Double.parseDouble(dataSnapshot.child("longitude").getValue().toString()), username, true);
-
-                displayUserRoute(new LatLng(Double.parseDouble(dataSnapshot.child("latitude").getValue().toString()),
-                        Double.parseDouble(dataSnapshot.child("longitude").getValue().toString())));
             }
 
             @Override
@@ -178,6 +192,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         Log.d("NUMBEROFUSERS", "" + hashMapMarkers.size());
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         mMap.moveCamera(cu);
+        Log.d("MOVEDCAMERA", "TRIGGERED");
     }
 
     private void getLocationPermission() {
@@ -340,6 +355,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
                 Log.d("USERNAME", userName + " Lat: " + userLoc.latitude + " Long: " + userLoc.longitude);
                 addUserMarker(userLoc.latitude, userLoc.longitude, userName, true);
+
+                displayUserRoute(new LatLng(Double.parseDouble(dataSnapshot.child("latitude").getValue().toString()),
+                        Double.parseDouble(dataSnapshot.child("longitude").getValue().toString())));
+
+
             }
 
             @Override
@@ -363,6 +383,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(username).visible(visible));
         hashMapMarkers.put(username, marker);
+        Log.d("TYPEOFDATA", latitude.toString() + " " + longitude.toString());
         moveCamera(new LatLng(latitude, longitude), 14f);
         Log.d("ADDUSERMARKER", username + " " + latitude.toString() + " " + longitude.toString());
     }
@@ -375,6 +396,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d("ONLOCATIONCHANGED", "TRIGGERED");
         Double lat, lng;
         lat = location.getLatitude();
         lng = location.getLongitude();
@@ -470,6 +492,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             if(polylineOptions != null){
                 mMap.addPolyline(polylineOptions);
+                //Polyline polylineOptions1 = mMap.addPolyline(polylineOptions);
+                //polylineOptions1.remove();
+
             } else {
                 Toast.makeText(getApplicationContext(), "Directions not found!", Toast.LENGTH_LONG).show();
             }

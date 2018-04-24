@@ -8,8 +8,11 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import t.systematic.letsgo.UserObject.User;
 
@@ -65,6 +68,18 @@ public class Meeting implements Comparable<Meeting>, Serializable{
     public LatLng getLatLng(){
         return new LatLng(mLat, mLong);
     }
+    public String getMeetingTime(){
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm a");
+        TimeZone timeZone = TimeZone.getDefault();
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(mDateTime.getTime());
+    }
+    public String getMeetingDate(){
+        DateFormat dateFormat = new SimpleDateFormat("EEEE, d MMM yyyy");
+        TimeZone timeZone = TimeZone.getDefault();
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(mDateTime.getTime());
+    }
 
     /* Functions */
     public int numberOfUsersInMeeting(){
@@ -80,6 +95,6 @@ public class Meeting implements Comparable<Meeting>, Serializable{
     /* Comparable so that we can organize ArrayList<Meeting> from nearest dateTime to furthest. */
     @Override
     public int compareTo(@NonNull Meeting meeting) {
-        return getDateTime().compareTo(meeting.getDateTime());
+        return mDateTime.compareTo(meeting.getDateTime());
     }
 }
