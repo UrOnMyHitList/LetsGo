@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -117,19 +118,20 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     }
 
     private void init_destinationButton(){
+        final Location meeting_location = meeting.getLocation();
         destinationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mode.equals("EDIT_TEXT_MODE")){
-                    Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
-                    intent.putExtra("userType", "admin");
-                    startActivity(intent);
-                }
-                else if(mode.equals("TEXT_VIEW_MODE")){
-                    Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
-                    intent.putExtra("userType", "notAdmin");
-                    startActivity(intent);
-                }
+            if(mode.equals("EDIT_TEXT_MODE")){
+                Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
+                intent.putExtra("meeting", meeting);
+                startActivity(intent);
+            }
+            else if(mode.equals("TEXT_VIEW_MODE")){
+                Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationNonAdminActivity.class);
+                intent.putExtra("meeting", meeting);
+                startActivity(intent);
+            }
             }
         });
     }
