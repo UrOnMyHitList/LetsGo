@@ -259,6 +259,7 @@ public class DatabaseHelper extends FragmentActivity{
         ref.child("meetings").child(meetingId).child("Long").setValue(Long);
         ref.child("meetings").child(meetingId).child("admin").setValue(admin);
         ref.child("meetings").child(meetingId).child("meetingName").setValue(newMeetingName);
+        ref.child("meetings").child(meetingId).child("participants").removeValue();
         for(int i = 0; i < participants.size(); i++){
             ref.child("meetings").child(meetingId).child("participants").child(Integer.toString(i)).setValue(participants.get(i));
         }

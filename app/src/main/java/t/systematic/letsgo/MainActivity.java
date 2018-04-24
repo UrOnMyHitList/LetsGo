@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import t.systematic.letsgo.AccountManagement.LogInActivity;
 import t.systematic.letsgo.Database.DatabaseHelper;
@@ -25,6 +26,8 @@ import t.systematic.letsgo.UserObject.User;
 public class MainActivity extends AppCompatActivity implements  OnGetDataListener{
     private User user;
     private String mUsername;
+    /* Think of getting updated timeZone. */
+    TimeZone timeZone = TimeZone.getDefault();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,16 +86,42 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
                 public void onSuccess(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
                         String meetingName = dataSnapshot.child("meetingName").getValue().toString();
-                        String calendarValues = dataSnapshot.child("startTime").getValue().toString();
+                        String[] calendarValues = dataSnapshot.child("startTime").getValue().toString().split("@");
+
                         String admin = dataSnapshot.child("admin").getValue().toString();
                         /* Set date into Calendar object. */
                         Calendar calendar = Calendar.getInstance();
-                        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
-                        try {
-                            calendar.setTime(sdf.parse(calendarValues));// all done
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, d MMM yyyy, HH:mm");
+                        dateFormat.setTimeZone(timeZone);
+
+                        /* [0] = Day [1] = Month (Apr, Dec, etc) [2] = Year*/
+                        Log.d("CHECKINGFULL", calendarValues[0]);
+                        String[] fullDate = calendarValues[0].split(", ")[1].split(" ");
+
+
+
+                        String[] fullTime = calendarValues[1].split(" ");
+                        String hour = fullTime[0].split(":")[0];
+                        String minute = fullTime[0].split(":")[1];
+
+                        try{
+                            //Convert 'Apr, Dec, etc' into a Calendar int representation.
+                            calendar.setTime(new SimpleDateFormat("MMM").parse(fullDate[1]));
+                        }catch (ParseException e ){
+                            Log.d("FAILEDPARSE", "FAILED PARSING DATE WHEN PULLING USER MEETING INFO: " + e);
                         }
+
+                        calendar.set(Calendar.YEAR, Integer.valueOf(fullDate[2]));
+                        calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(fullDate[0]));
+                        calendar.set(Calendar.HOUR, Integer.valueOf(hour));
+                        calendar.set(Calendar.MINUTE, Integer.valueOf(minute));
+
+
+                        //Helpful for debugging / seeing timedate transformation.
+//                        dateFormat = new SimpleDateFormat("EEEE, d MMM yyyy, HH:mm");
+//                        dateFormat.setTimeZone(timeZone);
+//                        String date = dateFormat.format(calendar.getTime());
+//                        Log.d("PARSINGDATE",date);
 
                         ArrayList<String> participants = new ArrayList<String>();
                         for(DataSnapshot dbParticipants : dataSnapshot.child("participants").getChildren()){
