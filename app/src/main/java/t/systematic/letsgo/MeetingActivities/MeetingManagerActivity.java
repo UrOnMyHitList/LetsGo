@@ -125,6 +125,7 @@ public class MeetingManagerActivity extends SettingsActivity {
                     }
                 }
 
+   //             if(isServicesOK()){}
 
 
 //                Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
@@ -152,12 +153,11 @@ public class MeetingManagerActivity extends SettingsActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isServicesOK()){
                     Intent intent = new Intent(MeetingManagerActivity.this, ViewEditMeetingActivity.class);
                     intent.putExtra("ACTIVITY_MODE", "CREATE_MEETING_MODE");
                     intent.putExtra("USER_OBJECT", user);
                     startActivity(intent);
-                }
+
             }
         });
     }
