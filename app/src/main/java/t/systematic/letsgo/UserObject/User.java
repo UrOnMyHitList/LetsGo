@@ -60,6 +60,7 @@ public class User implements Serializable{
     public boolean hasMeetings(){
         return !mMeetings.isEmpty();
     }
+    public boolean hasFriends() {return !mFriends.isEmpty();}
 
     public Meeting getMeeting(String meetingName){
         for(int i = 0; i < mMeetings.size(); i++){
