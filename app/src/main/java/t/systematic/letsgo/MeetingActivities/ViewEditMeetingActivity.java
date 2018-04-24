@@ -107,18 +107,34 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
 
         mode = intent.getStringExtra("ACTIVITY_MODE");
         user = (User)intent.getSerializableExtra("USER_OBJECT");
+        meeting = user.getMeeting(intent.getStringExtra("MEETING_NAME"));
         if(mode.equals("EDIT_TEXT_MODE")){
             init_EditTextMode(intent);
             addEditTextListeners();
-
+            init_SelectFriendsVars();
 
         } else if(mode.equals("TEXT_VIEW_MODE")){
             init_TextViewMode(intent);
+            init_SelectFriendsVars();
+        } else if(mode.equals("CREATE_MEETING_MODE")){
+            init_EditTextMode(intent);
+            addEditTextListeners();
+
+            friends = user.getFriends();
+            Collections.sort(friends);
+            selectedFriends = new HashMap<>();
+            participants = new ArrayList<>();
+
+            int numberOfFriends = friends.size();
+            checkedItems = new boolean[numberOfFriends];
+
+
+
         } else {
             Log.d("ERROR", "VIEWEDITMEETINGACTIVITY - onCreate");
             /* If time, create error logs table in some local DB. */
         }
-        init_SelectFriendsVars();
+
         init_PageButtons();
 
         calendar = Calendar.getInstance();
@@ -252,7 +268,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 String meetingTime = "";
 
                 String meetingName = "ERROR GETTING MEETING NAME";
-                if(mode.equals("EDIT_TEXT_MODE")){
+                if(mode.equals("EDIT_TEXT_MODE") || mode.equals("CREATE_MEETING_MODE")){
                     meetingDate = date_editText.getText().toString();
                     meetingName = meetingName_editText.getText().toString();
                     meetingTime = time_editText.getText().toString();
@@ -359,10 +375,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     }
 
     private void init_TextViewMode(Intent intent){
-        /* Get the name of meeting, and then details from User Obj. */
-        originalMeetingName = intent.getStringExtra("MEETING_NAME");
-        meeting = user.getMeeting(originalMeetingName);
-
         /* If the user is an admin allow him/her to update the meeting info. */
         if(meeting.getAdmin().equals(user.getUsername())){
             init_editAndTextViewListeners();
@@ -372,7 +384,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 Double.toString(meeting.getLong()));
         Log.d("TIMEVALUE" , meeting.getDateTime().toString());
         /* Initialize all editText, textView, and listView fields. */
-        meetingName_textView.setText(originalMeetingName);
+        meetingName_textView.setText(meeting.getMeetingName());
         participants = meeting.getParticipants();
 
         date_textView.setText(meeting.getMeetingDate());

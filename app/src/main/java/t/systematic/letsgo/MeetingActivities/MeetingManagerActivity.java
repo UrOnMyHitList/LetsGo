@@ -154,7 +154,7 @@ public class MeetingManagerActivity extends SettingsActivity {
             public void onClick(View view) {
                 if(isServicesOK()){
                     Intent intent = new Intent(MeetingManagerActivity.this, ViewEditMeetingActivity.class);
-                    intent.putExtra("ACTIVITY_MODE", "EDIT_TEXT_MODE");
+                    intent.putExtra("ACTIVITY_MODE", "CREATE_MEETING_MODE");
                     intent.putExtra("USER_OBJECT", user);
                     startActivity(intent);
                 }
