@@ -19,7 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import t.systematic.letsgo.R;
 
 public class ForgotInfoActivity extends AppCompatActivity {
-
+    //TODO allow this activity to send SMS to user's phone.  permissions necessary +sms +access contacts (already implemented?)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,13 +63,13 @@ public class ForgotInfoActivity extends AppCompatActivity {
                                 }
                             }
                             else {
-                                DataSnapshot temp = userList.child("email");
-                                String userEmail = temp.getValue(String.class);
+                                String userEmail = userList.child("email").getValue(String.class);
                                 if (userEmail.equals(enterEmailBox.getText().toString())) {
                                     found = true;
                                     Toast toast = Toast.makeText(getApplicationContext(), username, Toast.LENGTH_LONG);
                                     toast.show();
                                     //TODO update this logic with what we actually want to do later
+                                    //send text to user with (link/signal/etc) to reset password
                                     break;
                                 }
                             }
