@@ -10,9 +10,12 @@ import android.widget.Toast;
 import t.systematic.letsgo.MeetingActivities.MeetingManagerActivity;
 import t.systematic.letsgo.ParentChildActivities.ParentChildManagerActivity;
 import t.systematic.letsgo.R;
+import t.systematic.letsgo.UserObject.User;
 
 public class FriendsManagerActivity extends AppCompatActivity {
     private float x1,x2,y1,y2;
+    Intent intent = getIntent();
+    User user = (User)intent.getSerializableExtra("USER_OBJECT");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +26,7 @@ public class FriendsManagerActivity extends AppCompatActivity {
 
     public void addFriendButtonClicked(View view){
         Intent addFriendActivity = new Intent(FriendsManagerActivity.this, AddFriendActivity.class);
+        addFriendActivity.putExtra("USER_OBJECT", user);
         FriendsManagerActivity.this.startActivity(addFriendActivity);
         //input friend username
         //search database for match
