@@ -30,16 +30,27 @@ public class AddFriendActivity extends AppCompatActivity {
         final EditText addFriendBox = findViewById(R.id.AddFriendBox);
         Button b1 = findViewById(R.id.SubmitFriendButton);
         final String TAG = "AddFriendActivity";
-        final User user = (User)intent.getSerializableExtra("USER_OBJECT");
+        User user = (User)intent.getSerializableExtra("USER_OBJECT");
+        final String username = user.getUsername();
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //thank god for auto-boilerplate
-                myDb.child("users").child(user.getUsername()).child("friends").addListenerForSingleValueEvent(new ValueEventListener() {
+                myDb.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String friendName = addFriendBox.getText().toString();
-                        
+                        for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                            String name = snapshot.getKey();
+                            if (name.equals(friendName)) {
+                                //add the friend
+                                //add a new key/value under friends
+                                myDb.child("users").child(username).child("friends").push().setValue(friendName);
+
+                                //TODO send a notification????
+                                break;
+                            }
+                        }
                     }
 
                     @Override
