@@ -36,6 +36,7 @@ public class FriendsManagerActivity extends AppCompatActivity {
 
     public void removeFriendButtonClicked(View view){
         Intent removeFriendActivity = new Intent(FriendsManagerActivity.this, RemoveFriendActivity.class);
+        removeFriendActivity.putExtra("USER_OBJECT", user);
         FriendsManagerActivity.this.startActivity(removeFriendActivity);
         //select friend from list
         //search for meetings with either user as owner

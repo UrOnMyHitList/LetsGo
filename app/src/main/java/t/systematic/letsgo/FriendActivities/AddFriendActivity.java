@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,8 +25,7 @@ public class AddFriendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
         //TODO: fix formatting on xml
-        final DatabaseReference myDb;
-        myDb = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference myDb = FirebaseDatabase.getInstance().getReference();
         Intent intent = getIntent();
         final EditText addFriendBox = findViewById(R.id.AddFriendBox);
         Button b1 = findViewById(R.id.SubmitFriendButton);
@@ -39,17 +39,27 @@ public class AddFriendActivity extends AppCompatActivity {
                 myDb.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        Boolean found = false;
                         String friendName = addFriendBox.getText().toString();
                         for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
                             String name = snapshot.getKey();
                             if (name.equals(friendName)) {
                                 //add the friend
                                 //add a new key/value under friends
+                                //replace below line when i figure out how to do notifications.
                                 myDb.child("users").child(username).child("friends").push().setValue(friendName);
-
-                                //TODO send a notification????
+                                found = true;
+                                //TODO send a notification to friended user????
+                                //TODO don't add if duplicate friend
+                                //TODO race condition checking?
+                                Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!" , Toast.LENGTH_LONG);
+                                toast.show();
                                 break;
                             }
+                        }
+                        if(!found) {
+                            Toast toast = Toast.makeText(getApplicationContext(), "No such user found!" , Toast.LENGTH_LONG);
+                            toast.show();
                         }
                     }
 
