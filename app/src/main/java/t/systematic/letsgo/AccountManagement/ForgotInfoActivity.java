@@ -3,6 +3,7 @@ package t.systematic.letsgo.AccountManagement;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -17,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import t.systematic.letsgo.R;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ForgotInfoActivity extends AppCompatActivity {
     //TODO allow this activity to send SMS to user's phone.  permissions necessary +sms +access contacts (already implemented?)
@@ -54,11 +56,23 @@ public class ForgotInfoActivity extends AppCompatActivity {
                             if (flavor.equals(flavorCheck)) {
                                 if (username.equals(enterInfoBox.getText().toString())) {
                                     found = true;
-                                    DataSnapshot temp = userList.child("password"); //returns key = password value = "whatever"
-                                    String pw = temp.getValue(String.class);
-                                    Toast toast = Toast.makeText(getApplicationContext(), pw , Toast.LENGTH_LONG);
+                                    //SEND THE THING HERE AND RESET THE PASSWORD
+                                    //pull phone number for user from database
+                                    DataSnapshot temp1 = userList.child("phone");
+                                    String phoneNum = temp1.getValue(String.class); //get phone number associated with that user
+                                    //generate random 6 digit code for temp password
+                                    int randPass = ThreadLocalRandom.current().nextInt(111111,1000000);
+                                    //setup Sms manager
+                                    SmsManager sms = SmsManager.getDefault();
+                                    //FIRE THE CANNONS
+                                    sms.sendTextMessage(phoneNum,null,"Your password is set to "+randPass+". Please change it immediately",null, null);
+                                    //set user password to new password
+                                    myDb.child("users").child(username).child("password").setValue(""+randPass);
+                                    //DataSnapshot temp = userList.child("password"); //returns key = password value = "whatever" - old logic
+                                    //String pw = temp.getValue(String.class); - old logic
+                                    Toast toast = Toast.makeText(getApplicationContext(), "Password reset! Check your text messages" , Toast.LENGTH_LONG);
                                     toast.show();
-                                    //TODO update this logic with what we actually want to do later
+                                    //update this logic with what we actually want to do later - DONE
                                     break;
                                 }
                             }

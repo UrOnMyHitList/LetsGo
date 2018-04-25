@@ -51,7 +51,7 @@ public class AddFriendActivity extends AppCompatActivity {
                                 found = true;
                                 //TODO send a notification to friended user????
                                 //TODO don't add if duplicate friend
-                                //TODO race condition checking?
+
                                 Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!" , Toast.LENGTH_LONG);
                                 toast.show();
                                 break;
