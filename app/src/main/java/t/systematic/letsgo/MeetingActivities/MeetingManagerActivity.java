@@ -44,11 +44,8 @@ public class MeetingManagerActivity extends SettingsActivity {
         }
 
         /* Get name of meetings to display in listView. */
-        if (user.hasMeetings())
-            init_listView(user.getAllMeetingNames());
-        else{
-            //TODO: write "No Meetings Scheduled" to listView
-        }
+        init_listView(user.getAllMeetingNames());
+
         /* Add listener to Scheduled Meeting button. */
         init_viewScheduledMeetingsButton();
         /* Add listener to Schedule Meeting button. */
@@ -78,7 +75,13 @@ public class MeetingManagerActivity extends SettingsActivity {
     }
 
     private void init_listView(ArrayList<String> meetingNames){
+
+        for(int i =0; i < meetingNames.size(); i++){
+            Log.d("MEETINGS", meetingNames.get(i));
+        }
+
         if(meetingNames.size() == 0){
+            Log.d("NOMEETINGS", "NOMEETINGS");
             meetingNames.add("No meetings scheduled!");
         }
         meetings_listView = (ListView)findViewById(R.id.upComingMeetingListView);
@@ -124,6 +127,8 @@ public class MeetingManagerActivity extends SettingsActivity {
                         Log.d("CHECKING MEETING!", userMeetings.get(i).getMeetingName());
                     }
                 }
+
+
 
    //             if(isServicesOK()){}
 

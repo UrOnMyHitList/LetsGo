@@ -377,7 +377,9 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     private void init_TextViewMode(Intent intent){
         /* If the user is an admin allow him/her to update the meeting info. */
         if(meeting.getAdmin().equals(user.getUsername())){
+            Log.d("CHECKINGUSERADMINPRIV", "TR");
             init_editAndTextViewListeners();
+            addEditTextListeners();
         }
 
         destination_textView.setText(Double.toString(meeting.getLat()) + " " +
