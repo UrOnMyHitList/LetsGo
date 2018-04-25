@@ -109,24 +109,28 @@ public class MeetingManagerActivity extends SettingsActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 ArrayList<Meeting> userMeetings = user.getMeetings();
-                Log.d("NUMBEROFMEETINGS", "" + userMeetings.size());
-                int me = userMeetings.size();
 
-                for(int i = 0; i < me; i++){
-                    Log.d("CHECKINGMEETINGITER", "IN");
-                    Date x = Calendar.getInstance().getTime();
+                /* Check if user has meetings scheduled. */
+                if(user.getAllMeetingNames().size() > 0){
+                    /* Since meetings are ordered by their start time/date we always get the 1st. */
+                    Meeting nextUpMeeting = user.getMeeting(user.getAllMeetingNames().get(0));
+                    Date meetingTime = nextUpMeeting.getDateTime().getTime();
+                    Date now = Calendar.getInstance().getTime();
 
-                    long ONE_MINUTE_IN_MILLIS=60000;//millisecs
-
-                    long t= userMeetings.get(i).getDateTime().getTimeInMillis();
-                    Date afterAddingOneMin = new Date(t + ONE_MINUTE_IN_MILLIS);
-
-                    if (x.after(userMeetings.get(i).getDateTime().getTime()) && x.before(afterAddingOneMin)) {
-                        Log.d("CHECKING MEETING!", userMeetings.get(i).getMeetingName());
+                    Log.d("CHECKINGMEETING", "" + meetingTime);
+                    Log.d("CHECKINGMEETING NOW", "" + now);
+                    if (now.after(meetingTime)) {
+                        Log.d("CHECKINGMEETING", nextUpMeeting.getMeetingName());
+                    } else {
+                        Toast.makeText(getApplicationContext(), "It's still not time for " + nextUpMeeting.getMeetingName() + "!", Toast.LENGTH_SHORT).show();
                     }
+
+                }else {
+                    Toast.makeText(getApplicationContext(), "You have no meetings scheduled!", Toast.LENGTH_SHORT).show();
                 }
+
+
 
 
 
