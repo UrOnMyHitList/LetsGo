@@ -23,20 +23,6 @@
         android:textColor="@color/royalAway" />
 
     <TextView
-        android:id="@+id/destination_textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/royalAway"
-        android:text="Placeholder destination"
-        android:layout_below="@id/meetingName_textView" />
-
-    <TextView
         android:id="@+id/date_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,7 +33,7 @@
         android:layout_marginBottom="10dp"
         android:textColor="@color/royalAway"
         android:text="Placeholder date"
-        android:layout_below="@id/destination_textView" />
+        android:layout_below="@id/destination_button" />
 
     <TextView
         android:id="@+id/time_textView"
@@ -92,7 +78,7 @@
         android:background="@color/colorPrimaryDark"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Destination"
+        android:text="Click to view destination"
         android:textSize="20sp"
         android:visibility="visible" />
     <EditText

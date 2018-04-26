@@ -1,11 +1,14 @@
 package t.systematic.letsgo.MeetingActivities;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +16,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +30,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -146,8 +152,44 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         newMeetingCalendar.setTimeZone(timeZone);
     }
 
+    private void update_destinationButton_text(){
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(meeting.getLat(), meeting.getLong(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        } catch(IOException e){
+            Toast.makeText(this, "Uable to load locaiton address", Toast.LENGTH_SHORT).show();
+        }
+        if(addresses != null) {
+            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            String city = addresses.get(0).getLocality();
+            String state = addresses.get(0).getAdminArea();
+            String country = addresses.get(0).getCountryName();
+            String postalCode = addresses.get(0).getPostalCode();
+            String knownName = addresses.get(0).getFeatureName();
+
+            String display = "Click to view destination";
+
+            if(address != null){
+                display = address + ", " + city + ", " + state;
+                destinationButton.setText(display);
+                destinationButton.setGravity(Gravity.CENTER);
+            }
+            else if(city != null && state != null && country != null){
+                display = city + ", " + state + ", " + country;
+                destinationButton.setText(display);
+                destinationButton.setGravity(Gravity.CENTER);
+            }
+            else{
+                destinationButton.setText(display);
+                destinationButton.setGravity(Gravity.CENTER);
+            }
+        }
+    }
+
     private void init_destinationButton(){
-        final Location meeting_location = meeting.getLocation();
+        update_destinationButton_text();
 
         destinationButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,7 +197,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 if (meeting.getAdmin().equals(user.getUsername())) {
                     Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
                     intent.putExtra("meeting", meeting);
-                    //startActivity(intent);
                     startActivityForResult(intent, 1);
                 } else {
                     Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationNonAdminActivity.class);
@@ -166,6 +207,25 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         });
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (1) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    LatLng latlng = (LatLng) data.getParcelableExtra("latlng");
+
+                    //Update meeting location.
+                    Location targetLocation = new Location("");
+                    targetLocation.setLatitude(latlng.latitude);
+                    targetLocation.setLongitude(latlng.longitude);
+                    meeting.setLocation(new Location(targetLocation));
+                    update_destinationButton_text();
+                }
+                break;
+            }
+        }
+    }
 
     private void init_SelectFriendsVars(){
         friends = user.getFriends();

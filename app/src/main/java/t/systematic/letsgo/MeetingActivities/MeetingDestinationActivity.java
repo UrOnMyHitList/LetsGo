@@ -2,6 +2,7 @@ package t.systematic.letsgo.MeetingActivities;
 
 import android.*;
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -68,7 +69,6 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(this, "Map is Ready", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onMapReady: map is ready");
         mMap = googleMap;
 
@@ -195,7 +195,7 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
     private void confirm(final LatLng latlng){
         final RelativeLayout rl = findViewById(R.id.ok_cancel_buttons);
         rl.setVisibility(View.VISIBLE);
-        // TODO ask user if this is the location to change to
+
         FloatingActionButton ok = findViewById(R.id.ok);
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,6 +205,10 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
                     public void onSuccess(DataSnapshot dataSnapshot) {
                         Toast.makeText(MeetingDestinationActivity.this, "Location updated!", Toast.LENGTH_SHORT).show();
                         rl.setVisibility(View.INVISIBLE);
+
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra("latlng", latlng);
+                        setResult(Activity.RESULT_OK, resultIntent);
                         finish();
                     }
 
@@ -267,7 +271,6 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
      * @param meeting
      */
     private void getMeetingLocation(Meeting meeting){
-        Toast.makeText(this, ""+meeting.getLat() + ", " + meeting.getLong(), Toast.LENGTH_LONG).show();
         moveCamera(meeting.getLatLng(),
                 DEFAULT_ZOOM,
                 meeting.getMeetingName());
