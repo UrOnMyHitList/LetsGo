@@ -21,7 +21,8 @@ import t.systematic.letsgo.UserObject.User;
 public class FriendsManagerActivity extends AppCompatActivity {
     private float x1,x2,y1,y2;
     private ListView friendsList;
-    private User user;
+    Intent intent = getIntent();
+    User user = (User)intent.getSerializableExtra("USER_OBJECT");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +43,24 @@ public class FriendsManagerActivity extends AppCompatActivity {
     }
 
     public void addFriendButtonClicked(View view){
-
+        Intent addFriendActivity = new Intent(FriendsManagerActivity.this, AddFriendActivity.class);
+        addFriendActivity.putExtra("USER_OBJECT", user);
+        FriendsManagerActivity.this.startActivity(addFriendActivity);
+        //input friend username
+        //search database for match
+        //if match add that username string to list in user object
+        //if no match give error
     }
 
     public void removeFriendButtonClicked(View view){
-
+        Intent removeFriendActivity = new Intent(FriendsManagerActivity.this, RemoveFriendActivity.class);
+        removeFriendActivity.putExtra("USER_OBJECT", user);
+        FriendsManagerActivity.this.startActivity(removeFriendActivity);
+        //select friend from list
+        //search for meetings with either user as owner
+        //remove user or old friend from any meetings found
+        //remove old friend from friend list in user object
+        //
     }
 
     public boolean onTouchEvent(MotionEvent touchEvent){
