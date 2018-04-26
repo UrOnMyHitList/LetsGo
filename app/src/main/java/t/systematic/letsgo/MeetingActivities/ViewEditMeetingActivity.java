@@ -159,7 +159,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         try {
             addresses = geocoder.getFromLocation(meeting.getLat(), meeting.getLong(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
         } catch(IOException e){
-            Toast.makeText(this, "Uable to load locaiton address", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Unable to load locaiton address", Toast.LENGTH_SHORT).show();
         }
         if(addresses != null) {
             String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
@@ -172,7 +172,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             String display = "Click to view destination";
 
             if(address != null){
-                display = address + ", " + city + ", " + state;
+                display = address + ", " + city + ", " + state; 
                 destinationButton.setText(display);
                 destinationButton.setGravity(Gravity.CENTER);
             }
