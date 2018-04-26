@@ -259,6 +259,7 @@ public class DatabaseHelper extends FragmentActivity{
         ref.child("meetings").child(meetingId).child("Long").setValue(Long);
         ref.child("meetings").child(meetingId).child("admin").setValue(admin);
         ref.child("meetings").child(meetingId).child("meetingName").setValue(newMeetingName);
+        ref.child("meetings").child(meetingId).child("participants").removeValue();
         for(int i = 0; i < participants.size(); i++){
             ref.child("meetings").child(meetingId).child("participants").child(Integer.toString(i)).setValue(participants.get(i));
         }
@@ -395,6 +396,13 @@ public class DatabaseHelper extends FragmentActivity{
 
             }
         });
+    }
+
+    public void updateUserLocation(String username, Double lat, Double lng){
+        DatabaseReference userRef = ref.child("users").child(username).child("latlng").child("latitude");
+        userRef.setValue(lat);
+        userRef = ref.child("users").child(username).child("latlng").child("longitude");
+        userRef.setValue(lng);
     }
 
 }
