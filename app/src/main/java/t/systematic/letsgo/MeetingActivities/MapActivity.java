@@ -325,6 +325,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         if (task.isSuccessful()) {
                             currentLocation = (Location) task.getResult();
                             displayUserRoute(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
+                            addUserMarker(currentLocation.getLatitude(), currentLocation.getLongitude(), user.getUsername(), false);
                         } else {
                             Toast.makeText(MapActivity.this, "Unable to get Location", Toast.LENGTH_LONG).show();
                         }
