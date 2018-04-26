@@ -63,7 +63,7 @@ public class DatabaseHelper extends FragmentActivity{
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 if(dataSnapshot.exists()){
-                    if(dataSnapshot.getKey().equals(username)){
+                    if(dataSnapshot.getKey().toLowerCase().equals(username)){
                         if(dataSnapshot.child("password").getValue().equals(password)){
                             listener.onSuccess(dataSnapshot);
                         }
