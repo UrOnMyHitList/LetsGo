@@ -30,7 +30,7 @@ public class AddFriendActivity extends AppCompatActivity {
         final EditText addFriendBox = findViewById(R.id.AddFriendBox);
         Button b1 = findViewById(R.id.SubmitFriendButton);
         final String TAG = "AddFriendActivity";
-        User user = (User)intent.getSerializableExtra("USER_OBJECT");
+        final User user = (User)intent.getSerializableExtra("USER_OBJECT");
         final String username = user.getUsername();
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,13 +47,27 @@ public class AddFriendActivity extends AppCompatActivity {
                                 //add the friend
                                 //add a new key/value under friends
                                 //replace below line when i figure out how to do notifications.
-                                myDb.child("users").child(username).child("friends").push().setValue(friendName);
-                                found = true;
-                                //TODO send a notification to friended user????
-                                //TODO don't add if duplicate friend
+                                Boolean duplicate = false;
+                                for (DataSnapshot subSnap: dataSnapshot.child(username).child("friends").getChildren()) {
+                                    if (subSnap.getValue().equals(friendName)) {
+                                        duplicate = true;
+                                        break;
+                                    }
+                                }
+                                if (!duplicate) {
+                                    myDb.child("users").child(username).child("friends").push().setValue(friendName);
+                                    found = true;
+                                    user.addFriend(friendName);
+                                    //TODO send a notification to friended user????
+                                    //TODO don't add if duplicate friend
 
-                                Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!" , Toast.LENGTH_LONG);
-                                toast.show();
+                                    Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG);
+                                    toast.show();
+                                }
+                                else {
+                                    Toast toast = Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG);
+                                    toast.show();
+                                }
                                 break;
                             }
                         }
