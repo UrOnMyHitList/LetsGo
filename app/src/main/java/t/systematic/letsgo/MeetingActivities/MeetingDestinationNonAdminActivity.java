@@ -57,6 +57,7 @@ public class MeetingDestinationNonAdminActivity extends FragmentActivity impleme
             String postalCode = addresses.get(0).getPostalCode();
             String knownName = addresses.get(0).getFeatureName();
 
+
             String display = "Click here to view destination";
 
             if(address != null){
