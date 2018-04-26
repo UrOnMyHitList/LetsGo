@@ -54,10 +54,10 @@ public class MeetingDestinationNonAdminActivity extends FragmentActivity impleme
             String city = addresses.get(0).getLocality();
             String state = addresses.get(0).getAdminArea();
             String country = addresses.get(0).getCountryName();
-            //String postalCode = addresses.get(0).getPostalCode();
-            //String knownName = addresses.get(0).getFeatureName();
+            String postalCode = addresses.get(0).getPostalCode();
+            String knownName = addresses.get(0).getFeatureName();
 
-            String display = "";
+            String display = "Click to view destination";
 
             if(address != null){
                 display = address + "\n" + city + ", " + state + ", " + country;
