@@ -149,15 +149,14 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     private void init_destinationButton(){
         final Location meeting_location = meeting.getLocation();
 
-
-
         destinationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (meeting.getAdmin().equals(user.getUsername())) {
                     Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
                     intent.putExtra("meeting", meeting);
-                    startActivity(intent);
+                    //startActivity(intent);
+                    startActivityForResult(intent, 1);
                 } else {
                     Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationNonAdminActivity.class);
                     intent.putExtra("meeting", meeting);

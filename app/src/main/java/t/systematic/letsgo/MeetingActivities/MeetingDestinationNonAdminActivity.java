@@ -54,20 +54,24 @@ public class MeetingDestinationNonAdminActivity extends FragmentActivity impleme
             String city = addresses.get(0).getLocality();
             String state = addresses.get(0).getAdminArea();
             String country = addresses.get(0).getCountryName();
-            String postalCode = addresses.get(0).getPostalCode();
-            String knownName = addresses.get(0).getFeatureName();
-            if(knownName != null){
-                meetingLocationTextView.setText(knownName);
+            //String postalCode = addresses.get(0).getPostalCode();
+            //String knownName = addresses.get(0).getFeatureName();
+
+            String display = "";
+
+            if(address != null){
+                display = address + "\n" + city + ", " + state + ", " + country;
+                meetingLocationTextView.setText(display);
+                meetingLocationTextView.setGravity(Gravity.CENTER);
+            }
+            else if(city != null && state != null && country != null){
+                display = city + ", " + state + ", " + country;
+                meetingLocationTextView.setText(display);
                 meetingLocationTextView.setGravity(Gravity.CENTER);
             }
             else{
-                String display = address + ", "
-                                + city + ", "
-                                + state + ", "
-                                + country + " "
-                                + postalCode;
                 meetingLocationTextView.setText(display);
-                Toast.makeText(this, ""+display, Toast.LENGTH_SHORT).show();
+                meetingLocationTextView.setGravity(Gravity.CENTER);
             }
         }
         else{
