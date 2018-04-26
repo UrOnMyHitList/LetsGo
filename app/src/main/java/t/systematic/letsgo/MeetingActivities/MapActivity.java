@@ -11,6 +11,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -45,12 +47,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.Database.OnGetDataListener;
@@ -59,7 +64,7 @@ import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
 import t.systematic.letsgo.Utils.DirectionsParser;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, TextToSpeech.OnInitListener {
 
     private GoogleMap mMap;
     private User user;
@@ -78,6 +83,16 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private Meeting mMeeting;
     private ArrayList<String> participants;
     private HashMap<String, Marker> hashMapMarkers = new HashMap<>();
+    private HashMap<String, LatLng> participantsLocation = new HashMap<>();
+    private HashMap<String, Double> participantsStatusMessage = new HashMap<>();
+    private ArrayList<String> speakMessageQueue = new ArrayList<>();
+
+    Thread monitorUsersThread;
+    Thread t;
+    Thread speakMonitor;
+    boolean abort;
+
+    private TextToSpeech myTTS;
 
 
     @Override
@@ -85,11 +100,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
 
+        myTTS = new TextToSpeech(getApplicationContext(), this);
 
-        //TODO add logic in the case that the user is not the admin but instead a participant.
         Intent intent = getIntent();
         user = (User) intent.getSerializableExtra("USER_OBJECT");
-        String meetingName = (String) intent.getSerializableExtra("MEETING_NAME");
+        final String meetingName = (String) intent.getSerializableExtra("MEETING_NAME");
         mMeeting = user.getMeeting(meetingName);
         participants = mMeeting.getParticipants();
 
@@ -110,12 +125,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         /* Time is in milliseconds, distance in meters. */
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 20, (android.location.LocationListener) this);
 
+
+        Intent checkTTSIntent = new Intent();
+        checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkTTSIntent, 0);
+
+
+
         /* Noticed the logs say: Skipped 34 frames!
             The application may be doing too
             much work on its main thread.
 
            So I added this part in a new thread. */
-        Thread t = new Thread(new Runnable(){
+        t = new Thread(new Runnable(){
             @Override
             public void run() {
                 for(int i = 0; i < participants.size(); i++){
@@ -124,10 +146,146 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 }
             }
         });
-
         t.start();
-        Log.d("ONCREATEFINISH", "TRIGGERED");
-        //getDeviceLocation();
+
+        /* Thread will be used to perform functionality based on users's location. */
+        monitorUsersThread = new Thread(new Runnable() {
+
+
+            @Override
+            public void run() {
+                for(String userName : participants){
+                    participantsStatusMessage.put(userName, 100.00);
+                }
+
+
+                speakMessageQueue.add("Lets get started " + user.getUsername());
+                SystemClock.sleep(5000);
+
+                boolean meetingComplete = false;
+
+                while((abort == false) && (meetingComplete == false)){
+                    Log.d("INSIDEWHILE", "");
+                    checkForInActiveUsers();
+
+                    SystemClock.sleep(5000);
+                }
+
+
+            }
+
+        });
+
+
+        speakMonitor = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while(!abort){
+                    Log.d("SPEAKMONITOR", "");
+                    if(speakMessageQueue.size() > 0){
+                        speakWords(speakMessageQueue.get(0));
+                        speakMessageQueue.remove(0);
+                    }
+
+                    SystemClock.sleep(5000);
+                }
+            }
+        });
+        speakMonitor.start();
+        monitorUsersThread.start();
+        getDeviceLocation();
+    }
+
+    public void checkForInActiveUsers(){
+        float[] dist = new float[1];
+        String message = "";
+        double milesAway;
+        for(String participantName: participantsLocation.keySet()){
+            Location.distanceBetween(participantsLocation.get(participantName).latitude,participantsLocation.get(participantName).longitude,
+                    mMeeting.getLat(),mMeeting.getLong(),dist);
+            message = participantName + " is ";
+            milesAway = 0.62137 * (dist[0]/1000);
+            milesAway = BigDecimal.valueOf(milesAway)
+                    .setScale(1, RoundingMode.HALF_UP)
+                    .doubleValue();
+            if(milesAway >=4 && milesAway <=5 && participantsStatusMessage.get(participantName) != 5.0){
+                message += milesAway + " miles away from the destination";
+                Log.d("SPEAKING", "5");
+                speakMessageQueue.add(message);
+                participantsStatusMessage.put(participantName, 5.0);
+            } else if(milesAway >=1 && milesAway <= 2 && participantsStatusMessage.get(participantName) != 2.0){
+                message += milesAway + " miles away from the destination";
+                Log.d("SPEAKING", "2");
+                speakMessageQueue.add(message);
+                participantsStatusMessage.put(participantName, 2.0);
+            } else if(milesAway >=0 && milesAway <= 1 && participantsStatusMessage.get(participantName) != 1.0){
+                message += milesAway + " miles away from the destination";
+                Log.d("SPEAKING", "1");
+                speakMessageQueue.add(message);
+                participantsStatusMessage.put(participantName, 1.0);
+            } else if(milesAway >=0 && milesAway <= 0.5 && participantsStatusMessage.get(participantName) != 0.5){
+                message += milesAway + " miles away from the destination";
+                Log.d("SPEAKING", ".5");
+                speakMessageQueue.add(message);
+                participantsStatusMessage.put(participantName, 0.5);
+            } else if(milesAway >=0 && milesAway <= 0.1 && participantsStatusMessage.get(participantName) != 0.1){
+                message = participantName + " has arrived at the destination";
+                Log.d("SPEAKING", "0");
+                speakMessageQueue.add(message);
+                participantsStatusMessage.put(participantName, 0.1);
+            }
+
+        }
+    }
+
+    /* When activity is destroyed kill threads. */
+    @Override
+    protected void onDestroy() {
+
+        abort = true;
+        t.interrupt();
+        t = null;
+        monitorUsersThread.interrupt();
+        monitorUsersThread = null;
+        myTTS.stop();
+        myTTS.shutdown();
+
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        if(myTTS == null){
+            myTTS = new TextToSpeech(getApplicationContext(), this);
+        }
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        myTTS.shutdown();
+        super.onStop();
+    }
+
+    private boolean speakWords(String speech) {
+        while(myTTS != null && myTTS.isSpeaking()){ Log.d("INTHESPEAKLOP", ""); SystemClock.sleep(1000); }
+            myTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+            Log.d("SPEAKWORDSMETHOD", speech);
+            return true;
+
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                myTTS = new TextToSpeech(getApplicationContext(), this);
+            }
+            else {
+                Intent installTTSIntent = new Intent();
+                installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installTTSIntent);
+            }
+        }
     }
 
     private void displayUserRoute(LatLng latLng){
@@ -142,8 +300,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         DatabaseHelper.getInstance().getUserLocation(username, new OnGetDataListener() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
-                addUserMarker(Double.parseDouble(dataSnapshot.child("latitude").getValue().toString()),
-                        Double.parseDouble(dataSnapshot.child("longitude").getValue().toString()), username, true);
+                double latitude = Double.parseDouble(dataSnapshot.child("latitude").getValue().toString());
+                double longitude = Double.parseDouble(dataSnapshot.child("longitude").getValue().toString());
+                addUserMarker(latitude, longitude, username, true);
+                participantsLocation.put(username, new LatLng(latitude, longitude));
             }
 
             @Override
@@ -153,11 +313,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         });
     }
 
-    /* Might not need this since we are using a listener to get the updated location.*/
+    /* Used to get initial location from user device.*/
     private void getDeviceLocation() {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
-
             if (mLocationPermissionsGranted) {
                 Task location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(new OnCompleteListener() {
@@ -165,9 +324,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
                             currentLocation = (Location) task.getResult();
-                            moveCamera(new LatLng(currentLocation.getLatitude(),
-                                    currentLocation.getLongitude()), 14f);
-                            mMap.addMarker(new MarkerOptions().position(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude())).title("Your position")).showInfoWindow();
+                            displayUserRoute(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
                         } else {
                             Toast.makeText(MapActivity.this, "Unable to get Location", Toast.LENGTH_LONG).show();
                         }
@@ -356,9 +513,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
                 Log.d("USERNAME", userName + " Lat: " + userLoc.latitude + " Long: " + userLoc.longitude);
                 addUserMarker(userLoc.latitude, userLoc.longitude, userName, true);
+                participantsLocation.put(userName, userLoc);
 
+                /*      ***************** IF THERE IS TIME TO UPDATE OPTIMAL PATH OR JUST LEAVE ORIGINAL PATH
                 displayUserRoute(new LatLng(Double.parseDouble(dataSnapshot.child("latitude").getValue().toString()),
                         Double.parseDouble(dataSnapshot.child("longitude").getValue().toString())));
+
+                 */
 
 
             }
@@ -406,7 +567,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         /* User will have the blue dot, so set marker visibility to false. Need the marker to calculate the
         *  camera zoom. */
         addUserMarker(lat, lng, user.getUsername(), false);
-        displayUserRoute(new LatLng(lat,lng));
 
         /* Update user location into the database for other participants to see. */
         DatabaseHelper.getInstance().updateUserLocation(user.getUsername(), lat, lng);
@@ -427,6 +587,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
+    @Override
+    public void onInit(int i) {
+        if (i == TextToSpeech.SUCCESS) {
+            myTTS.setLanguage(Locale.US);
+        } else if (i == TextToSpeech.ERROR) {
+            Toast.makeText(this, "Sorry! Text To Speech failed...", Toast.LENGTH_LONG).show();
+        }
+    }
 
 
     public class TaskRequestDirections extends AsyncTask<String, Void, String> {
@@ -470,7 +638,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> lists) {
             /* Get list route and display it into the map. */
-            Log.d("DIDROUTE", "DID");
             ArrayList points = null;
             PolylineOptions polylineOptions = null;
 

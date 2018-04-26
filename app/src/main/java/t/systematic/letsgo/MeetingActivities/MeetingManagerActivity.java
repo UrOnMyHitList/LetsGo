@@ -122,6 +122,14 @@ public class MeetingManagerActivity extends SettingsActivity {
                     Log.d("CHECKINGMEETING NOW", "" + now);
                     if (now.after(meetingTime)) {
                         Log.d("CHECKINGMEETING", nextUpMeeting.getMeetingName());
+                        if(isServicesOK()){
+                            Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
+                            intent.putExtra("USER_OBJECT", user);
+                            intent.putExtra("MEETING_NAME", nextUpMeeting.getMeetingName());
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Services failed", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         Toast.makeText(getApplicationContext(), "It's still not time for " + nextUpMeeting.getMeetingName() + "!", Toast.LENGTH_SHORT).show();
                     }
@@ -129,18 +137,6 @@ public class MeetingManagerActivity extends SettingsActivity {
                 }else {
                     Toast.makeText(getApplicationContext(), "You have no meetings scheduled!", Toast.LENGTH_SHORT).show();
                 }
-
-
-
-
-
-   //             if(isServicesOK()){}
-
-
-//                Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
-//                intent.putExtra("USER_OBJECT", user);
-//                intent.putExtra("MEETING_NAME", "Demo");
-//                startActivity(intent);
             }
         });
     }
