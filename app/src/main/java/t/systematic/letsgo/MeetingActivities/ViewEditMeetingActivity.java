@@ -172,7 +172,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             String display = "Click to view destination";
 
             if(address != null){
-                display = address + ", " + city + ", " + state; 
+                display = address + ", " + city + ", " + state;
                 destinationButton.setText(display);
                 destinationButton.setGravity(Gravity.CENTER);
             }
