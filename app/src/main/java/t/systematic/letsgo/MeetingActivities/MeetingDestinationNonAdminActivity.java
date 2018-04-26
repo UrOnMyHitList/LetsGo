@@ -86,5 +86,7 @@ public class MeetingDestinationNonAdminActivity extends FragmentActivity impleme
         LatLng meetingLatLng = meeting.getLatLng();
         mMap.addMarker(new MarkerOptions().position(meetingLatLng).title(meeting.getMeetingName()));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(meetingLatLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(8.0f));
+
     }
 }

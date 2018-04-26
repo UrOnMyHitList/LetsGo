@@ -251,6 +251,25 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void changeMeetingLocation(final String meetingId, final LatLng location, final OnGetDataListener listener){
+        final DatabaseReference meetingRef = ref.child("meetings").child(meetingId);
+        meetingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    meetingRef.child("Lat").setValue(location.latitude);
+                    meetingRef.child("Long").setValue(location.longitude);
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Unable to change meeting location.");
+            }
+        });
+    }
+
+
     public void createUpdateMeeting(String meetingId, double Lat, double Long, String admin, final String newMeetingName,
         ArrayList<String> participants, String startTime, final OnGetDataListener listener){
 
@@ -259,6 +278,7 @@ public class DatabaseHelper extends FragmentActivity{
         ref.child("meetings").child(meetingId).child("Long").setValue(Long);
         ref.child("meetings").child(meetingId).child("admin").setValue(admin);
         ref.child("meetings").child(meetingId).child("meetingName").setValue(newMeetingName);
+        ref.child("meetings").child(meetingId).child("participants").removeValue();
         for(int i = 0; i < participants.size(); i++){
             ref.child("meetings").child(meetingId).child("participants").child(Integer.toString(i)).setValue(participants.get(i));
         }

@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +48,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
+import t.systematic.letsgo.Database.DatabaseHelper;
+import t.systematic.letsgo.Database.OnGetDataListener;
+import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.MeetingActivities.PlaceAutoCompleteAdapter;
 
@@ -67,7 +73,7 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
         mMap = googleMap;
 
         if (mLocationPermissionsGranted) {
-            getDeviceLocation();
+            getMeetingLocation(meeting);
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
@@ -102,7 +108,7 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
     private PlaceAutoCompleteAdapter mPlaceAutocompleteAdapter;
     private GoogleApiClient mGoogleApiClient;
 
-    private Location meetingLocation;
+    private Meeting meeting;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,7 +120,7 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
         Intent intent = getIntent();
         String a = intent.getStringExtra("userType");
 
-        meetingLocation = intent.getParcelableExtra("location");
+        meeting = (Meeting) intent.getSerializableExtra("meeting");
 
         getLocationPermission();
 
@@ -178,13 +184,53 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
             Address address = list.get(0);
 
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-
+            mMap.clear();
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
                     address.getAddressLine(0));
+
+            confirm(new LatLng(address.getLatitude(), address.getLongitude()));
         }
     }
 
+    private void confirm(final LatLng latlng){
+        final RelativeLayout rl = findViewById(R.id.ok_cancel_buttons);
+        rl.setVisibility(View.VISIBLE);
+        // TODO ask user if this is the location to change to
+        FloatingActionButton ok = findViewById(R.id.ok);
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatabaseHelper.getInstance().changeMeetingLocation(meeting.getMeetingId(), latlng, new OnGetDataListener() {
+                    @Override
+                    public void onSuccess(DataSnapshot dataSnapshot) {
+                        Toast.makeText(MeetingDestinationActivity.this, "Location updated!", Toast.LENGTH_SHORT).show();
+                        rl.setVisibility(View.INVISIBLE);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(String failure) {
+                        Toast.makeText(MeetingDestinationActivity.this, ""+failure, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+        FloatingActionButton cancel = findViewById(R.id.cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSearchText.setText("");
+                getMeetingLocation(meeting);
+                rl.setVisibility(View.INVISIBLE);
+            }
+        });
+
+    }
+
+    /**
+     * This method focuses the camera on the user's device location
+     */
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: getting the devices current location");
 
@@ -203,7 +249,6 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
                                     DEFAULT_ZOOM,
                                     "My Location");
-
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
                             Toast.makeText(MeetingDestinationActivity.this, "unable to get current location", Toast.LENGTH_SHORT).show();
@@ -214,6 +259,18 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
         }catch (SecurityException e){
             Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage() );
         }
+    }
+
+    /**
+     * This function focuses the camera on the meeting location that is passed in and drops a marker on that location.
+     * It is useful for when a user searches for a place and decides not to confirm it, so the old location is still set.
+     * @param meeting
+     */
+    private void getMeetingLocation(Meeting meeting){
+        Toast.makeText(this, ""+meeting.getLat() + ", " + meeting.getLong(), Toast.LENGTH_LONG).show();
+        moveCamera(meeting.getLatLng(),
+                DEFAULT_ZOOM,
+                meeting.getMeetingName());
     }
 
     private void moveCamera(LatLng latLng, float zoom, String title){

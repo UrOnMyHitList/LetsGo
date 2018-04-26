@@ -95,7 +95,6 @@
         android:text="Destination"
         android:textSize="20sp"
         android:visibility="visible" />
-
     <EditText
         android:id="@+id/date_editText"
         android:layout_width="match_parent"
@@ -107,7 +106,8 @@
         android:layout_marginBottom="10dp"
         android:ems="10"
         android:hint="Date"
-        android:inputType="textPersonName"
+        android:focusable="false"
+        android:inputType="none"
         android:visibility="invisible"
         android:layout_below="@id/destination_button" />
 
@@ -122,7 +122,8 @@
         android:layout_marginBottom="10dp"
         android:ems="10"
         android:hint="Time"
-        android:inputType="textPersonName"
+        android:focusable="false"
+        android:inputType="none"
         android:visibility="invisible"
         android:layout_below="@id/date_editText" />
 
