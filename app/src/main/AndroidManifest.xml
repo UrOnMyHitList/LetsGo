@@ -9,6 +9,9 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- To send text message to user to let them reset their password -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -43,13 +46,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".AccountManagement.LogInActivity" />
+        <activity android:name=".AccountManagement.LogInActivity" />
         <activity
             android:name=".MeetingActivities.MapActivity"
             android:label="@string/title_activity_map" />
-        <activity
-            android:name=".MeetingActivities.MeetingManagerActivity" />
+        <activity android:name=".MeetingActivities.MeetingManagerActivity" />
         <activity
             android:name=".AccountManagement.ChangeAccountInfoActivity"
             android:parentActivityName=".MainActivity" />
@@ -57,6 +58,7 @@
             android:name=".FriendActivities.FriendsManagerActivity" />
         <activity
             android:name=".ParentChildActivities.ParentChildManagerActivity" />
+
         <activity
             android:name=".MeetingActivities.ViewEditMeetingActivity"
             android:configChanges="orientation"
@@ -64,10 +66,9 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".AccountManagement.CreateAccountActivity"
-            android:parentActivityName=".AccountManagement.LogInActivity"/>
-        <activity 
-        	android:name=".MeetingActivities.ViewCalendarActivity" />
-            <!--TODO add proper way to go back - android:parentActivityName=".MeetingActivities.MeetingManagerActivity"-->
+            android:parentActivityName=".AccountManagement.LogInActivity" />
+        <activity android:name=".MeetingActivities.ViewCalendarActivity" />
+        <!-- TODO add proper way to go back - android:parentActivityName=".MeetingActivities.MeetingManagerActivity" -->
         <activity
             android:name=".AccountManagement.ForgotInfoActivity"
             android:parentActivityName=".AccountManagement.LogInActivity" />
@@ -75,8 +76,24 @@
             android:name=".NotificationActivities.NotificationActivity"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".AccountManagement.ChangeUsername" />
         <activity
-            android:name=".AccountManagement.ChangeUsername" />
+            android:name=".MeetingActivities.MeetingDestinationActivity"
+            android:label="@string/title_activity_meeting_destination">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="t.systematic.letsgo.MeetingActivities.ViewEditMeetingActivity" />
+        </activity>
+        <activity
+            android:name=".MeetingActivities.MeetingDestinationNonAdminActivity"
+            android:label="@string/title_activity_meeting_destination_non_admin">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="t.systematic.letsgo.MeetingActivities.ViewEditMeetingActivity" />
+        </activity>
+
+        <activity android:name=".FriendActivities.AddFriendActivity" />
+        <activity android:name=".FriendActivities.RemoveFriendActivity"></activity>
     </application>
 
 </manifest>
