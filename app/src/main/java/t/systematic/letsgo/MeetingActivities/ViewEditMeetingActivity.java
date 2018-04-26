@@ -1,17 +1,22 @@
 package t.systematic.letsgo.MeetingActivities;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +30,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -58,14 +65,13 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     private TextView meetingName_textView;
     private EditText meetingName_editText;
 
-    private TextView destination_textView;
-    private EditText destination_editText;
-
     private TextView date_textView;
     private EditText date_editText;
 
     private TextView time_textView;
     private EditText time_editText;
+
+    private Button destinationButton;
 
     private Button updateCreateButton;
     private Button addFriendsButton;
@@ -102,6 +108,8 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         setContentView(R.layout.activity_view_edit_single_meeting);
         init_layoutElements();
 
+        destinationButton = (Button)findViewById(R.id.destination_button);
+
         Intent intent = getIntent();
         intent.getExtras();
 
@@ -136,14 +144,88 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         }
 
         init_PageButtons();
+        init_destinationButton();
 
         calendar = Calendar.getInstance();
         calendar.setTimeZone(timeZone);
         newMeetingCalendar = Calendar.getInstance();
         newMeetingCalendar.setTimeZone(timeZone);
-
     }
 
+    private void update_destinationButton_text(){
+        Geocoder geocoder;
+        List<Address> addresses = null;
+        geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            addresses = geocoder.getFromLocation(meeting.getLat(), meeting.getLong(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+        } catch(IOException e){
+            Toast.makeText(this, "Uable to load locaiton address", Toast.LENGTH_SHORT).show();
+        }
+        if(addresses != null) {
+            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+            String city = addresses.get(0).getLocality();
+            String state = addresses.get(0).getAdminArea();
+            String country = addresses.get(0).getCountryName();
+            String postalCode = addresses.get(0).getPostalCode();
+            String knownName = addresses.get(0).getFeatureName();
+
+            String display = "Click to view destination";
+
+            if(address != null){
+                display = address + ", " + city + ", " + state;
+                destinationButton.setText(display);
+                destinationButton.setGravity(Gravity.CENTER);
+            }
+            else if(city != null && state != null && country != null){
+                display = city + ", " + state + ", " + country;
+                destinationButton.setText(display);
+                destinationButton.setGravity(Gravity.CENTER);
+            }
+            else{
+                destinationButton.setText(display);
+                destinationButton.setGravity(Gravity.CENTER);
+            }
+        }
+    }
+
+    private void init_destinationButton(){
+        update_destinationButton_text();
+
+        destinationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (meeting.getAdmin().equals(user.getUsername())) {
+                    Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
+                    intent.putExtra("meeting", meeting);
+                    startActivityForResult(intent, 1);
+                } else {
+                    Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationNonAdminActivity.class);
+                    intent.putExtra("meeting", meeting);
+                    startActivity(intent);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (1) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    LatLng latlng = (LatLng) data.getParcelableExtra("latlng");
+
+                    //Update meeting location.
+                    Location targetLocation = new Location("");
+                    targetLocation.setLatitude(latlng.latitude);
+                    targetLocation.setLongitude(latlng.longitude);
+                    meeting.setLocation(new Location(targetLocation));
+                    update_destinationButton_text();
+                }
+                break;
+            }
+        }
+    }
 
     private void init_SelectFriendsVars(){
         friends = user.getFriends();
@@ -238,17 +320,14 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
 
                 if(mode.equals("EDIT_TEXT_MODE")){
                     Log.d("LLL", "IN EDIT");
-                    if(isEmpty(date_editText.getText().toString())|| isEmpty(meetingName_editText.getText().toString()) || isEmpty(time_editText.getText().toString()) ||
-                            isEmpty(destination_editText.getText().toString())){
+                    if(isEmpty(date_editText.getText().toString())|| isEmpty(meetingName_editText.getText().toString()) || isEmpty(time_editText.getText().toString())){
                         Toast.makeText(getApplicationContext(), "*** All fields must be filled in ***", Toast.LENGTH_LONG).show();
                         return;
                     }
                 } else if(mode.equals("TEXT_VIEW_MODE")){
                     if(isEmpty(date_textView.getText().toString())|| isEmpty(meetingName_textView.getText().toString()) ||
-                            isEmpty(time_textView.getText().toString()) || isEmpty(destination_textView.getText().toString())){
+                            isEmpty(time_textView.getText().toString())){
                         Toast.makeText(getApplicationContext(), "*** All fields must be filled in ***", Toast.LENGTH_LONG).show();
-                        Log.d("RETTT", "DATE: "+date_textView.getText().toString() + " TIME: " + time_textView.getText().toString() +
-                        " Meetingnam: " + meetingName_textView.getText().toString() + " dest: " + destination_textView.getText().toString());
                         return;
                     }
                 }
@@ -360,7 +439,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
 
     private void init_EditTextMode(Intent intent){
         setCreateMeetingLayout(meetingName_editText, meetingName_textView, "Meeting name");
-        setCreateMeetingLayout(destination_editText, destination_textView, "Click to select destination");
         setCreateMeetingLayout(date_editText, date_textView, "Click to select a date");
         setCreateMeetingLayout(time_editText, time_textView, "Click to select a time");
         meetingName_editText.requestFocus();
@@ -380,9 +458,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             init_editAndTextViewListeners();
         }
 
-        destination_textView.setText(Double.toString(meeting.getLat()) + " " +
-                Double.toString(meeting.getLong()));
-        Log.d("TIMEVALUE" , meeting.getDateTime().toString());
         /* Initialize all editText, textView, and listView fields. */
         meetingName_textView.setText(meeting.getMeetingName());
         participants = meeting.getParticipants();
@@ -410,9 +485,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         meetingName_editText = (EditText)findViewById(R.id.meetingName_editText);
         meetingName_textView = (TextView) findViewById(R.id.meetingName_textView);
 
-        destination_editText = (EditText)findViewById(R.id.destination_editText);
-        destination_textView = (TextView)findViewById(R.id.destination_textView);
-
         date_editText = (EditText)findViewById(R.id.date_editText);
         date_textView = (TextView)findViewById(R.id.date_textView);
 
@@ -431,9 +503,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
 
         init_textViewOnLongClickListener(meetingName_textView, meetingName_editText);
         init_editTextOnFocusChangeListener(meetingName_editText, meetingName_textView);
-
-        init_textViewOnLongClickListener(destination_textView, destination_editText);
-        init_editTextOnFocusChangeListener(destination_editText, destination_textView);
 
         init_textViewOnLongClickListener(date_textView, date_editText);
         init_editTextOnFocusChangeListener(date_editText, date_textView);
