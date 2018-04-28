@@ -39,9 +39,6 @@ public class MeetingManagerActivity extends SettingsActivity {
 
         Intent intent = getIntent();
         user = (User)intent.getSerializableExtra("USER_OBJECT");
-        if(user == null){
-            System.out.print("Nothing passed");
-        }
 
         /* Get name of meetings to display in listView. */
         init_listView(user.getAllMeetingNames());

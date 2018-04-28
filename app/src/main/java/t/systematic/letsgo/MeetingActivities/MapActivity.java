@@ -85,6 +85,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private HashMap<String, Marker> hashMapMarkers = new HashMap<>();
     private HashMap<String, LatLng> participantsLocation = new HashMap<>();
     private HashMap<String, Double> participantsStatusMessage = new HashMap<>();
+    private HashMap<String, Boolean> allArrived = new HashMap<>();
     private ArrayList<String> speakMessageQueue = new ArrayList<>();
 
     Thread monitorUsersThread;
@@ -110,8 +111,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         /* In the case the user is not admin, remove user from 'participants' and add admin. */
         if(!mMeeting.getAdmin().equals(user.getUsername())){
-            participants.remove(user.getUsername());
-            participants.add(mMeeting.getAdmin());
+            participants.remove(mMeeting.getAdmin());
+            participants.add(user.getUsername());
         }
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -154,22 +155,28 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             @Override
             public void run() {
+                int k = 0;
                 for(String userName : participants){
+                    Log.d("CHECKINGALLPARTS"+ k++, userName);
                     participantsStatusMessage.put(userName, 100.00);
+                    allArrived.put(userName, false);
                 }
 
 
-                speakMessageQueue.add("Lets get started " + user.getUsername());
-                SystemClock.sleep(5000);
 
+
+                speakMessageQueue.add("Lets go!");
                 boolean meetingComplete = false;
-
+                int i = 0;
+                Log.d("MONITORUSER", "USER");
                 while((abort == false) && (meetingComplete == false)){
-                    Log.d("INSIDEWHILE", "");
-                    checkForInActiveUsers();
+                    Log.d("MONITORUSERSTHREAD " + i++, "INSIDE");
+                    reportUserProgress();
 
                     SystemClock.sleep(5000);
                 }
+
+                Log.d("MONITORUSERSTHREAD", "abort: " + abort + " meetingCOmplete " + meetingComplete);
 
 
             }
@@ -197,10 +204,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         getDeviceLocation();
     }
 
-    public void checkForInActiveUsers(){
+
+
+    public void reportUserProgress(){
+
         float[] dist = new float[1];
+        double pStatusMessage;
         String message = "";
         double milesAway;
+        boolean allArrived = false;
         for(String participantName: participantsLocation.keySet()){
             Location.distanceBetween(participantsLocation.get(participantName).latitude,participantsLocation.get(participantName).longitude,
                     mMeeting.getLat(),mMeeting.getLong(),dist);
@@ -209,33 +221,49 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             milesAway = BigDecimal.valueOf(milesAway)
                     .setScale(1, RoundingMode.HALF_UP)
                     .doubleValue();
-            if(milesAway >=4 && milesAway <=5 && participantsStatusMessage.get(participantName) != 5.0){
+            pStatusMessage = participantsStatusMessage.get(participantName);
+            Log.d("CHECKINGDISTANCE"+participantName, "milesaway: " + milesAway + " part: " + participantName + " partMess: " + participantsStatusMessage.get(participantName));
+            if(milesAway >=4 && milesAway <=5 && pStatusMessage != 5.0){
                 message += milesAway + " miles away from the destination";
-                Log.d("SPEAKING", "5");
+                Log.d("SPEAKING1", "5");
                 speakMessageQueue.add(message);
                 participantsStatusMessage.put(participantName, 5.0);
-            } else if(milesAway >=1 && milesAway <= 2 && participantsStatusMessage.get(participantName) != 2.0){
+            } else if(milesAway >=1 && milesAway <= 2 && pStatusMessage != 2.0){
                 message += milesAway + " miles away from the destination";
                 Log.d("SPEAKING", "2");
                 speakMessageQueue.add(message);
                 participantsStatusMessage.put(participantName, 2.0);
-            } else if(milesAway >=0 && milesAway <= 1 && participantsStatusMessage.get(participantName) != 1.0){
-                message += milesAway + " miles away from the destination";
-                Log.d("SPEAKING", "1");
-                speakMessageQueue.add(message);
-                participantsStatusMessage.put(participantName, 1.0);
-            } else if(milesAway >=0 && milesAway <= 0.5 && participantsStatusMessage.get(participantName) != 0.5){
-                message += milesAway + " miles away from the destination";
-                Log.d("SPEAKING", ".5");
-                speakMessageQueue.add(message);
-                participantsStatusMessage.put(participantName, 0.5);
-            } else if(milesAway >=0 && milesAway <= 0.1 && participantsStatusMessage.get(participantName) != 0.1){
+
+            } else if(milesAway >=0.0 && milesAway <= 0.1 && pStatusMessage != 0.1){
                 message = participantName + " has arrived at the destination";
                 Log.d("SPEAKING", "0");
                 speakMessageQueue.add(message);
                 participantsStatusMessage.put(participantName, 0.1);
+                allArrived = true;
+            } else if(milesAway >=0.0 && milesAway <= 0.5 && pStatusMessage != 0.5 && pStatusMessage != 0.1){
+                message += milesAway + " miles away from the destination";
+                Log.d("SPEAKING", participantName + ".5");
+                speakMessageQueue.add(message);
+                participantsStatusMessage.put(participantName, 0.5);
+            } else if(milesAway >=0.0 && milesAway <= 1 && pStatusMessage != 1.0 && pStatusMessage != 0.1){
+                message += milesAway + " miles away from the destination";
+                Log.d("SPEAKING", "1");
+                speakMessageQueue.add(message);
+                participantsStatusMessage.put(participantName, 1.0);
+            } else {
+                allArrived = false;
             }
 
+
+
+        }
+
+        if(allArrived){
+            speakWords("Everyone has arrived to the destination!");
+            Intent intent = new Intent(MapActivity.this, MeetingManagerActivity.class);
+            intent.putExtra("USER_OBJECT", user);
+            finish();
+            startActivity(intent);
         }
     }
 
@@ -269,11 +297,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     private boolean speakWords(String speech) {
-        while(myTTS != null && myTTS.isSpeaking()){ Log.d("INTHESPEAKLOP", ""); SystemClock.sleep(1000); }
-            myTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
-            Log.d("SPEAKWORDSMETHOD", speech);
-            return true;
-
+        //Might need to add logic to check when another is speaking.
+        myTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+        Log.d("SPEAKWORDSMETHOD", speech);
+        while(myTTS.isSpeaking()){};
+        return true;
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0) {
@@ -304,6 +332,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 double longitude = Double.parseDouble(dataSnapshot.child("longitude").getValue().toString());
                 addUserMarker(latitude, longitude, username, true);
                 participantsLocation.put(username, new LatLng(latitude, longitude));
+                displayUserRoute(new LatLng(latitude, longitude));
             }
 
             @Override
@@ -488,6 +517,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     protected void onPause() {
+        if(myTTS !=null){
+            myTTS.stop();
+            myTTS.shutdown();
+        }
         super.onPause();
         locationManager.removeUpdates(this);
     }
@@ -564,6 +597,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         lat = location.getLatitude();
         lng = location.getLongitude();
         user.setLocation(lat, lng);
+        participantsLocation.put(user.getUsername(), new LatLng(lat, lng));
 
         /* User will have the blue dot, so set marker visibility to false. Need the marker to calculate the
         *  camera zoom. */
@@ -665,6 +699,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 //polylineOptions1.remove();
 
             } else {
+                Log.d("FAILEDTOADDPOLYLINE", "TRIGGERED");
                 Toast.makeText(getApplicationContext(), "Directions not found!", Toast.LENGTH_LONG).show();
             }
         }
