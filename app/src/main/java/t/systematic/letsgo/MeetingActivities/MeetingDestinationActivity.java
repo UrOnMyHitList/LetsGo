@@ -73,8 +73,12 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
         mMap = googleMap;
 
         if (mLocationPermissionsGranted) {
-            getMeetingLocation(meeting);
-
+            if(mode.equals("CREATE_MEETING_MODE")){
+                getDeviceLocation();
+            }
+            else {
+                getMeetingLocation(meeting);
+            }
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -109,6 +113,7 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
     private GoogleApiClient mGoogleApiClient;
 
     private Meeting meeting;
+    private String mode;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -118,9 +123,9 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
         mGps = (ImageView) findViewById(R.id.ic_gps);
 
         Intent intent = getIntent();
-        String a = intent.getStringExtra("userType");
 
         meeting = (Meeting) intent.getSerializableExtra("meeting");
+        mode = intent.getStringExtra("mode");
 
         getLocationPermission();
 
@@ -211,23 +216,12 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseHelper.getInstance().changeMeetingLocation(meeting.getMeetingId(), latlng, new OnGetDataListener() {
-                    @Override
-                    public void onSuccess(DataSnapshot dataSnapshot) {
-                        Toast.makeText(MeetingDestinationActivity.this, "Location updated!", Toast.LENGTH_SHORT).show();
-                        rl.setVisibility(View.INVISIBLE);
+                rl.setVisibility(View.INVISIBLE);
 
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra("latlng", latlng);
-                        setResult(Activity.RESULT_OK, resultIntent);
-                        finish();
-                    }
-
-                    @Override
-                    public void onFailure(String failure) {
-                        Toast.makeText(MeetingDestinationActivity.this, ""+failure, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("latlng", latlng);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
             }
         });
 
@@ -236,7 +230,12 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
             @Override
             public void onClick(View view) {
                 mSearchText.setText("");
-                getMeetingLocation(meeting);
+                if(mode.equals("CREATE_MEETING_MODE")){
+                    getDeviceLocation();
+                }
+                else {
+                    getMeetingLocation(meeting);
+                }
                 rl.setVisibility(View.INVISIBLE);
             }
         });
@@ -279,6 +278,7 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
     /**
      * This function focuses the camera on the meeting location that is passed in and drops a marker on that location.
      * It is useful for when a user searches for a place and decides not to confirm it, so the old location is still set.
+     * Be sure to make sure the user is not creating a new meeting, if they are call getDeviceLocation method.
      * @param meeting
      */
     private void getMeetingLocation(Meeting meeting){
