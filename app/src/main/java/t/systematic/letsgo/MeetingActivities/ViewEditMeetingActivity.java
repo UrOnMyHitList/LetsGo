@@ -373,9 +373,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                     meetingTime = time_textView.getText().toString();
                 }
 
-
-                //TODO NEED TO GET LOCATION POINTS AND ADD THEM TO ARGUMENTS BELOW
-                DatabaseHelper.getInstance().createUpdateMeeting(meetingId, 43.0, 34.0,user.getUsername(), meetingName,
+                DatabaseHelper.getInstance().createUpdateMeeting(meetingId, editedMeetingLocation.latitude, editedMeetingLocation.longitude,user.getUsername(), meetingName,
                         participants, meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
 
                 Meeting modMeeting = new Meeting(meetingName, participants, newMeetingCalendar, 43.0, 32.0, meetingId, user.getUsername() );
@@ -469,7 +467,9 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     private void init_TextViewMode(Intent intent){
         /* If the user is an admin allow him/her to update the meeting info. */
         if(meeting.getAdmin().equals(user.getUsername())){
+            Log.d("CHECKINGUSERADMINPRIV", "TR");
             init_editAndTextViewListeners();
+            addEditTextListeners();
         }
 
         /* Initialize all editText, textView, and listView fields. */

@@ -286,6 +286,7 @@ public class DatabaseHelper extends FragmentActivity{
 
 
         //Then in success will need to send the requests to other users.
+
     }
 
     public void addMeetingToUser(final String meetingId, final String username){
