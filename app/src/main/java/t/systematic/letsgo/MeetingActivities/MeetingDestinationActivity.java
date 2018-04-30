@@ -1,6 +1,5 @@
 package t.systematic.letsgo.MeetingActivities;
 
-import android.*;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,7 +22,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -41,19 +41,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
-import t.systematic.letsgo.Database.DatabaseHelper;
-import t.systematic.letsgo.Database.OnGetDataListener;
+import javax.net.ssl.HttpsURLConnection;
+
 import t.systematic.letsgo.Meeting.Meeting;
 import t.systematic.letsgo.R;
-import t.systematic.letsgo.MeetingActivities.PlaceAutoCompleteAdapter;
 
 /**
  * Created by User on 10/2/2017.
@@ -112,6 +109,7 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
     private PlaceAutoCompleteAdapter mPlaceAutocompleteAdapter;
     private GoogleApiClient mGoogleApiClient;
 
+
     private Meeting meeting;
     private String mode;
 
@@ -169,8 +167,12 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
                     TODO check with google if it is a valid place and then
                     drop marker at the latlng and update location of meeting by calling confirm(latlng)
                  */
-                Toast.makeText(MeetingDestinationActivity.this, "Implement location picking from long click...", Toast.LENGTH_SHORT).show();
-
+                mMap.clear();
+                MarkerOptions options = new MarkerOptions()
+                        .position(latLng)
+                        .title("Meeting Location");
+                mMap.addMarker(options);
+                confirm(latLng);
             }
         });
         mGps.setOnClickListener(new View.OnClickListener() {
@@ -358,8 +360,6 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
     private void hideSoftKeyboard(){
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
-
-
 }
 
 
