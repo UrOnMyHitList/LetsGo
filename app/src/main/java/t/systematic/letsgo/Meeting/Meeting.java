@@ -95,6 +95,7 @@ public class Meeting implements Comparable<Meeting>, Serializable{
     /* Comparable so that we can organize ArrayList<Meeting> from nearest dateTime to furthest. */
     @Override
     public int compareTo(@NonNull Meeting meeting) {
+
         return mDateTime.compareTo(meeting.getDateTime());
     }
 }

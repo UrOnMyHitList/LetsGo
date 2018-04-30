@@ -39,16 +39,10 @@ public class MeetingManagerActivity extends SettingsActivity {
 
         Intent intent = getIntent();
         user = (User)intent.getSerializableExtra("USER_OBJECT");
-        if(user == null){
-            System.out.print("Nothing passed");
-        }
 
         /* Get name of meetings to display in listView. */
-        if (user.hasMeetings())
-            init_listView(user.getAllMeetingNames());
-        else{
-            //TODO: write "No Meetings Scheduled" to listView
-        }
+        init_listView(user.getAllMeetingNames());
+
         /* Add listener to Scheduled Meeting button. */
         init_viewScheduledMeetingsButton();
         /* Add listener to Schedule Meeting button. */
@@ -78,7 +72,13 @@ public class MeetingManagerActivity extends SettingsActivity {
     }
 
     private void init_listView(ArrayList<String> meetingNames){
+
+        for(int i =0; i < meetingNames.size(); i++){
+            Log.d("MEETINGS", meetingNames.get(i));
+        }
+
         if(meetingNames.size() == 0){
+            Log.d("NOMEETINGS", "NOMEETINGS");
             meetingNames.add("No meetings scheduled!");
         }
         meetings_listView = (ListView)findViewById(R.id.upComingMeetingListView);
@@ -106,32 +106,34 @@ public class MeetingManagerActivity extends SettingsActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 ArrayList<Meeting> userMeetings = user.getMeetings();
-                Log.d("NUMBEROFMEETINGS", "" + userMeetings.size());
-                int me = userMeetings.size();
 
-                for(int i = 0; i < me; i++){
-                    Log.d("CHECKINGMEETINGITER", "IN");
-                    Date x = Calendar.getInstance().getTime();
+                /* Check if user has meetings scheduled. */
+                if(user.getAllMeetingNames().size() > 0){
+                    /* Since meetings are ordered by their start time/date we always get the 1st. */
+                    Meeting nextUpMeeting = user.getMeeting(user.getAllMeetingNames().get(0));
+                    Date meetingTime = nextUpMeeting.getDateTime().getTime();
+                    Date now = Calendar.getInstance().getTime();
 
-                    long ONE_MINUTE_IN_MILLIS=60000;//millisecs
-
-                    long t= userMeetings.get(i).getDateTime().getTimeInMillis();
-                    Date afterAddingOneMin = new Date(t + ONE_MINUTE_IN_MILLIS);
-
-                    if (x.after(userMeetings.get(i).getDateTime().getTime()) && x.before(afterAddingOneMin)) {
-                        Log.d("CHECKING MEETING!", userMeetings.get(i).getMeetingName());
+                    Log.d("CHECKINGMEETING", "" + meetingTime);
+                    Log.d("CHECKINGMEETING NOW", "" + now);
+                    if (now.after(meetingTime)) {
+                        Log.d("CHECKINGMEETING", nextUpMeeting.getMeetingName());
+                        if(isServicesOK()){
+                            Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
+                            intent.putExtra("USER_OBJECT", user);
+                            intent.putExtra("MEETING_NAME", nextUpMeeting.getMeetingName());
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Services failed", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "It's still not time for " + nextUpMeeting.getMeetingName() + "!", Toast.LENGTH_SHORT).show();
                     }
+
+                }else {
+                    Toast.makeText(getApplicationContext(), "You have no meetings scheduled!", Toast.LENGTH_SHORT).show();
                 }
-
-   //             if(isServicesOK()){}
-
-
-//                Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
-//                intent.putExtra("USER_OBJECT", user);
-//                intent.putExtra("MEETING_NAME", "Demo");
-//                startActivity(intent);
             }
         });
     }
