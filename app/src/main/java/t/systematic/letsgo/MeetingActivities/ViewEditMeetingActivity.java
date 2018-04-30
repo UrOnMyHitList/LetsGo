@@ -164,7 +164,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         } catch(IOException e){
             Toast.makeText(this, "Unable to load locaiton address", Toast.LENGTH_SHORT).show();
         }
-        if(addresses != null) {
+        if(addresses != null && !addresses.isEmpty()) {
             String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
             String city = addresses.get(0).getLocality();
             String state = addresses.get(0).getAdminArea();
@@ -367,9 +367,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                     meetingTime = time_textView.getText().toString();
                 }
 
-
-                //TODO NEED TO GET LOCATION POINTS AND ADD THEM TO ARGUMENTS BELOW
-                DatabaseHelper.getInstance().createUpdateMeeting(meetingId, 43.0, 34.0,user.getUsername(), meetingName,
+                DatabaseHelper.getInstance().createUpdateMeeting(meetingId, editedMeetingLocation.latitude, editedMeetingLocation.longitude,user.getUsername(), meetingName,
                         participants, meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
 
                 Meeting modMeeting = new Meeting(meetingName, participants, newMeetingCalendar, 43.0, 32.0, meetingId, user.getUsername() );
