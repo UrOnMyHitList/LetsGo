@@ -86,7 +86,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
 
     private String originalMeetingName;
     private Meeting meeting;
-
+    private LatLng editedMeetingLocation;
     private String mode;
 
 
@@ -120,14 +120,17 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             init_EditTextMode(intent);
             addEditTextListeners();
             init_SelectFriendsVars();
+            editedMeetingLocation = meeting.getLatLng();
 
         } else if(mode.equals("TEXT_VIEW_MODE")){
             init_TextViewMode(intent);
             init_SelectFriendsVars();
+            editedMeetingLocation = meeting.getLatLng();
         } else if(mode.equals("CREATE_MEETING_MODE")){
             init_EditTextMode(intent);
             addEditTextListeners();
 
+            editedMeetingLocation = null;
             friends = user.getFriends();
             Collections.sort(friends);
             selectedFriends = new HashMap<>();
@@ -157,7 +160,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         List<Address> addresses = null;
         geocoder = new Geocoder(this, Locale.getDefault());
         try {
-            addresses = geocoder.getFromLocation(meeting.getLat(), meeting.getLong(), 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+            addresses = geocoder.getFromLocation(editedMeetingLocation.latitude, editedMeetingLocation.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
         } catch(IOException e){
             Toast.makeText(this, "Unable to load locaiton address", Toast.LENGTH_SHORT).show();
         }
@@ -166,13 +169,11 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             String city = addresses.get(0).getLocality();
             String state = addresses.get(0).getAdminArea();
             String country = addresses.get(0).getCountryName();
-            String postalCode = addresses.get(0).getPostalCode();
-            String knownName = addresses.get(0).getFeatureName();
 
             String display = "Click to view destination";
 
             if(address != null){
-                display = address + ", " + city + ", " + state; 
+                display = address + ", " + city + ", " + state;
                 destinationButton.setText(display);
                 destinationButton.setGravity(Gravity.CENTER);
             }
@@ -189,14 +190,23 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     }
 
     private void init_destinationButton(){
-        update_destinationButton_text();
+        if(editedMeetingLocation != null) {
+            update_destinationButton_text();
+        }
 
         destinationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (meeting.getAdmin().equals(user.getUsername())) {
+                if(mode.equals("CREATE_MEETING_MODE")){
                     Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
                     intent.putExtra("meeting", meeting);
+                    intent.putExtra("mode", "CREATE_MEETING_MODE");
+                    startActivityForResult(intent, 1);
+                }
+                else if (meeting.getAdmin().equals(user.getUsername())) {
+                    Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
+                    intent.putExtra("meeting", meeting);
+                    intent.putExtra("mode", "EDIT_MEETING_MODE");
                     startActivityForResult(intent, 1);
                 } else {
                     Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationNonAdminActivity.class);
@@ -216,10 +226,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                     LatLng latlng = (LatLng) data.getParcelableExtra("latlng");
 
                     //Update meeting location.
-                    Location targetLocation = new Location("");
-                    targetLocation.setLatitude(latlng.latitude);
-                    targetLocation.setLongitude(latlng.longitude);
-                    meeting.setLocation(new Location(targetLocation));
+                    editedMeetingLocation = new LatLng(latlng.latitude, latlng.longitude);
                     update_destinationButton_text();
                 }
                 break;
@@ -338,7 +345,8 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 }
                 else if(meeting.getAdmin().equals(user.getUsername())){
                     meetingId = meeting.getMeetingId();
-                } else {
+                }
+                else {
                     meetingId = user.getUsername() + System.currentTimeMillis() + (new Date(System.currentTimeMillis())).toString();
                     meetingId = meetingId.replace(".","");
                 }
