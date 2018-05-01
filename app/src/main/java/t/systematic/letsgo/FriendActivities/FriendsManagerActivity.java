@@ -21,21 +21,20 @@ import t.systematic.letsgo.UserObject.User;
 public class FriendsManagerActivity extends AppCompatActivity {
     private float x1,x2,y1,y2;
     private ListView friendsList;
-    Intent intent = getIntent();
-    User user = (User)intent.getSerializableExtra("USER_OBJECT");
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_manager);
-        //Toast.makeText(getApplicationContext(), "Friends Manager Activity", Toast.LENGTH_LONG).show();
+
         friendsList = findViewById(R.id.friendsListView);
         Intent intent = getIntent();
         user = (User)intent.getSerializableExtra("USER_OBJECT");
         if(user == null){
             System.out.print("Nothing passed");
         }
-        if (user.hasMeetings())
+        if (user.hasFriends())
             initializeFriendsList(user.getFriends());
         else{
             //TODO: write "No friends" to listView
