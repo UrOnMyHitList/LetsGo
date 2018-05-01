@@ -298,6 +298,8 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                         newMeetingCalendar.set(Calendar.MINUTE, minute);
                         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.US);
                         String formatedTime = sdf.format(newMeetingCalendar.getTime());
+
+                        Log.d("CHECKINGTIME", formatedTime);
                         time_editText.setText(formatedTime);
 
                     }
@@ -370,7 +372,9 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 DatabaseHelper.getInstance().createUpdateMeeting(meetingId, editedMeetingLocation.latitude, editedMeetingLocation.longitude,user.getUsername(), meetingName,
                         participants, meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
 
-                Meeting modMeeting = new Meeting(meetingName, participants, newMeetingCalendar, 43.0, 32.0, meetingId, user.getUsername() );
+
+                Meeting modMeeting = new Meeting(meetingName, participants, newMeetingCalendar, editedMeetingLocation.latitude, editedMeetingLocation.longitude,
+                        meetingId, user.getUsername() );
                 Log.d("CHECKING2", "" + newMeetingCalendar.getTime());
                 if(meeting == null){
                     DatabaseHelper.getInstance().addMeetingToUser(meetingId, user.getUsername());
@@ -471,6 +475,10 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         participants = meeting.getParticipants();
 
         date_textView.setText(meeting.getMeetingDate());
+
+        Log.d("THISISTHETIME", meeting.getMeetingTime());
+
+
         time_textView.setText(meeting.getMeetingTime());
 
         /* Set listView using custom adapter. */
