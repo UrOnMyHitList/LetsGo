@@ -37,7 +37,10 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="15dp"
         android:id="@+id/linearLayout">
 
         <Button
@@ -48,7 +51,7 @@
             android:drawableStart="@drawable/create_meeting_icon"
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:text="Create A New Meeting"
             />
 
@@ -60,7 +63,7 @@
             android:drawableStart="@drawable/view_active_meeting_icon"
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:text="View Active Meeting"
             />
 
@@ -72,7 +75,7 @@
             android:drawableStart="@drawable/view_scheduled_meeting_icon"
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:text="Scheduled Meetings" />
 
         <Button
@@ -82,7 +85,7 @@
             android:background="@color/colorPrimaryDark"
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:text="Friends List" />
 
 
