@@ -2,7 +2,7 @@
 
 <resources>
     <color name="colorPrimary">#B64926</color>
-    <color name="colorPrimaryDark">#FFB03B</color>
+    <color name="colorPrimaryDark">#ffb03b</color>
     <color name="colorAccent">#8E2800</color>
     <color name="royalHome">#FFF0A5</color>
     <color name="royalAway">#468966</color>

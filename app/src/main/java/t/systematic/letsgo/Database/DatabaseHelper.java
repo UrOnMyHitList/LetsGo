@@ -251,6 +251,25 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void changeMeetingLocation(final String meetingId, final LatLng location, final OnGetDataListener listener){
+        final DatabaseReference meetingRef = ref.child("meetings").child(meetingId);
+        meetingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    meetingRef.child("Lat").setValue(location.latitude);
+                    meetingRef.child("Long").setValue(location.longitude);
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Unable to change meeting location.");
+            }
+        });
+    }
+
+
     public void createUpdateMeeting(String meetingId, double Lat, double Long, String admin, final String newMeetingName,
         ArrayList<String> participants, String startTime, final OnGetDataListener listener){
 
@@ -267,6 +286,7 @@ public class DatabaseHelper extends FragmentActivity{
 
 
         //Then in success will need to send the requests to other users.
+
     }
 
     public void addMeetingToUser(final String meetingId, final String username){

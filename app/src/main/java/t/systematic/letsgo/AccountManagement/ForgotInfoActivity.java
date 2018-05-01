@@ -43,6 +43,8 @@ public class ForgotInfoActivity extends AppCompatActivity {
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
+                    Toast toast = Toast.makeText(getApplicationContext(), "Error resetting password, can't send reset text message.", Toast.LENGTH_LONG);
+                    toast.show();
                 }
                 return;
             }

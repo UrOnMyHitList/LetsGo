@@ -98,11 +98,15 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
                         Log.d("CHECKINGFULL", calendarValues[0]);
                         String[] fullDate = calendarValues[0].split(", ")[1].split(" ");
 
-
-
                         String[] fullTime = calendarValues[1].split(" ");
                         String hour = fullTime[0].split(":")[0];
                         String minute = fullTime[0].split(":")[1];
+                        String am_pm = fullTime[1].trim();
+
+                        int AM_PM = 0;
+                        if(am_pm.equals("PM")){
+                            AM_PM = 1;
+                        }
 
                         try{
                             //Convert 'Apr, Dec, etc' into a Calendar int representation.
@@ -113,9 +117,10 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
 
                         calendar.set(Calendar.YEAR, Integer.valueOf(fullDate[2]));
                         calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(fullDate[0]));
-                        calendar.set(Calendar.HOUR, Integer.valueOf(hour));
+                        calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(hour));
                         calendar.set(Calendar.MINUTE, Integer.valueOf(minute));
-
+                        calendar.set(Calendar.AM_PM, AM_PM);
+                        Log.d("CALENDARSET", "" + calendar);
 
                         //Helpful for debugging / seeing timedate transformation.
 //                        dateFormat = new SimpleDateFormat("EEEE, d MMM yyyy, HH:mm");
