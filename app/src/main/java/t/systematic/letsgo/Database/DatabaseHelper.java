@@ -54,7 +54,13 @@ public class DatabaseHelper extends FragmentActivity{
         ref.setValue(str);
     }
 
-
+    public String encrypt(String x) throws Exception {
+        java.security.MessageDigest digest = null;
+        digest = java.security.MessageDigest.getInstance("SHA-1");
+        digest.reset();
+        digest.update(x.getBytes("UTF-8"));
+        return digest.digest().toString();
+    }
 
     public void validateUser(final String username, final String password, final OnGetDataListener listener){
         ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
