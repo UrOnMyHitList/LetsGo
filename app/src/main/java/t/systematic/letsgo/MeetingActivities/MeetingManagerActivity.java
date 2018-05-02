@@ -47,7 +47,7 @@ public class MeetingManagerActivity extends SettingsActivity {
         init_viewScheduledMeetingsButton();
         /* Add listener to Schedule Meeting button. */
         init_createNewMeetingButton();
-
+        /* Add listener to View Active Meeting Button. */
         init_viewActiveMeetingButton();
 
         init_friendsListButton();
@@ -74,20 +74,16 @@ public class MeetingManagerActivity extends SettingsActivity {
     }
 
     private void init_listView(ArrayList<String> meetingNames){
-
-        for(int i =0; i < meetingNames.size(); i++){
-            Log.d("MEETINGS", meetingNames.get(i));
-        }
-
         if(meetingNames.size() == 0){
-            Log.d("NOMEETINGS", "NOMEETINGS");
             meetingNames.add("No meetings scheduled!");
         }
+
         meetings_listView = (ListView)findViewById(R.id.upComingMeetingListView);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 R.layout.up_coming_meeting_list, R.id.singleMeetingRow, meetingNames);
         meetings_listView.setAdapter(adapter);
 
+        /* Don't add listener to listView if user does not have any meetings scheduled. */
         if(meetingNames.get(0).equals("No meetings scheduled!")){
             return;
         }
@@ -117,10 +113,7 @@ public class MeetingManagerActivity extends SettingsActivity {
                     Date meetingTime = nextUpMeeting.getDateTime().getTime();
                     Date now = Calendar.getInstance().getTime();
 
-                    Log.d("CHECKINGMEETING", "" + meetingTime);
-                    Log.d("CHECKINGMEETING NOW", "" + now);
                     if (now.after(meetingTime)) {
-                        Log.d("CHECKINGMEETING", nextUpMeeting.getMeetingName());
                         if(isServicesOK()){
                             Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
                             intent.putExtra("USER_OBJECT", user);
@@ -174,7 +167,6 @@ public class MeetingManagerActivity extends SettingsActivity {
                 Intent intent = new Intent(MeetingManagerActivity.this, FriendsManagerActivity.class);
                 intent.putExtra("USER_OBJECT", user);
                 startActivity(intent);
-
             }
         });
     }
@@ -188,20 +180,16 @@ public class MeetingManagerActivity extends SettingsActivity {
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MeetingManagerActivity.this);
         if(available == ConnectionResult.SUCCESS){
             //Everything is fine and user can make map requests.
-            Log.d(TAG, "Connection was available for Google API.");
             return true;
         }else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
             //Error occured but user can fix it.
-            Log.d(TAG, "Google API error, dialog invoked.");
+            Log.d("USERCANFIX", "Google API error, dialog invoked.");
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MeetingManagerActivity.this, available, ERROR_DAILOG_REQUEST);
             dialog.show();
         } else {
             //Failure, nothing we can do.
-            Log.d(TAG, "Google API failure.");
             Toast.makeText(this, "ERROR: MAP REQUESTS FAILURE", Toast.LENGTH_LONG).show();
         }
         return false;
     }
-
-
 }
