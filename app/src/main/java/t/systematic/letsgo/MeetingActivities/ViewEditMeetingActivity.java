@@ -162,13 +162,15 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         } catch(IOException e){
             Toast.makeText(this, "Unable to load locaiton address", Toast.LENGTH_SHORT).show();
         }
+
+        String display = "Click to view destination";
+
         if(addresses != null && !addresses.isEmpty()) {
             String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
             String city = addresses.get(0).getLocality();
             String state = addresses.get(0).getAdminArea();
             String country = addresses.get(0).getCountryName();
 
-            String display = "Click to view destination";
 
             if(address != null){
                 display = address + ", " + city + ", " + state;
@@ -184,6 +186,10 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 destinationButton.setText(display);
                 destinationButton.setGravity(Gravity.CENTER);
             }
+        }
+        else{
+            destinationButton.setText(display);
+            destinationButton.setGravity(Gravity.CENTER);
         }
     }
 
