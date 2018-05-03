@@ -350,8 +350,14 @@ public class DatabaseHelper extends FragmentActivity{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
-                    userRef.child("read").setValue("Y");
-                    userRef.child("reply").setValue("Y");
+                    if(dataSnapshot.child("type").getValue().equals("meetingRequest")){
+                        addMeetingToUser(id, username);
+                    }
+                    else{
+
+                    }
+
+                    ref.child("users").child(username).child("notifications").child(id).removeValue();
                     listener.onSuccess(dataSnapshot);
                 }
             }
@@ -362,6 +368,25 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void notificationRepliedNo(final String username, final String id, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("notifications");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    if(dataSnapshot.getChildrenCount() == 1.0){
+                        ref.child("users").child(username).child("notifications").child("null").child("type").setValue("null");
+                    }
+                    ref.child("users").child(username).child("notifications").child(id).removeValue();
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error with notifications.");
+            }
+        });
+    }
 
     public void hasUnreadNotifs(final String username, final OnGetDataListener listener){
         final DatabaseReference userRef = ref.child("users").child(username).child("notifications");
