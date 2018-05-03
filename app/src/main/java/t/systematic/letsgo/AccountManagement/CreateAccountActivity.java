@@ -1,13 +1,8 @@
 package t.systematic.letsgo.AccountManagement;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -80,7 +75,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnGetDat
                     email.getText().toString(),
                     phone.getText().toString()
             );
-
+            user.setLocation(0.0,0.0);
             //TODO decide if to user input for phone number or use the phone iteself
 
             DatabaseHelper.getInstance().createAccount(user, password.getText().toString(), this);

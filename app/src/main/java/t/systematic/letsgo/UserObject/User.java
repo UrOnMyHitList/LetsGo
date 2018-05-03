@@ -24,10 +24,10 @@ public class User implements Serializable{
     private ArrayList<Meeting> mMeetings;
     private String email_addr;
     private String phone_number;
+
     private double mLatitude;
+
     private double mLongitude;
-
-
     /* Constructor */
     public User (String userName, ArrayList<String> friends, ArrayList<Meeting> meetings, String email, String phone){
         mUserName = userName;
@@ -37,8 +37,16 @@ public class User implements Serializable{
         phone_number = phone;
     }
 
+
     /* Setters */
     public void setFriends(ArrayList<String> friends){ mFriends = friends; }
+
+    public void setmLatitude(double mLatitude) {
+        this.mLatitude = mLatitude;
+    }
+    public void setmLongitude(double mLongitude) {
+        this.mLongitude = mLongitude;
+    }
     public void setMeetings(ArrayList<Meeting> meetings){ mMeetings = meetings; }
     public void setLocation(double latitude, double longitude) { mLatitude = latitude; mLongitude = longitude; }
 
@@ -59,6 +67,14 @@ public class User implements Serializable{
 
     public boolean hasMeetings(){
         return !mMeetings.isEmpty();
+    }
+
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    public double getLongitude() {
+        return mLongitude;
     }
 
     public Meeting getMeeting(String meetingName){
@@ -86,7 +102,6 @@ public class User implements Serializable{
     public LatLng getLatLng(){
         return new LatLng(mLatitude, mLongitude);
     }
-
     /* Functions */
     public void addFriend(String newFriend){
         mFriends.add(newFriend);

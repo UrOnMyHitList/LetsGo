@@ -122,6 +122,8 @@ public class DatabaseHelper extends FragmentActivity{
                     user_ref.child("email").setValue(user.getEmail_addr());
                     user_ref.child("phone").setValue(user.getPhone_number());
                     user_ref.child("password").setValue(password);
+                    user_ref.child("latlng").child("latitude").setValue(user.getLatitude());
+                    user_ref.child("latlng").child("longitude").setValue(user.getLongitude());
                     user_ref.child("friends").child("0").setValue("null");
                     user_ref.child("meetings").child("0").setValue("null");
                     user_ref.child("notifications").child("null").child("type").setValue("null");
