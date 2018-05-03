@@ -54,11 +54,11 @@
         <activity
             android:name=".AccountManagement.ChangeAccountInfoActivity"
             android:parentActivityName=".MainActivity" />
-
         <activity
             android:name=".FriendActivities.FriendsManagerActivity" />
         <activity
             android:name=".ParentChildActivities.ParentChildManagerActivity" />
+
         <activity
             android:name=".MeetingActivities.ViewEditMeetingActivity"
             android:configChanges="orientation"
@@ -66,10 +66,9 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".AccountManagement.CreateAccountActivity"
-            android:parentActivityName=".AccountManagement.LogInActivity"/>
-        <activity 
-        	android:name=".MeetingActivities.ViewCalendarActivity" />
-            <!--TODO add proper way to go back - android:parentActivityName=".MeetingActivities.MeetingManagerActivity"-->
+            android:parentActivityName=".AccountManagement.LogInActivity" />
+        <activity android:name=".MeetingActivities.ViewCalendarActivity" />
+        <!-- TODO add proper way to go back - android:parentActivityName=".MeetingActivities.MeetingManagerActivity" -->
         <activity
             android:name=".AccountManagement.ForgotInfoActivity"
             android:parentActivityName=".AccountManagement.LogInActivity" />
@@ -78,6 +77,21 @@
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".AccountManagement.ChangeUsername" />
+        <activity
+            android:name=".MeetingActivities.MeetingDestinationActivity"
+            android:label="@string/title_activity_meeting_destination">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="t.systematic.letsgo.MeetingActivities.ViewEditMeetingActivity" />
+        </activity>
+        <activity
+            android:name=".MeetingActivities.MeetingDestinationNonAdminActivity"
+            android:label="@string/title_activity_meeting_destination_non_admin">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="t.systematic.letsgo.MeetingActivities.ViewEditMeetingActivity" />
+        </activity>
+
         <activity android:name=".FriendActivities.AddFriendActivity" />
         <activity android:name=".FriendActivities.RemoveFriendActivity"></activity>
     </application>

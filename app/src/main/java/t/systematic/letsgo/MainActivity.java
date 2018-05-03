@@ -39,11 +39,6 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
         String defaultValue = "";
         String username = sharedPref.getString("username", defaultValue);
 
-        //TODO remove when committing
-        //Intent i = new Intent(MainActivity.this, LogInActivity.class);
-        //startActivity(i);
-        //TODO reimplement after bug fixing
-
         //If username is valid get all of user's info, else take user to login activity.
         if(!username.equals(defaultValue)){
             mUsername = username;
@@ -53,8 +48,6 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
             Intent i = new Intent(MainActivity.this, LogInActivity.class);
             startActivity(i);
         }
-
-
     }
 
     @Override
@@ -95,28 +88,29 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
                         dateFormat.setTimeZone(timeZone);
 
                         /* [0] = Day [1] = Month (Apr, Dec, etc) [2] = Year*/
-                        Log.d("CHECKINGFULL", calendarValues[0]);
                         String[] fullDate = calendarValues[0].split(", ")[1].split(" ");
-
-
-
                         String[] fullTime = calendarValues[1].split(" ");
                         String hour = fullTime[0].split(":")[0];
                         String minute = fullTime[0].split(":")[1];
+                        String am_pm = fullTime[1].trim();
+
+                        int AM_PM = 0;
+                        if(am_pm.equals("PM")){
+                            AM_PM = 1;
+                        }
 
                         try{
                             //Convert 'Apr, Dec, etc' into a Calendar int representation.
                             calendar.setTime(new SimpleDateFormat("MMM").parse(fullDate[1]));
                         }catch (ParseException e ){
-                            Log.d("FAILEDPARSE", "FAILED PARSING DATE WHEN PULLING USER MEETING INFO: " + e);
+                            Toast.makeText(getApplicationContext(), "Failed getting Meeting Info", Toast.LENGTH_SHORT).show();
                         }
 
                         calendar.set(Calendar.YEAR, Integer.valueOf(fullDate[2]));
                         calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(fullDate[0]));
                         calendar.set(Calendar.HOUR, Integer.valueOf(hour));
                         calendar.set(Calendar.MINUTE, Integer.valueOf(minute));
-
-
+                        calendar.set(Calendar.AM_PM, AM_PM);
                         //Helpful for debugging / seeing timedate transformation.
 //                        dateFormat = new SimpleDateFormat("EEEE, d MMM yyyy, HH:mm");
 //                        dateFormat.setTimeZone(timeZone);
@@ -155,5 +149,4 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
     public void onFailure(String failure) {
         Toast.makeText(getApplicationContext(), failure, Toast.LENGTH_SHORT).show();
     }
-
 }
