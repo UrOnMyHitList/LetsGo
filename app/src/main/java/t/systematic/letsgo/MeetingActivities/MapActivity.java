@@ -137,7 +137,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             return;
         }
         /* Time is in milliseconds, distance in meters. */
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 20, (android.location.LocationListener) this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 20, (android.location.LocationListener) this);
 
 
         Intent checkTTSIntent = new Intent();
@@ -359,13 +359,16 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                             currentLocation = (Location) task.getResult();
                             displayUserRoute(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()));
                             addUserMarker(currentLocation.getLatitude(), currentLocation.getLongitude(), user.getUsername(), false);
-                            Log.d("ADDINGLOCATION", "NOW");
+                            Log.d("ADDINGLOCATION", user.getUsername() + " " + currentLocation.getLongitude() + " " + currentLocation.getLongitude());
                             participantsLocation.put(user.getUsername(), new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()));
+                            DatabaseHelper.getInstance().updateUserLocation(user.getUsername(), currentLocation.getLatitude(), currentLocation.getLongitude());
                         } else {
                             Toast.makeText(MapActivity.this, "Unable to get Location", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
+            } else {
+                Toast.makeText(getApplicationContext(), "Permissions not granted", Toast.LENGTH_SHORT).show();
             }
         } catch (SecurityException e) {
             Log.d(TAG, "SecurityException: " + e.getMessage());
@@ -457,6 +460,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             //getDeviceLocation();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+                Log.d("FAILEDPERMISSIONLOC", "ONCMAP");
                 return;
             }
             mMap.setMyLocationEnabled(true);
@@ -539,7 +543,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             return;
         }
         //Time is in milliseconds, distance is in meters.
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 20, (android.location.LocationListener) this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 20, (android.location.LocationListener) this);
     }
 
 
