@@ -69,7 +69,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnGetDat
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
         }else {
 
-            User user = new User(username.getText().toString(),
+            User user = new User(username.getText().toString().toLowerCase(),
                     new ArrayList<String>(),
                     new ArrayList<Meeting>(),
                     email.getText().toString(),

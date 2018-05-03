@@ -68,6 +68,7 @@ public class User implements Serializable{
     public boolean hasMeetings(){
         return !mMeetings.isEmpty();
     }
+    public boolean hasFriends() {return !mFriends.isEmpty();}
 
     public double getLatitude() {
         return mLatitude;

@@ -5,23 +5,40 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import t.systematic.letsgo.MeetingActivities.MeetingManagerActivity;
+import t.systematic.letsgo.MeetingActivities.ViewEditMeetingActivity;
 import t.systematic.letsgo.ParentChildActivities.ParentChildManagerActivity;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
 
 public class FriendsManagerActivity extends AppCompatActivity {
     private float x1,x2,y1,y2;
-    Intent intent = getIntent();
-    User user = (User)intent.getSerializableExtra("USER_OBJECT");
+    private ListView friendsList;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_manager);
-        Toast.makeText(getApplicationContext(), "Friends Manager Activity", Toast.LENGTH_LONG).show();
+
+        friendsList = findViewById(R.id.friendsListView);
+        Intent intent = getIntent();
+        user = (User)intent.getSerializableExtra("USER_OBJECT");
+        if(user == null){
+            System.out.print("Nothing passed");
+        }
+        if (user.hasFriends())
+            initializeFriendsList(user.getFriends());
+        else{
+            //TODO: write "No friends" to listView
+        }
     }
 
     public void addFriendButtonClicked(View view){
@@ -66,5 +83,18 @@ public class FriendsManagerActivity extends AppCompatActivity {
                 }
         }
         return false;
+    }
+
+    private void initializeFriendsList(ArrayList<String> friends){
+        if(friends.size() == 0){
+            friends.add("Add new friends below");
+        }
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                friends );
+
+        friendsList.setAdapter(arrayAdapter);
+
     }
 }

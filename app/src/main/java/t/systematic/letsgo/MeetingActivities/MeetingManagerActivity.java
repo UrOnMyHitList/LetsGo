@@ -49,6 +49,8 @@ public class MeetingManagerActivity extends SettingsActivity {
         init_createNewMeetingButton();
 
         init_viewActiveMeetingButton();
+
+        init_friendsListButton();
     }
 
     public boolean onTouchEvent(MotionEvent touchEvent){
@@ -159,6 +161,19 @@ public class MeetingManagerActivity extends SettingsActivity {
                     intent.putExtra("ACTIVITY_MODE", "CREATE_MEETING_MODE");
                     intent.putExtra("USER_OBJECT", user);
                     startActivity(intent);
+
+            }
+        });
+    }
+
+    private void init_friendsListButton(){
+        Button button = findViewById(R.id.viewFriendslistButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MeetingManagerActivity.this, FriendsManagerActivity.class);
+                intent.putExtra("USER_OBJECT", user);
+                startActivity(intent);
 
             }
         });
