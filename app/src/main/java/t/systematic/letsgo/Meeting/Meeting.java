@@ -68,12 +68,14 @@ public class Meeting implements Comparable<Meeting>, Serializable{
     public LatLng getLatLng(){
         return new LatLng(mLat, mLong);
     }
+    /* Returns time in 12 hour format. */
     public String getMeetingTime(){
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm a");
+        DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
         TimeZone timeZone = TimeZone.getDefault();
         dateFormat.setTimeZone(timeZone);
         return dateFormat.format(mDateTime.getTime());
     }
+    /* Returns name of day, day of week, month, year. */
     public String getMeetingDate(){
         DateFormat dateFormat = new SimpleDateFormat("EEEE, d MMM yyyy");
         TimeZone timeZone = TimeZone.getDefault();

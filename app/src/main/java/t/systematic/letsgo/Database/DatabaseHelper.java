@@ -452,4 +452,22 @@ public class DatabaseHelper extends FragmentActivity{
         userRef.setValue(lng);
     }
 
+    public void removeMeeting(String meetingId){
+        ref.child("meetings").child(meetingId).removeValue();
+    }
+
+    public void removeMeetingFromUser(String meetingId, String username){
+        ref.child("users").child(username).child("meetings").child(meetingId).removeValue();
+    }
+
+    public void createMeetingNotification(String toUser, String fromUser, String meetingId){
+
+        ref.child("users").child(toUser).child("notifications").child(meetingId).child("read").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(meetingId).child("reply").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(meetingId).child("requestor").setValue(fromUser);
+        ref.child("users").child(toUser).child("notifications").child(meetingId).child("type").setValue("meetingRequest");
+
+        ref.child("users").child(toUser).child("notifications").child("null").removeValue();
+    }
+
 }
