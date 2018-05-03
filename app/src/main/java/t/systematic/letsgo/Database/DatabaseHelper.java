@@ -122,6 +122,8 @@ public class DatabaseHelper extends FragmentActivity{
                     user_ref.child("email").setValue(user.getEmail_addr());
                     user_ref.child("phone").setValue(user.getPhone_number());
                     user_ref.child("password").setValue(password);
+                    user_ref.child("latlng").child("latitude").setValue(user.getLatitude());
+                    user_ref.child("latlng").child("longitude").setValue(user.getLongitude());
                     user_ref.child("friends").child("0").setValue("null");
                     user_ref.child("meetings").child("0").setValue("null");
                     user_ref.child("notifications").child("null").child("type").setValue("null");
@@ -348,8 +350,18 @@ public class DatabaseHelper extends FragmentActivity{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
-                    userRef.child("read").setValue("Y");
-                    userRef.child("reply").setValue("Y");
+                    if(dataSnapshot.getChildrenCount() == 1.0){
+                        ref.child("users").child(username).child("notifications").child("null").child("type").setValue("null");
+                    }
+                    if(dataSnapshot.child("type").getValue().equals("meetingRequest")){
+                        addMeetingToUser(id, username);
+                    }
+                    else{
+                        ref.child("users").child(username).child("friends").push().setValue(id);
+                        ref.child("users").child(id).child("friends").push().setValue(username);
+                    }
+
+                    ref.child("users").child(username).child("notifications").child(id).removeValue();
                     listener.onSuccess(dataSnapshot);
                 }
             }
@@ -360,6 +372,25 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void notificationRepliedNo(final String username, final String id, final OnGetDataListener listener){
+        final DatabaseReference userRef = ref.child("users").child(username).child("notifications");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    if(dataSnapshot.getChildrenCount() == 1.0){
+                        ref.child("users").child(username).child("notifications").child("null").child("type").setValue("null");
+                    }
+                    ref.child("users").child(username).child("notifications").child(id).removeValue();
+                    listener.onSuccess(dataSnapshot);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onFailure("Error with notifications.");
+            }
+        });
+    }
 
     public void hasUnreadNotifs(final String username, final OnGetDataListener listener){
         final DatabaseReference userRef = ref.child("users").child(username).child("notifications");
@@ -423,6 +454,33 @@ public class DatabaseHelper extends FragmentActivity{
         userRef.setValue(lat);
         userRef = ref.child("users").child(username).child("latlng").child("longitude");
         userRef.setValue(lng);
+    }
+
+    public void removeMeeting(String meetingId){
+        ref.child("meetings").child(meetingId).removeValue();
+    }
+
+    public void removeMeetingFromUser(String meetingId, String username){
+        ref.child("users").child(username).child("meetings").child(meetingId).removeValue();
+    }
+
+    public void createFriendRequestNotification(String toUser, String fromUser){
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("read").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("reply").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("requestor").setValue(fromUser);
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("type").setValue("friendRequest");
+
+        ref.child("users").child(toUser).child("notifications").child("null").removeValue();
+    }
+
+    public void createMeetingNotification(String toUser, String fromUser, String meetingId){
+
+        ref.child("users").child(toUser).child("notifications").child(meetingId).child("read").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(meetingId).child("reply").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(meetingId).child("requestor").setValue(fromUser);
+        ref.child("users").child(toUser).child("notifications").child(meetingId).child("type").setValue("meetingRequest");
+
+        ref.child("users").child(toUser).child("notifications").child("null").removeValue();
     }
 
 }

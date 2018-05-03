@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import t.systematic.letsgo.Database.DatabaseHelper;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
 
@@ -55,18 +56,16 @@ public class AddFriendActivity extends AppCompatActivity {
                                     }
                                 }
                                 if (!duplicate) {
-                                    myDb.child("users").child(username).child("friends").push().setValue(friendName);
-                                    found = true;
-                                    user.addFriend(friendName);
+                                    DatabaseHelper.getInstance().createFriendRequestNotification(friendName, username);
                                     //TODO send a notification to friended user????
                                     //TODO don't add if duplicate friend
 
-                                    Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG);
-                                    toast.show();
+                                    found = true;
+                                    user.addFriend(friendName);
+                                    Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG).show();
                                 }
                                 else {
-                                    Toast toast = Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG);
-                                    toast.show();
+                                    Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG).show();
                                 }
                                 break;
                             }
