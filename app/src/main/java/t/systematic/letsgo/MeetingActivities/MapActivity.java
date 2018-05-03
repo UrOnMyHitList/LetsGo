@@ -258,6 +258,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         if(allArrived){
             speakWords("Everyone has arrived to the destination!");
+
+            user.removeMeeting(mMeeting);
+
+            if(mMeeting.getAdmin().equals(user.getUsername())){
+                DatabaseHelper.getInstance().removeMeeting(mMeeting.getMeetingId());
+            }
+            DatabaseHelper.getInstance().removeMeetingFromUser(mMeeting.getMeetingId(), user.getUsername());
+
             Intent intent = new Intent(MapActivity.this, MeetingManagerActivity.class);
             intent.putExtra("USER_OBJECT", user);
             finish();

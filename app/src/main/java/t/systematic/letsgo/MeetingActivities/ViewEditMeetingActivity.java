@@ -360,11 +360,16 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                     meetingTime = time_textView.getText().toString();
                 }
 
+                for(int i = 0; i < participants.size(); i++){
+                    DatabaseHelper.getInstance().createMeetingNotification(participants.get(i), user.getUsername(), meetingId);
+                }
+
+
                 /* Update Meeting in Database. */
                 DatabaseHelper.getInstance().createUpdateMeeting(meetingId, editedMeetingLocation.latitude, editedMeetingLocation.longitude,user.getUsername(), meetingName,
-                        participants, meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
+                        new ArrayList<String>(), meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
                 /* Update user object. */
-                Meeting modMeeting = new Meeting(meetingName, participants, newMeetingCalendar, editedMeetingLocation.latitude, editedMeetingLocation.longitude,
+                Meeting modMeeting = new Meeting(meetingName, new ArrayList<String>(), newMeetingCalendar, editedMeetingLocation.latitude, editedMeetingLocation.longitude,
                         meetingId, user.getUsername() );
                 /* In the case we are just creating the meeting. It would not be in one of the user's meetings list. */
                 if(meeting == null){
