@@ -120,20 +120,17 @@ public class DatabaseHelper extends FragmentActivity{
                 for(DataSnapshot snapshot: dataSnapshot.child(username).child("friends").getChildren()) {
                     String name = (String)snapshot.getValue();
                     if (name.equals(friendName)) {
-                        //add the friend
-                        //add a new key/value under friends
-                        //replace below line when i figure out how to do notifications.
-                        //Boolean duplicate = false;
-                        for (DataSnapshot subSnap: dataSnapshot.child(username).child("friends").getChildren()) {
-                            if (subSnap.getValue().equals(friendName)) {
-                                //remove the friend from the database = delete entry.
-                                found = true;
-                                ref.child("users").child(username).child("friends").child(subSnap.getKey()).removeValue();
-
-                                //duplicate = true;
+                        found = true;
+                        ref.child("users").child(username).child("friends").child(snapshot.getKey()).removeValue();
+                        for (DataSnapshot otherSide: dataSnapshot.child(friendName).child("friends").getChildren()) {
+                            if (otherSide.getValue().equals(username)) {
+                                ref.child("users").child(friendName).child("friends").child(otherSide.getKey()).removeValue();
                                 break;
                             }
                         }
+                        break;
+                    }
+                }
                         /*if (!duplicate) {
                             ref.child("users").child(username).child("friends").push().setValue(friendName);
                             found = true;
@@ -146,10 +143,12 @@ public class DatabaseHelper extends FragmentActivity{
                         /*Toast toast = Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG);
                         toast.show();
                         break;*/
-                    }
-                }
                 if(!found) {
                     Toast toast = Toast.makeText(getApplicationContext(), "No such user in friends list!" , Toast.LENGTH_LONG);
+                    toast.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(getApplicationContext(),"Friend removed!",Toast.LENGTH_LONG);
                     toast.show();
                 }
             }
