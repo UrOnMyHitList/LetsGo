@@ -62,6 +62,54 @@ public class DatabaseHelper extends FragmentActivity{
         return digest.digest().toString();
     }
 
+    public void addFriend(final String friendName, final String username, final User user, final String TAG) {
+        ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Boolean found = false;
+                //String friendName = addFriendBox.getText().toString();
+                for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    String name = snapshot.getKey();
+                    if (name.equals(friendName)) {
+                        //add the friend
+                        //add a new key/value under friends
+                        //replace below line when i figure out how to do notifications.
+                        Boolean duplicate = false;
+                        for (DataSnapshot subSnap: dataSnapshot.child(username).child("friends").getChildren()) {
+                            if (subSnap.getValue().equals(friendName)) {
+                                duplicate = true;
+                                break;
+                            }
+                        }
+                        if (!duplicate) {
+                            ref.child("users").child(username).child("friends").push().setValue(friendName);
+                            found = true;
+                            user.addFriend(friendName);
+                            // notification sending handled separately
+                            // don't add if duplicate friend - DONE
+
+
+                        }
+                        else {
+                            Toast toast = Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        break;
+                    }
+                }
+                if(!found) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "No such user found!" , Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadUsers:onCancelled", databaseError.toException());
+            }
+        });
+    }
+
     public void validateUser(final String username, final String password, final OnGetDataListener listener){
         ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
