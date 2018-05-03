@@ -26,17 +26,19 @@ public class AddFriendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
         //TODO: fix formatting on xml
-        final DatabaseReference myDb = FirebaseDatabase.getInstance().getReference();
+        //final DatabaseReference myDb = FirebaseDatabase.getInstance().getReference();
         Intent intent = getIntent();
         final EditText addFriendBox = findViewById(R.id.AddFriendBox);
         Button b1 = findViewById(R.id.SubmitFriendButton);
         final String TAG = "AddFriendActivity";
         final User user = (User)intent.getSerializableExtra("USER_OBJECT");
         final String username = user.getUsername();
+        final String friendName = addFriendBox.getText().toString();
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //thank god for auto-boilerplate
+/*<<<<<<< master
                 myDb.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -75,12 +77,14 @@ public class AddFriendActivity extends AppCompatActivity {
                             toast.show();
                         }
                     }
+=======*/
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.w(TAG, "loadUsers:onCancelled", databaseError.toException());
-                    }
-                });
+                DatabaseHelper.getInstance().addFriend(friendName, username, user, TAG);
+                Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG);
+                toast.show();
+//>>>>>>> Tristan
+
+                //TODO send notification to added user
             }
         });
     }
