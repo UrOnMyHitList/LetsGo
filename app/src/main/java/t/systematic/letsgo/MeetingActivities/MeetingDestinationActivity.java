@@ -163,10 +163,6 @@ public class MeetingDestinationActivity extends AppCompatActivity implements OnM
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                /*
-                    TODO check with google if it is a valid place and then
-                    drop marker at the latlng and update location of meeting by calling confirm(latlng)
-                 */
                 mMap.clear();
                 MarkerOptions options = new MarkerOptions()
                         .position(latLng)
