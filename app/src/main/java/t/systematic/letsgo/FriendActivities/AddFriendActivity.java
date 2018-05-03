@@ -42,6 +42,7 @@ public class AddFriendActivity extends AppCompatActivity {
                 DatabaseHelper.getInstance().addFriend(friendName, username, user, TAG);
                 Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG);
                 toast.show();
+
                 //TODO send notification to added user
             }
         });

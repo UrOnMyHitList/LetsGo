@@ -41,6 +41,7 @@ public class DatabaseHelper extends FragmentActivity{
     public DatabaseHelper(){
         database = FirebaseDatabase.getInstance();
         ref = database.getReference();
+
     }
 
     public static DatabaseHelper getInstance() {
@@ -99,6 +100,56 @@ public class DatabaseHelper extends FragmentActivity{
                 }
                 if(!found) {
                     Toast toast = Toast.makeText(getApplicationContext(), "No such user found!" , Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadUsers:onCancelled", databaseError.toException());
+            }
+        });
+    }
+
+    public void removeFriend(final String friendName, final String username, final User user, final String TAG) {
+        ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Boolean found = false;
+                //String friendName = addFriendBox.getText().toString();
+                for(DataSnapshot snapshot: dataSnapshot.child(username).child("friends").getChildren()) {
+                    String name = (String)snapshot.getValue();
+                    if (name.equals(friendName)) {
+                        //add the friend
+                        //add a new key/value under friends
+                        //replace below line when i figure out how to do notifications.
+                        //Boolean duplicate = false;
+                        for (DataSnapshot subSnap: dataSnapshot.child(username).child("friends").getChildren()) {
+                            if (subSnap.getValue().equals(friendName)) {
+                                //remove the friend from the database = delete entry.
+                                found = true;
+                                ref.child("users").child(username).child("friends").child(subSnap.getKey()).removeValue();
+
+                                //duplicate = true;
+                                break;
+                            }
+                        }
+                        /*if (!duplicate) {
+                            ref.child("users").child(username).child("friends").push().setValue(friendName);
+                            found = true;
+                            user.addFriend(friendName);
+                            // notification sending handled separately
+                            // don't add if duplicate friend - DONE
+
+
+                        }*/
+                        /*Toast toast = Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG);
+                        toast.show();
+                        break;*/
+                    }
+                }
+                if(!found) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "No such user in friends list!" , Toast.LENGTH_LONG);
                     toast.show();
                 }
             }
