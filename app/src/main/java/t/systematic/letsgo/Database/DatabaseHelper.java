@@ -453,6 +453,7 @@ public class DatabaseHelper extends FragmentActivity{
                     }
                     if(dataSnapshot.child("type").getValue().equals("meetingRequest")){
                         addMeetingToUser(id, username);
+                        ref.child("meetings").child(id).child("participants").push().setValue(username);
                     }
                     else{
                         ref.child("users").child(username).child("friends").push().setValue(id);
@@ -507,7 +508,7 @@ public class DatabaseHelper extends FragmentActivity{
                     listener.onFailure("Read");
                 }
                 else{
-                    listener.onFailure("Error retrieving unread notifications.");
+                    //listener.onFailure("Error retrieving unread notifications.");
                 }
             }
 
