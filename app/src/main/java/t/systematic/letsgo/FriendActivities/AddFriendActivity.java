@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import t.systematic.letsgo.Database.DatabaseHelper;
+import t.systematic.letsgo.Database.OnGetDataListener;
 import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
 
@@ -33,58 +34,24 @@ public class AddFriendActivity extends AppCompatActivity {
         final String TAG = "AddFriendActivity";
         final User user = (User)intent.getSerializableExtra("USER_OBJECT");
         final String username = user.getUsername();
-        final String friendName = addFriendBox.getText().toString();
+
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //thank god for auto-boilerplate
-/*<<<<<<< master
-                myDb.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                final String friendName = addFriendBox.getText().toString();
+                DatabaseHelper.getInstance().addFriend(friendName, username, user, TAG, new OnGetDataListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Boolean found = false;
-                        String friendName = addFriendBox.getText().toString();
-                        for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                            String name = snapshot.getKey();
-                            if (name.equals(friendName)) {
-                                //add the friend
-                                //add a new key/value under friends
-                                //replace below line when i figure out how to do notifications.
-                                Boolean duplicate = false;
-                                for (DataSnapshot subSnap: dataSnapshot.child(username).child("friends").getChildren()) {
-                                    if (subSnap.getValue().equals(friendName)) {
-                                        duplicate = true;
-                                        break;
-                                    }
-                                }
-                                if (!duplicate) {
-                                    DatabaseHelper.getInstance().createFriendRequestNotification(friendName, username);
-                                    //TODO send a notification to friended user????
-                                    //TODO don't add if duplicate friend
-
-                                    found = true;
-                                    user.addFriend(friendName);
-                                    Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG).show();
-                                }
-                                else {
-                                    Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG).show();
-                                }
-                                break;
-                            }
-                        }
-                        if(!found) {
-                            Toast toast = Toast.makeText(getApplicationContext(), "No such user found!" , Toast.LENGTH_LONG);
-                            toast.show();
-                        }
+                    public void onSuccess(DataSnapshot dataSnapshot) {
+                        user.addFriend(friendName);
+                        Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG).show();
                     }
-=======*/
 
-                DatabaseHelper.getInstance().addFriend(friendName, username, user, TAG);
-                Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG);
-                toast.show();
-//>>>>>>> Tristan
+                    @Override
+                    public void onFailure(String failure) {
+                        Toast.makeText(AddFriendActivity.this, ""+failure, Toast.LENGTH_LONG).show();
+                    }
+                });
 
-                //TODO send notification to added user
             }
         });
     }

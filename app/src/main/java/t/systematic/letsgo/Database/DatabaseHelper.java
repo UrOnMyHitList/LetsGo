@@ -63,7 +63,7 @@ public class DatabaseHelper extends FragmentActivity{
         return digest.digest().toString();
     }
 
-    public void addFriend(final String friendName, final String username, final User user, final String TAG) {
+    public void addFriend(final String friendName, final String username, final User user, final String TAG, final OnGetDataListener listener) {
         ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -85,22 +85,17 @@ public class DatabaseHelper extends FragmentActivity{
                         if (!duplicate) {
                             ref.child("users").child(username).child("friends").push().setValue(friendName);
                             found = true;
-                            user.addFriend(friendName);
-                            // notification sending handled separately
-                            // don't add if duplicate friend - DONE
-
-
+                            createFriendRequestNotification(friendName, username);
+                            listener.onSuccess(snapshot);
                         }
                         else {
-                            Toast toast = Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG);
-                            toast.show();
+                            listener.onFailure("Friend already on list!");
                         }
                         break;
                     }
                 }
                 if(!found) {
-                    Toast toast = Toast.makeText(getApplicationContext(), "No such user found!" , Toast.LENGTH_LONG);
-                    toast.show();
+                    listener.onFailure("No such user found!");
                 }
             }
 
