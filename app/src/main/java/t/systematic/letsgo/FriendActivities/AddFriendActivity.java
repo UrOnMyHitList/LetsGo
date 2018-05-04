@@ -38,51 +38,10 @@ public class AddFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //thank god for auto-boilerplate
-/*<<<<<<< master
-                myDb.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Boolean found = false;
-                        String friendName = addFriendBox.getText().toString();
-                        for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                            String name = snapshot.getKey();
-                            if (name.equals(friendName)) {
-                                //add the friend
-                                //add a new key/value under friends
-                                //replace below line when i figure out how to do notifications.
-                                Boolean duplicate = false;
-                                for (DataSnapshot subSnap: dataSnapshot.child(username).child("friends").getChildren()) {
-                                    if (subSnap.getValue().equals(friendName)) {
-                                        duplicate = true;
-                                        break;
-                                    }
-                                }
-                                if (!duplicate) {
-                                    DatabaseHelper.getInstance().createFriendRequestNotification(friendName, username);
-                                    //TODO send a notification to friended user????
-                                    //TODO don't add if duplicate friend
-
-                                    found = true;
-                                    user.addFriend(friendName);
-                                    Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG).show();
-                                }
-                                else {
-                                    Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG).show();
-                                }
-                                break;
-                            }
-                        }
-                        if(!found) {
-                            Toast toast = Toast.makeText(getApplicationContext(), "No such user found!" , Toast.LENGTH_LONG);
-                            toast.show();
-                        }
-                    }
-=======*/
 
                 DatabaseHelper.getInstance().addFriend(friendName, username, user, TAG);
                 Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG);
                 toast.show();
-//>>>>>>> Tristan
 
                 //TODO send notification to added user
             }

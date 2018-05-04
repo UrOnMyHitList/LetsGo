@@ -72,22 +72,10 @@ public class CustomNotificationAdapter extends BaseAdapter implements ListAdapte
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.shared_preference), Context.MODE_PRIVATE);
-                String defaultValue = "";
-                String userName = sharedPref.getString("username", defaultValue);
-
-                DatabaseHelper.getInstance().notificationRepliedNo(userName, list.get(position).getId(), new OnGetDataListener() {
-                    @Override
-                    public void onSuccess(DataSnapshot dataSnapshot) {
-                        list.remove(position);
-                        notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onFailure(String failure) {
-                        Toast.makeText(context, ""+failure, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                //do something
+                //list.remove(position); //or some other task
+                list.remove(position);
+                notifyDataSetChanged();
             }
         });
         addBtn.setOnClickListener(new View.OnClickListener(){

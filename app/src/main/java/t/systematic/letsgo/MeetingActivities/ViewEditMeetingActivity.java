@@ -1,22 +1,17 @@
 package t.systematic.letsgo.MeetingActivities;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +25,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 
 import org.w3c.dom.Text;
 
-import java.io.IOException;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -65,13 +58,14 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     private TextView meetingName_textView;
     private EditText meetingName_editText;
 
+    private TextView destination_textView;
+    private EditText destination_editText;
+
     private TextView date_textView;
     private EditText date_editText;
 
     private TextView time_textView;
     private EditText time_editText;
-
-    private Button destinationButton;
 
     private Button updateCreateButton;
     private Button addFriendsButton;
@@ -82,19 +76,19 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     private ArrayList<String> participants;
     private ListView participants_listView;
 
-    /* User object containing all user info. */
     private User user;
-    /* Meeting object containing all meeting info. */
+
+    private String originalMeetingName;
     private Meeting meeting;
-    /* Used to store meeting location selected. */
-    private LatLng editedMeetingLocation;
-    /* Used to determine which type of mode.*/
+
     private String mode;
-    /* The three below is used to coordinate selecting and removing friends from
-    *  listView and Dialog. */
+
+
+
     private HashMap<String, Integer> selectedFriends;
     ArrayList<String> friends;
     boolean[] checkedItems;
+
     /* Used to get current date and time. */
     Calendar calendar;
     /* Used to record last/current date and time. */
@@ -108,8 +102,6 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         setContentView(R.layout.activity_view_edit_single_meeting);
         init_layoutElements();
 
-        destinationButton = (Button)findViewById(R.id.destination_button);
-
         Intent intent = getIntent();
         intent.getExtras();
 
@@ -120,17 +112,14 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             init_EditTextMode(intent);
             addEditTextListeners();
             init_SelectFriendsVars();
-            editedMeetingLocation = meeting.getLatLng();
 
         } else if(mode.equals("TEXT_VIEW_MODE")){
             init_TextViewMode(intent);
             init_SelectFriendsVars();
-            editedMeetingLocation = meeting.getLatLng();
         } else if(mode.equals("CREATE_MEETING_MODE")){
             init_EditTextMode(intent);
             addEditTextListeners();
 
-            editedMeetingLocation = null;
             friends = user.getFriends();
             Collections.sort(friends);
             selectedFriends = new HashMap<>();
@@ -139,106 +128,23 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             int numberOfFriends = friends.size();
             checkedItems = new boolean[numberOfFriends];
 
+
+
         } else {
             Log.d("ERROR", "VIEWEDITMEETINGACTIVITY - onCreate");
             /* If time, create error logs table in some local DB. */
         }
 
         init_PageButtons();
-        init_destinationButton();
 
         calendar = Calendar.getInstance();
         calendar.setTimeZone(timeZone);
         newMeetingCalendar = Calendar.getInstance();
         newMeetingCalendar.setTimeZone(timeZone);
+
     }
 
-    private void update_destinationButton_text(){
-        Geocoder geocoder;
-        List<Address> addresses = null;
-        geocoder = new Geocoder(this, Locale.getDefault());
-        try {
-            addresses = geocoder.getFromLocation(editedMeetingLocation.latitude, editedMeetingLocation.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-        } catch(IOException e){
-            Toast.makeText(this, "Unable to load locaiton address", Toast.LENGTH_SHORT).show();
-        }
 
-        String display = "Click to view destination";
-
-        if(addresses != null && !addresses.isEmpty()) {
-            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-            String city = addresses.get(0).getLocality();
-            String state = addresses.get(0).getAdminArea();
-            String country = addresses.get(0).getCountryName();
-
-
-            if(address != null){
-                display = address + ", " + city + ", " + state;
-                destinationButton.setText(display);
-                destinationButton.setGravity(Gravity.CENTER);
-            }
-            else if(city != null && state != null && country != null){
-                display = city + ", " + state + ", " + country;
-                destinationButton.setText(display);
-                destinationButton.setGravity(Gravity.CENTER);
-            }
-            else{
-                destinationButton.setText(display);
-                destinationButton.setGravity(Gravity.CENTER);
-            }
-        }
-        else{
-            destinationButton.setText(display);
-            destinationButton.setGravity(Gravity.CENTER);
-        }
-    }
-
-    private void init_destinationButton(){
-        if(editedMeetingLocation != null) {
-            update_destinationButton_text();
-        }
-        destinationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mode.equals("CREATE_MEETING_MODE")){
-                    Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
-                    intent.putExtra("meeting", meeting);
-                    intent.putExtra("mode", "CREATE_MEETING_MODE");
-                    startActivityForResult(intent, 1);
-                }
-                else if (meeting.getAdmin().equals(user.getUsername())) {
-                    Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationActivity.class);
-                    intent.putExtra("meeting", meeting);
-                    intent.putExtra("mode", "EDIT_MEETING_MODE");
-                    startActivityForResult(intent, 1);
-                } else {
-                    Intent intent = new Intent(ViewEditMeetingActivity.this, MeetingDestinationNonAdminActivity.class);
-                    intent.putExtra("meeting", meeting);
-                    startActivity(intent);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            case (1) : {
-                if (resultCode == Activity.RESULT_OK) {
-                    LatLng latlng = (LatLng) data.getParcelableExtra("latlng");
-
-                    //Update meeting location.
-                    editedMeetingLocation = new LatLng(latlng.latitude, latlng.longitude);
-                    update_destinationButton_text();
-                }
-                break;
-            }
-        }
-    }
-
-    /* Need to synchronize listView and Dialog order in which friends are displayed.
-    *  Also need to have selected users already in Meeting within Dialog pop up. */
     private void init_SelectFriendsVars(){
         friends = user.getFriends();
         Collections.sort(friends);
@@ -258,12 +164,15 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         for(int i = 0; i < friends.size(); i++){
             for(int k = 0; k < prevSetUsers.size(); k++){
                 if(friends.get(i).equals(prevSetUsers.get(k))){
+                    Log.d("PREVUSERS", friends.get(i) + " " + i);
                     selectedFriends.put(friends.get(i), i);
                     checkedItems[i] = true;
                 }
             }
         }
+
     }
+
 
     /* Both methods are simply listeners to bring up the calendar and timepicker UI. When user selects
     *  a date/time it will appear in the approriate editText. */
@@ -295,13 +204,13 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+
                         newMeetingCalendar.set(Calendar.HOUR_OF_DAY, hour);
                         newMeetingCalendar.set(Calendar.MINUTE, minute);
                         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.US);
-                        String formattedTime = sdf.format(newMeetingCalendar.getTime());
+                        String formatedTime = sdf.format(newMeetingCalendar.getTime());
+                        time_editText.setText(formatedTime);
 
-                        time_editText.setText(formattedTime);
-                        time_textView.setText(formattedTime);
                     }
                 };
 
@@ -322,20 +231,24 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         return true;
     }
 
-    /* Initialize all button listeners on UI layout. */
     private void init_PageButtons(){
         updateCreateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if(mode.equals("EDIT_TEXT_MODE")){
-                    if(isEmpty(date_editText.getText().toString())|| isEmpty(meetingName_editText.getText().toString()) || isEmpty(time_editText.getText().toString())){
+                    Log.d("LLL", "IN EDIT");
+                    if(isEmpty(date_editText.getText().toString())|| isEmpty(meetingName_editText.getText().toString()) || isEmpty(time_editText.getText().toString()) ||
+                            isEmpty(destination_editText.getText().toString())){
                         Toast.makeText(getApplicationContext(), "*** All fields must be filled in ***", Toast.LENGTH_LONG).show();
                         return;
                     }
                 } else if(mode.equals("TEXT_VIEW_MODE")){
                     if(isEmpty(date_textView.getText().toString())|| isEmpty(meetingName_textView.getText().toString()) ||
-                            isEmpty(time_textView.getText().toString())){
+                            isEmpty(time_textView.getText().toString()) || isEmpty(destination_textView.getText().toString())){
                         Toast.makeText(getApplicationContext(), "*** All fields must be filled in ***", Toast.LENGTH_LONG).show();
+                        Log.d("RETTT", "DATE: "+date_textView.getText().toString() + " TIME: " + time_textView.getText().toString() +
+                        " Meetingnam: " + meetingName_textView.getText().toString() + " dest: " + destination_textView.getText().toString());
                         return;
                     }
                 }
@@ -346,8 +259,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 }
                 else if(meeting.getAdmin().equals(user.getUsername())){
                     meetingId = meeting.getMeetingId();
-                }
-                else {
+                } else {
                     meetingId = user.getUsername() + System.currentTimeMillis() + (new Date(System.currentTimeMillis())).toString();
                     meetingId = meetingId.replace(".","");
                 }
@@ -360,24 +272,21 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                     meetingDate = date_editText.getText().toString();
                     meetingName = meetingName_editText.getText().toString();
                     meetingTime = time_editText.getText().toString();
+
+
                 } else if(mode.equals("TEXT_VIEW_MODE")){
                     meetingDate = date_textView.getText().toString();
                     meetingName = meetingName_textView.getText().toString();
                     meetingTime = time_textView.getText().toString();
                 }
 
-                for(int i = 0; i < participants.size(); i++){
-                    DatabaseHelper.getInstance().createMeetingNotification(participants.get(i), user.getUsername(), meetingId);
-                }
 
+                //TODO NEED TO GET LOCATION POINTS AND ADD THEM TO ARGUMENTS BELOW
+                DatabaseHelper.getInstance().createUpdateMeeting(meetingId, 43.0, 34.0,user.getUsername(), meetingName,
+                        participants, meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
 
-                /* Update Meeting in Database. */
-                DatabaseHelper.getInstance().createUpdateMeeting(meetingId, editedMeetingLocation.latitude, editedMeetingLocation.longitude,user.getUsername(), meetingName,
-                        new ArrayList<String>(), meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
-                /* Update user object. */
-                Meeting modMeeting = new Meeting(meetingName, new ArrayList<String>(), newMeetingCalendar, editedMeetingLocation.latitude, editedMeetingLocation.longitude,
-                        meetingId, user.getUsername() );
-                /* In the case we are just creating the meeting. It would not be in one of the user's meetings list. */
+                Meeting modMeeting = new Meeting(meetingName, participants, newMeetingCalendar, 43.0, 32.0, meetingId, user.getUsername() );
+                Log.d("CHECKING2", "" + newMeetingCalendar.getTime());
                 if(meeting == null){
                     DatabaseHelper.getInstance().addMeetingToUser(meetingId, user.getUsername());
                 }
@@ -396,6 +305,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         });
 
         addFriendsButton.setOnClickListener(new View.OnClickListener() {
+
             String[] friendsArr = new String[friends.size()];
 
             @Override
@@ -403,9 +313,13 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 AlertDialog.Builder builder = new AlertDialog.Builder(ViewEditMeetingActivity.this);
                 builder.setTitle("Select friends to invite");
 
+
                 /* Sets the friendsArr values same as friends arrayList. */
                 friends.toArray(friendsArr);
                 Arrays.sort(friendsArr);
+
+
+
 
                 builder.setMultiChoiceItems(friendsArr, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
@@ -417,6 +331,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                         }else if (selectedFriends.containsKey(friendsArr[position])){
                             selectedFriends.remove(friendsArr[position]);
                         }
+
                     }
                 });
                 /* This is for the select freinds pop up. Logic applied when user selects OK and is finished selecting friends. */
@@ -442,8 +357,10 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         });
     }
 
+
     private void init_EditTextMode(Intent intent){
         setCreateMeetingLayout(meetingName_editText, meetingName_textView, "Meeting name");
+        setCreateMeetingLayout(destination_editText, destination_textView, "Click to select destination");
         setCreateMeetingLayout(date_editText, date_textView, "Click to select a date");
         setCreateMeetingLayout(time_editText, time_textView, "Click to select a time");
         meetingName_editText.requestFocus();
@@ -461,9 +378,11 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         /* If the user is an admin allow him/her to update the meeting info. */
         if(meeting.getAdmin().equals(user.getUsername())){
             init_editAndTextViewListeners();
-            addEditTextListeners();
         }
 
+        destination_textView.setText(Double.toString(meeting.getLat()) + " " +
+                Double.toString(meeting.getLong()));
+        Log.d("TIMEVALUE" , meeting.getDateTime().toString());
         /* Initialize all editText, textView, and listView fields. */
         meetingName_textView.setText(meeting.getMeetingName());
         participants = meeting.getParticipants();
@@ -474,19 +393,25 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
         /* Set listView using custom adapter. */
         participants_listView = (ListView)findViewById(R.id.participants_listView);
         if(meeting.getAdmin().equals(user.getUsername())){
+            Log.d("ORDEROFPARTS", "" + participants);
             Collections.sort(participants, String.CASE_INSENSITIVE_ORDER);
             participants_listView.setAdapter(new MyListAdapter(this, R.layout.textview_with_button, participants));
+
             updateCreateButton.setText("Update Meeting");
         } else {
             participants_listView.setAdapter(new ArrayAdapter<>(this, R.layout.up_coming_meeting_list,R.id.singleMeetingRow, participants));
             updateCreateButton.setVisibility(View.GONE);
             addFriendsButton.setVisibility(View.GONE);
         }
+
     }
 
     private void init_layoutElements(){
         meetingName_editText = (EditText)findViewById(R.id.meetingName_editText);
         meetingName_textView = (TextView) findViewById(R.id.meetingName_textView);
+
+        destination_editText = (EditText)findViewById(R.id.destination_editText);
+        destination_textView = (TextView)findViewById(R.id.destination_textView);
 
         date_editText = (EditText)findViewById(R.id.date_editText);
         date_textView = (TextView)findViewById(R.id.date_textView);
@@ -503,8 +428,12 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
      * textViews and editViews.
      */
     private void init_editAndTextViewListeners(){
+
         init_textViewOnLongClickListener(meetingName_textView, meetingName_editText);
         init_editTextOnFocusChangeListener(meetingName_editText, meetingName_textView);
+
+        init_textViewOnLongClickListener(destination_textView, destination_editText);
+        init_editTextOnFocusChangeListener(destination_editText, destination_textView);
 
         init_textViewOnLongClickListener(date_textView, date_editText);
         init_editTextOnFocusChangeListener(date_editText, date_textView);
@@ -557,10 +486,13 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     }
 
     @Override
-    public void onSuccess(DataSnapshot dataSnapshot) {}
+    public void onSuccess(DataSnapshot dataSnapshot) {
+    }
 
     @Override
-    public void onFailure(String failure) {}
+    public void onFailure(String failure) {
+
+    }
 
     /**
      * Since using a custom listView layout, a custom adapter is needed as well.
@@ -591,6 +523,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                         String userID = ((TextView)finalConvertView.findViewById(R.id.list_textView)).getText().toString();
 
                         /* Update variables used for add/remove friends dialog and listView*/
+                        Log.d("ARRAYPOSITION", userID + " " + selectedFriends.get(userID));
                         checkedItems[selectedFriends.get(userID)] = false;
                         selectedFriends.remove(userID);
                         participants.remove(position);
