@@ -350,11 +350,15 @@ public class DatabaseHelper extends FragmentActivity{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
+                    if(dataSnapshot.getChildrenCount() == 1.0){
+                        ref.child("users").child(username).child("notifications").child("null").child("type").setValue("null");
+                    }
                     if(dataSnapshot.child("type").getValue().equals("meetingRequest")){
                         addMeetingToUser(id, username);
                     }
                     else{
-
+                        ref.child("users").child(username).child("friends").push().setValue(id);
+                        ref.child("users").child(id).child("friends").push().setValue(username);
                     }
 
                     ref.child("users").child(username).child("notifications").child(id).removeValue();
@@ -466,6 +470,15 @@ public class DatabaseHelper extends FragmentActivity{
         ref.child("users").child(toUser).child("notifications").child(meetingId).child("reply").setValue("N");
         ref.child("users").child(toUser).child("notifications").child(meetingId).child("requestor").setValue(fromUser);
         ref.child("users").child(toUser).child("notifications").child(meetingId).child("type").setValue("meetingRequest");
+
+        ref.child("users").child(toUser).child("notifications").child("null").removeValue();
+    }
+
+    public void createFriendRequestNotification(String toUser, String fromUser){
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("read").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("reply").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("requestor").setValue(fromUser);
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("type").setValue("friendRequest");
 
         ref.child("users").child(toUser).child("notifications").child("null").removeValue();
     }
