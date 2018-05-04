@@ -55,7 +55,8 @@
             android:name=".AccountManagement.ChangeAccountInfoActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".FriendActivities.FriendsManagerActivity" />
+            android:name=".FriendActivities.FriendsManagerActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".ParentChildActivities.ParentChildManagerActivity" />
 

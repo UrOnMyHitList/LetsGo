@@ -63,7 +63,7 @@ public class DatabaseHelper extends FragmentActivity{
         return digest.digest().toString();
     }
 
-    public void addFriend(final String friendName, final String username, final User user, final String TAG, final OnGetDataListener listener) {
+    public void addFriend(final String friendName, final String username, final String TAG, final OnGetDataListener listener) {
         ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

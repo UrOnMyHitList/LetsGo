@@ -39,10 +39,9 @@ public class AddFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final String friendName = addFriendBox.getText().toString();
-                DatabaseHelper.getInstance().addFriend(friendName, username, user, TAG, new OnGetDataListener() {
+                DatabaseHelper.getInstance().addFriend(friendName, username, TAG, new OnGetDataListener() {
                     @Override
                     public void onSuccess(DataSnapshot dataSnapshot) {
-                        user.addFriend(friendName);
                         Toast.makeText(getApplicationContext(), "Friend request sent!", Toast.LENGTH_LONG).show();
                     }
 

@@ -43,14 +43,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
-        /**
-        if(id == R.id.changeDisplayName){
-            Intent intent = new Intent(getApplicationContext(), ChangeUsername.class);
-            intent.putExtra("username", userName);
-            intent.putExtra("action", "username");
-            startActivity(intent);
-        }
-         */
+
         if(id == R.id.changePhoneNumber){
             Intent intent = new Intent(getApplicationContext(), ChangeAccountInfoActivity.class);
             intent.putExtra("username", userName);
