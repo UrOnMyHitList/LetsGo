@@ -83,7 +83,6 @@ public class DatabaseHelper extends FragmentActivity{
                             }
                         }
                         if (!duplicate) {
-                            ref.child("users").child(username).child("friends").push().setValue(friendName);
                             found = true;
                             createFriendRequestNotification(friendName, username);
                             listener.onSuccess(snapshot);
