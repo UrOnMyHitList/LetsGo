@@ -58,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
 
         /* Add user's friends. */
         for(DataSnapshot friend : dataSnapshot.child("friends").getChildren()){
+            if(friend.getValue().toString().equals("null")){
+                Log.d("NULLDETECTED", "DETECTED");
+                continue;
+            }
             user.addFriend(friend.getValue().toString());
         }
 
