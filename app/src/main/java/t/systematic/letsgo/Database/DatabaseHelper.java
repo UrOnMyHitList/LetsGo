@@ -41,6 +41,7 @@ public class DatabaseHelper extends FragmentActivity{
     public DatabaseHelper(){
         database = FirebaseDatabase.getInstance();
         ref = database.getReference();
+
     }
 
     public static DatabaseHelper getInstance() {
@@ -54,7 +55,105 @@ public class DatabaseHelper extends FragmentActivity{
         ref.setValue(str);
     }
 
+    public String encrypt(String x) throws Exception {
+        java.security.MessageDigest digest = null;
+        digest = java.security.MessageDigest.getInstance("SHA-1");
+        digest.reset();
+        digest.update(x.getBytes("UTF-8"));
+        return digest.digest().toString();
+    }
 
+    public void addFriend(final String friendName, final String username, final User user, final String TAG, final OnGetDataListener listener) {
+        ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Boolean found = false;
+                //String friendName = addFriendBox.getText().toString();
+                for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    String name = snapshot.getKey();
+                    if (name.equals(friendName)) {
+                        //add the friend
+                        //add a new key/value under friends
+                        //replace below line when i figure out how to do notifications.
+                        Boolean duplicate = false;
+                        for (DataSnapshot subSnap: dataSnapshot.child(username).child("friends").getChildren()) {
+                            if (subSnap.getValue().equals(friendName)) {
+                                duplicate = true;
+                                break;
+                            }
+                        }
+                        if (!duplicate) {
+                            ref.child("users").child(username).child("friends").push().setValue(friendName);
+                            found = true;
+                            createFriendRequestNotification(friendName, username);
+                            listener.onSuccess(snapshot);
+                        }
+                        else {
+                            listener.onFailure("Friend already on list!");
+                        }
+                        break;
+                    }
+                }
+                if(!found) {
+                    listener.onFailure("No such user found!");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadUsers:onCancelled", databaseError.toException());
+            }
+        });
+    }
+
+    public void removeFriend(final String friendName, final String username, final User user, final String TAG) {
+        ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Boolean found = false;
+                //String friendName = addFriendBox.getText().toString();
+                for(DataSnapshot snapshot: dataSnapshot.child(username).child("friends").getChildren()) {
+                    String name = (String)snapshot.getValue();
+                    if (name.equals(friendName)) {
+                        found = true;
+                        ref.child("users").child(username).child("friends").child(snapshot.getKey()).removeValue();
+                        for (DataSnapshot otherSide: dataSnapshot.child(friendName).child("friends").getChildren()) {
+                            if (otherSide.getValue().equals(username)) {
+                                ref.child("users").child(friendName).child("friends").child(otherSide.getKey()).removeValue();
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                        /*if (!duplicate) {
+                            ref.child("users").child(username).child("friends").push().setValue(friendName);
+                            found = true;
+                            user.addFriend(friendName);
+                            // notification sending handled separately
+                            // don't add if duplicate friend - DONE
+
+
+                        }*/
+                        /*Toast toast = Toast.makeText(getApplicationContext(), "Friend already on list!", Toast.LENGTH_LONG);
+                        toast.show();
+                        break;*/
+                if(!found) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "No such user in friends list!" , Toast.LENGTH_LONG);
+                    toast.show();
+                }
+                else {
+                    Toast toast = Toast.makeText(getApplicationContext(),"Friend removed!",Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadUsers:onCancelled", databaseError.toException());
+            }
+        });
+    }
 
     public void validateUser(final String username, final String password, final OnGetDataListener listener){
         ref.child("users").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -464,21 +563,21 @@ public class DatabaseHelper extends FragmentActivity{
         ref.child("users").child(username).child("meetings").child(meetingId).removeValue();
     }
 
+    public void createFriendRequestNotification(String toUser, String fromUser){
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("read").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("reply").setValue("N");
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("requestor").setValue(fromUser);
+        ref.child("users").child(toUser).child("notifications").child(fromUser).child("type").setValue("friendRequest");
+
+        ref.child("users").child(toUser).child("notifications").child("null").removeValue();
+    }
+
     public void createMeetingNotification(String toUser, String fromUser, String meetingId){
 
         ref.child("users").child(toUser).child("notifications").child(meetingId).child("read").setValue("N");
         ref.child("users").child(toUser).child("notifications").child(meetingId).child("reply").setValue("N");
         ref.child("users").child(toUser).child("notifications").child(meetingId).child("requestor").setValue(fromUser);
         ref.child("users").child(toUser).child("notifications").child(meetingId).child("type").setValue("meetingRequest");
-
-        ref.child("users").child(toUser).child("notifications").child("null").removeValue();
-    }
-
-    public void createFriendRequestNotification(String toUser, String fromUser){
-        ref.child("users").child(toUser).child("notifications").child(fromUser).child("read").setValue("N");
-        ref.child("users").child(toUser).child("notifications").child(fromUser).child("reply").setValue("N");
-        ref.child("users").child(toUser).child("notifications").child(fromUser).child("requestor").setValue(fromUser);
-        ref.child("users").child(toUser).child("notifications").child(fromUser).child("type").setValue("friendRequest");
 
         ref.child("users").child(toUser).child("notifications").child("null").removeValue();
     }
