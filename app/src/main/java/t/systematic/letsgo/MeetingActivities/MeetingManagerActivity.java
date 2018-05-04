@@ -39,18 +39,22 @@ public class MeetingManagerActivity extends SettingsActivity {
 
         Intent intent = getIntent();
         user = (User)intent.getSerializableExtra("USER_OBJECT");
+        if(user == null){
+            System.out.print("Nothing passed");
+        }
 
         /* Get name of meetings to display in listView. */
-        init_listView(user.getAllMeetingNames());
-
+        if (user.hasMeetings())
+            init_listView(user.getAllMeetingNames());
+        else{
+            //TODO: write "No Meetings Scheduled" to listView
+        }
         /* Add listener to Scheduled Meeting button. */
         init_viewScheduledMeetingsButton();
         /* Add listener to Schedule Meeting button. */
         init_createNewMeetingButton();
-        /* Add listener to View Active Meeting Button. */
-        init_viewActiveMeetingButton();
 
-        init_friendsListButton();
+        init_viewActiveMeetingButton();
     }
 
     public boolean onTouchEvent(MotionEvent touchEvent){
@@ -77,13 +81,11 @@ public class MeetingManagerActivity extends SettingsActivity {
         if(meetingNames.size() == 0){
             meetingNames.add("No meetings scheduled!");
         }
-
         meetings_listView = (ListView)findViewById(R.id.upComingMeetingListView);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 R.layout.up_coming_meeting_list, R.id.singleMeetingRow, meetingNames);
         meetings_listView.setAdapter(adapter);
 
-        /* Don't add listener to listView if user does not have any meetings scheduled. */
         if(meetingNames.get(0).equals("No meetings scheduled!")){
             return;
         }
@@ -104,31 +106,32 @@ public class MeetingManagerActivity extends SettingsActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 ArrayList<Meeting> userMeetings = user.getMeetings();
+                Log.d("NUMBEROFMEETINGS", "" + userMeetings.size());
+                int me = userMeetings.size();
 
-                /* Check if user has meetings scheduled. */
-                if(user.getAllMeetingNames().size() > 0){
-                    /* Since meetings are ordered by their start time/date we always get the 1st. */
-                    Meeting nextUpMeeting = user.getMeeting(user.getAllMeetingNames().get(0));
-                    Date meetingTime = nextUpMeeting.getDateTime().getTime();
-                    Date now = Calendar.getInstance().getTime();
+                for(int i = 0; i < me; i++){
+                    Log.d("CHECKINGMEETINGITER", "IN");
+                    Date x = Calendar.getInstance().getTime();
 
-                    if (now.after(meetingTime)) {
-                        if(isServicesOK()){
-                            Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
-                            intent.putExtra("USER_OBJECT", user);
-                            intent.putExtra("MEETING_NAME", nextUpMeeting.getMeetingName());
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Services failed", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(getApplicationContext(), "It's still not time for " + nextUpMeeting.getMeetingName() + "!", Toast.LENGTH_SHORT).show();
+                    long ONE_MINUTE_IN_MILLIS=60000;//millisecs
+
+                    long t= userMeetings.get(i).getDateTime().getTimeInMillis();
+                    Date afterAddingOneMin = new Date(t + ONE_MINUTE_IN_MILLIS);
+
+                    if (x.after(userMeetings.get(i).getDateTime().getTime()) && x.before(afterAddingOneMin)) {
+                        Log.d("CHECKING MEETING!", userMeetings.get(i).getMeetingName());
                     }
-
-                }else {
-                    Toast.makeText(getApplicationContext(), "You have no meetings scheduled!", Toast.LENGTH_SHORT).show();
                 }
+
+   //             if(isServicesOK()){}
+
+
+//                Intent intent = new Intent(MeetingManagerActivity.this, MapActivity.class);
+//                intent.putExtra("USER_OBJECT", user);
+//                intent.putExtra("MEETING_NAME", "Demo");
+//                startActivity(intent);
             }
         });
     }
@@ -159,18 +162,6 @@ public class MeetingManagerActivity extends SettingsActivity {
         });
     }
 
-    private void init_friendsListButton(){
-        Button button = findViewById(R.id.viewFriendslistButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MeetingManagerActivity.this, FriendsManagerActivity.class);
-                intent.putExtra("USER_OBJECT", user);
-                startActivity(intent);
-            }
-        });
-    }
-
 
     /*    GOOGLE SERVICES CHECKS    */
     private static final String TAG = "MeetingManagerActivity";
@@ -180,16 +171,20 @@ public class MeetingManagerActivity extends SettingsActivity {
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MeetingManagerActivity.this);
         if(available == ConnectionResult.SUCCESS){
             //Everything is fine and user can make map requests.
+            Log.d(TAG, "Connection was available for Google API.");
             return true;
         }else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
             //Error occured but user can fix it.
-            Log.d("USERCANFIX", "Google API error, dialog invoked.");
+            Log.d(TAG, "Google API error, dialog invoked.");
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MeetingManagerActivity.this, available, ERROR_DAILOG_REQUEST);
             dialog.show();
         } else {
             //Failure, nothing we can do.
+            Log.d(TAG, "Google API failure.");
             Toast.makeText(this, "ERROR: MAP REQUESTS FAILURE", Toast.LENGTH_LONG).show();
         }
         return false;
     }
+
+
 }
