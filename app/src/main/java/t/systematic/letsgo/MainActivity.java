@@ -58,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
 
         /* Add user's friends. */
         for(DataSnapshot friend : dataSnapshot.child("friends").getChildren()){
+            if(friend.getValue().toString().equals("null")){
+                Log.d("NULLDETECTED", "DETECTED");
+                continue;
+            }
             user.addFriend(friend.getValue().toString());
         }
 
@@ -148,5 +152,7 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
     @Override
     public void onFailure(String failure) {
         Toast.makeText(getApplicationContext(), failure, Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(MainActivity.this, LogInActivity.class);
+        startActivity(i);
     }
 }
