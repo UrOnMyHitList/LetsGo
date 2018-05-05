@@ -80,6 +80,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     *  name. Will show participant's name and a delete button in
     *  each row. */
     private ArrayList<String> participants;
+    private ArrayList<String> previousParticipants;
     private ListView participants_listView;
 
     /* User object containing all user info. */
@@ -121,11 +122,18 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
             addEditTextListeners();
             init_SelectFriendsVars();
             editedMeetingLocation = meeting.getLatLng();
-
+            if(!meeting.getAdmin().equals(user.getUsername())){
+                participants.remove(user.getUsername());
+                participants.add(meeting.getAdmin());
+            }
         } else if(mode.equals("TEXT_VIEW_MODE")){
             init_TextViewMode(intent);
             init_SelectFriendsVars();
             editedMeetingLocation = meeting.getLatLng();
+            if(!meeting.getAdmin().equals(user.getUsername())){
+                participants.remove(user.getUsername());
+                participants.add(meeting.getAdmin());
+            }
         } else if(mode.equals("CREATE_MEETING_MODE")){
             init_EditTextMode(intent);
             addEditTextListeners();

@@ -31,8 +31,10 @@ public class ViewCalendarActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         user = (User)intent.getSerializableExtra("USER_OBJECT");
-
-        ArrayList<String> meetingsToday = user.getMeetingNamesWithStartDateAt(Calendar.MONTH, Calendar.DAY_OF_MONTH, Calendar.YEAR);
+        Log.d("MEETINGSTODAY", "" + Calendar.MONTH + Calendar.DAY_OF_MONTH + Calendar.YEAR);
+        ArrayList<String> meetingsToday = user.getMeetingNamesWithStartDateAt(Calendar.getInstance().get(Calendar.MONTH),
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
+                Calendar.getInstance().get(Calendar.YEAR));
         init_listView(checkIfNoMeetings(meetingsToday));
         init_calendarView();
     }
