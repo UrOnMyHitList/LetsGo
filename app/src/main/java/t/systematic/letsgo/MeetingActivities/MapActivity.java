@@ -111,22 +111,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         user = (User) intent.getSerializableExtra("USER_OBJECT");
         final String meetingName = (String) intent.getSerializableExtra("MEETING_NAME");
         mMeeting = user.getMeeting(meetingName);
-        participants = mMeeting.getParticipants();
-        for(int i = 0; i < participants.size(); i++){
-            Log.d("PARTICIPANTS"+i, participants.get(i));
-        }
-        allPeopleInMeeting = (ArrayList<String>)participants.clone();
-        allPeopleInMeeting.add(mMeeting.getAdmin());
-
-        /* Delete this when done */
-        for(int i = 0; i < allPeopleInMeeting.size(); i++){
-            Log.d("MEETINGSIZE"+i, allPeopleInMeeting.get(i));
-        }
-        /* In the case the user is not admin, remove user from 'participants' and add admin. */
-        if(!mMeeting.getAdmin().equals(user.getUsername())){
-            participants.remove(user.getUsername());
-            participants.add(mMeeting.getAdmin());
-        }
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         getLocationPermission();
@@ -136,65 +120,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             Log.d("PERMISSIONSCHECK", "TRIGGERED");
             return;
         }
-        /* Time is in milliseconds, distance in meters. */
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 20, (android.location.LocationListener) this);
 
-
-        Intent checkTTSIntent = new Intent();
-        checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-        startActivityForResult(checkTTSIntent, 0);
-
-
-
-        /* Noticed the logs say: Skipped 34 frames!
-            The application may be doing too
-            much work on its main thread.
-
-           So I added this part in a new thread. */
-        t = new Thread(new Runnable(){
-            @Override
-            public void run() {
-                for(int i = 0; i < participants.size(); i++){
-                    initParticipantsLocationOnDataChangeListeners(participants.get(i));
-                    pullUserLatlngFromDB(participants.get(i));
-                }
-            }
-        });
-        t.start();
-
-        /* Thread will be used to perform functionality based on users's location. */
-        monitorUsersThread = new Thread(new Runnable() {
-
-
-            @Override
-            public void run() {
-                for(int i = 0; i < allPeopleInMeeting.size(); i++){
-                    participantsStatusMessage.put(allPeopleInMeeting.get(i), 100.00);
-                }
-                speakMessageQueue.add("Lets go!");
-                boolean meetingComplete = false;
-                while((abort == false) && (meetingComplete == false)){
-                    reportUserProgress();
-                    SystemClock.sleep(5000);
-                }
-            }
-
-        });
-        monitorUsersThread.start();
-        speakMonitor = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(!abort){
-                    if(speakMessageQueue.size() > 0){
-                        speakWords(speakMessageQueue.get(0));
-                        speakMessageQueue.remove(0);
-                    }
-                    SystemClock.sleep(5000);
-                }
-            }
-        });
-        speakMonitor.start();
-        getDeviceLocation();
     }
 
     public void reportUserProgress(){
@@ -209,7 +135,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         double pStatusMessage;
         String message = "";
         double milesAway;
-        boolean allArrived = false;
+        HashMap<String, Boolean> allArrived = new HashMap<>();
+        Log.d("ALLPARTICIPANTSINKEY", "" + participantsLocation.keySet());
         for(String participantName: participantsLocation.keySet()){
             Location.distanceBetween(participantsLocation.get(participantName).latitude,participantsLocation.get(participantName).longitude,
                     mMeeting.getLat(),mMeeting.getLong(),dist);
@@ -218,53 +145,65 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             milesAway = BigDecimal.valueOf(milesAway)
                     .setScale(1, RoundingMode.HALF_UP)
                     .doubleValue();
-            Log.d("CRASHNAME", participantName + " name in status mesage: " + participantsStatusMessage.containsKey(participantName));
+            Log.d("CRASHNAME", participantName + " name in status mesage: " + participantsStatusMessage.containsKey(participantName) + " and is " + milesAway);
             pStatusMessage = participantsStatusMessage.get(participantName);
+            allArrived.put(participantName, false);
+            Log.d("PSTATUSMESSAGE", pStatusMessage + " with user " + participantName);
 
-            if(milesAway >=4 && milesAway <=5 && pStatusMessage != 5.0){
+            if(milesAway >=4 && milesAway <=5.0 && pStatusMessage != 5.0){
                 message += milesAway + " miles away from the destination";
-                Log.d("SPEAKING1", "5");
+                Log.d("SPEAKING1"+participantName, "5" + participantName + " " + milesAway);
                 speakMessageQueue.add(message);
                 participantsStatusMessage.put(participantName, 5.0);
             } else if(milesAway >=1 && milesAway <= 2 && pStatusMessage != 2.0){
                 message += milesAway + " miles away from the destination";
-                Log.d("SPEAKING", "2");
+                Log.d("SPEAKING"+participantName, "2" + participantName + " " + milesAway);
                 speakMessageQueue.add(message);
                 participantsStatusMessage.put(participantName, 2.0);
 
             } else if(milesAway >=0.0 && milesAway <= 0.1 && pStatusMessage != 0.1){
                 message = participantName + " has arrived at the destination";
-                Log.d("SPEAKING", "0");
+                Log.d("SPEAKING"+participantName, "0" + participantName + " " + milesAway);
                 speakMessageQueue.add(message);
                 participantsStatusMessage.put(participantName, 0.1);
-                allArrived = true;
+                Log.d("ALLARIVEDTRUE", "" + participantsLocation.keySet());
+                allArrived.put(participantName, true);
             } else if(milesAway >=0.0 && milesAway <= 0.5 && pStatusMessage != 0.5 && pStatusMessage != 0.1){
                 message += milesAway + " miles away from the destination";
-                Log.d("SPEAKING", participantName + ".5");
+                Log.d("SPEAKING"+participantName, participantName + ".5" + participantName + " " + milesAway);
                 speakMessageQueue.add(message);
                 participantsStatusMessage.put(participantName, 0.5);
-            } else if(milesAway >=0.0 && milesAway <= 1 && pStatusMessage != 1.0 && pStatusMessage != 0.1){
+            } else if(milesAway >=0.8 && milesAway <= 1 && pStatusMessage != 1.0 && pStatusMessage != 0.1 && pStatusMessage != 0.5){
                 message += milesAway + " miles away from the destination";
-                Log.d("SPEAKING", "1");
+                Log.d("SPEAKING"+participantName, "1" + participantName + " " + milesAway);
                 speakMessageQueue.add(message);
                 participantsStatusMessage.put(participantName, 1.0);
-            } else {
-                allArrived = false;
             }
 
 
 
         }
 
-        if(allArrived){
-            speakWords("Everyone has arrived to the destination!");
+        boolean end = true;
 
+        for(Boolean arrived : allArrived.values()){
+            Log.d("ALLARRIVEDLOOP", "" + arrived);
+            if(!arrived){
+                end  = false;
+            }
+        }
+
+
+
+        if(end){
+            speakWords("Everyone has arrived to the destination!");
+            Log.d("ALLARRIVED", "ALLARRIVED");
             user.removeMeeting(mMeeting);
 
-            if(mMeeting.getAdmin().equals(user.getUsername())){
+            /*if(mMeeting.getAdmin().equals(user.getUsername())){
                 DatabaseHelper.getInstance().removeMeeting(mMeeting.getMeetingId());
             }
-            DatabaseHelper.getInstance().removeMeetingFromUser(mMeeting.getMeetingId(), user.getUsername());
+            DatabaseHelper.getInstance().removeMeetingFromUser(mMeeting.getMeetingId(), user.getUsername());*/
 
             Intent intent = new Intent(MapActivity.this, MeetingManagerActivity.class);
             intent.putExtra("USER_OBJECT", user);
@@ -467,6 +406,87 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         }
         addMeetingMarker(mMeeting.getLat(), mMeeting.getLong(), mMeeting.getMeetingName());
+
+        participants = mMeeting.getParticipants();
+        for(int i = 0; i < participants.size(); i++){
+            Log.d("PARTICIPANTS"+i, participants.get(i));
+        }
+        allPeopleInMeeting = (ArrayList<String>)participants.clone();
+        allPeopleInMeeting.add(mMeeting.getAdmin());
+
+        /* Delete this when done */
+        for(int i = 0; i < allPeopleInMeeting.size(); i++){
+            Log.d("MEETINGSIZE"+i, allPeopleInMeeting.get(i));
+        }
+
+        Log.d("PARTICIPANTSARRAYLIST", "" + participants);
+        Log.d("ALLPEOPLEINMEETING", allPeopleInMeeting.toString());
+        /* In the case the user is not admin, remove user from 'participants' and add admin. */
+        if(!mMeeting.getAdmin().equals(user.getUsername())){
+            participants.remove(user.getUsername());
+            participants.add(mMeeting.getAdmin());
+        }
+
+
+        /* Time is in milliseconds, distance in meters. */
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 20, (android.location.LocationListener) this);
+
+
+        Intent checkTTSIntent = new Intent();
+        checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkTTSIntent, 0);
+
+
+
+        /* Noticed the logs say: Skipped 34 frames!
+            The application may be doing too
+            much work on its main thread.
+
+           So I added this part in a new thread. */
+        t = new Thread(new Runnable(){
+            @Override
+            public void run() {
+                for(int i = 0; i < participants.size(); i++){
+                    initParticipantsLocationOnDataChangeListeners(participants.get(i));
+                    pullUserLatlngFromDB(participants.get(i));
+                }
+            }
+        });
+        t.start();
+
+        /* Thread will be used to perform functionality based on users's location. */
+        monitorUsersThread = new Thread(new Runnable() {
+
+
+            @Override
+            public void run() {
+                for(int i = 0; i < allPeopleInMeeting.size(); i++){
+                    participantsStatusMessage.put(allPeopleInMeeting.get(i), 100.00);
+                }
+                speakMessageQueue.add("Lets go!");
+                boolean meetingComplete = false;
+                while((abort == false) && (meetingComplete == false)){
+                    reportUserProgress();
+                    SystemClock.sleep(5000);
+                }
+            }
+
+        });
+        monitorUsersThread.start();
+        speakMonitor = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(!abort){
+                    if(speakMessageQueue.size() > 0){
+                        speakWords(speakMessageQueue.get(0));
+                        speakMessageQueue.remove(0);
+                    }
+                    SystemClock.sleep(5000);
+                }
+            }
+        });
+        speakMonitor.start();
+        getDeviceLocation();
 
     }
 
