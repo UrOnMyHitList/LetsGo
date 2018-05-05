@@ -442,6 +442,22 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void checkIfUserHasNullFriend(final String username){
+        ref.child("users").child(username).child("friends").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("0").exists()){
+                    ref.child("users").child(username).child("friends").child("0").removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public void notificationRepliedYes(final String username, final String id, final OnGetDataListener listener){
         final DatabaseReference userRef = ref.child("users").child(username).child("notifications").child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -458,6 +474,8 @@ public class DatabaseHelper extends FragmentActivity{
                     else{
                         ref.child("users").child(username).child("friends").push().setValue(id);
                         ref.child("users").child(id).child("friends").push().setValue(username);
+                        checkIfUserHasNullFriend(username);
+                        checkIfUserHasNullFriend(id);
                     }
 
                     ref.child("users").child(username).child("notifications").child(id).removeValue();
