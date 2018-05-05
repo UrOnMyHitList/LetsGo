@@ -148,5 +148,7 @@ public class MainActivity extends AppCompatActivity implements  OnGetDataListene
     @Override
     public void onFailure(String failure) {
         Toast.makeText(getApplicationContext(), failure, Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(MainActivity.this, LogInActivity.class);
+        startActivity(i);
     }
 }
