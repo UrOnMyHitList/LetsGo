@@ -20,7 +20,7 @@ import t.systematic.letsgo.R;
 import t.systematic.letsgo.UserObject.User;
 
 public class FriendsManagerActivity extends AppCompatActivity {
-    private float x1,x2,y1,y2;
+
     private ListView friendsList;
     User user;
 
@@ -32,14 +32,11 @@ public class FriendsManagerActivity extends AppCompatActivity {
         friendsList = findViewById(R.id.friendsListView);
         Intent intent = getIntent();
         user = (User)intent.getSerializableExtra("USER_OBJECT");
+        //Toast.makeText(getApplicationContext(), "Init Friends List", Toast.LENGTH_SHORT).show();
         if(user == null){
-            System.out.print("Nothing passed");
+            System.out.print("No user passed");
         }
-        if (user.hasFriends())
-            initializeFriendsList(user.getFriends());
-        else{
-            //TODO: write "No friends" to listView
-        }
+        initializeFriendsList(user.getFriends());
 
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
@@ -66,36 +63,13 @@ public class FriendsManagerActivity extends AppCompatActivity {
         //
     }
 
-    public boolean onTouchEvent(MotionEvent touchEvent){
-        Intent i;
-        switch (touchEvent.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                x1 = touchEvent.getX();
-                y1 = touchEvent.getY();
-                break;
-            case MotionEvent.ACTION_UP:
-                x2 = touchEvent.getX();
-                y2 = touchEvent.getY();
-                if(x1 < x2){
-                    i= new Intent(FriendsManagerActivity.this, MeetingManagerActivity.class);
-                    startActivity(i);
-                    overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-                } else if(x1 > x2){
-                    i = new Intent(FriendsManagerActivity.this, ParentChildManagerActivity.class);
-                    startActivity(i);
-                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                }
-        }
-        return false;
-    }
-
     private void initializeFriendsList(ArrayList<String> friends){
-        if(friends.size() == 0){
-            friends.add("Add new friends below");
+        if(friends.get(0).equals("null")){
+            friends.set(0, "Add friends below!");
         }
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
-                android.R.layout.simple_list_item_1,
+                R.layout.friends_text_view,
                 friends );
 
         friendsList.setAdapter(arrayAdapter);
