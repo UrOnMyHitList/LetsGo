@@ -76,16 +76,9 @@ public class CreateAccountActivity extends AppCompatActivity implements OnGetDat
                     phone.getText().toString()
             );
             user.setLocation(0.0,0.0);
-            //TODO decide if to user input for phone number or use the phone iteself
-            String pw = null;
-            try {
-                pw = DatabaseHelper.getInstance().encrypt(password.getText().toString());
-            }
-            catch(Exception e) {
-                System.out.println("UNKNOWN ERROR");
-            }
 
-            DatabaseHelper.getInstance().createAccount(user, pw, this);
+
+            DatabaseHelper.getInstance().createAccount(user, password.getText().toString(), this);
 
 
         }
