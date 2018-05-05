@@ -80,7 +80,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
     *  name. Will show participant's name and a delete button in
     *  each row. */
     private ArrayList<String> participants;
-    private ArrayList<String> previousParticipants;
+    private ArrayList<String> participantsAlreadyInMeeting = new ArrayList<>();
     private ListView participants_listView;
 
     /* User object containing all user info. */
@@ -126,6 +126,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 participants.remove(user.getUsername());
                 participants.add(meeting.getAdmin());
             }
+            participantsAlreadyInMeeting = (ArrayList<String>)participants.clone();
         } else if(mode.equals("TEXT_VIEW_MODE")){
             init_TextViewMode(intent);
             init_SelectFriendsVars();
@@ -134,6 +135,7 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 participants.remove(user.getUsername());
                 participants.add(meeting.getAdmin());
             }
+            participantsAlreadyInMeeting = (ArrayList<String>)participants.clone();
         } else if(mode.equals("CREATE_MEETING_MODE")){
             init_EditTextMode(intent);
             addEditTextListeners();
@@ -375,15 +377,18 @@ public class ViewEditMeetingActivity extends AppCompatActivity implements OnGetD
                 }
 
                 for(int i = 0; i < participants.size(); i++){
-                    DatabaseHelper.getInstance().createMeetingNotification(participants.get(i), user.getUsername(), meetingId);
+                    if(!participantsAlreadyInMeeting.contains(participants.get(i))){
+                        DatabaseHelper.getInstance().createMeetingNotification(participants.get(i), user.getUsername(), meetingId);
+                    }
                 }
+
 
 
                 /* Update Meeting in Database. */
                 DatabaseHelper.getInstance().createUpdateMeeting(meetingId, editedMeetingLocation.latitude, editedMeetingLocation.longitude,user.getUsername(), meetingName,
-                        new ArrayList<String>(), meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
+                        participantsAlreadyInMeeting, meetingDate + "@" + meetingTime, ViewEditMeetingActivity.this);
                 /* Update user object. */
-                Meeting modMeeting = new Meeting(meetingName, new ArrayList<String>(), newMeetingCalendar, editedMeetingLocation.latitude, editedMeetingLocation.longitude,
+                Meeting modMeeting = new Meeting(meetingName, participantsAlreadyInMeeting, newMeetingCalendar, editedMeetingLocation.latitude, editedMeetingLocation.longitude,
                         meetingId, user.getUsername() );
                 /* In the case we are just creating the meeting. It would not be in one of the user's meetings list. */
                 if(meeting == null){
