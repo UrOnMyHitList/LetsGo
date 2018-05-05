@@ -63,7 +63,7 @@ public class DatabaseHelper extends FragmentActivity{
         return digest.digest().toString();
     }
 
-    public void addFriend(final String friendName, final String username, final User user, final String TAG, final OnGetDataListener listener) {
+    public void addFriend(final String friendName, final String username, final String TAG, final OnGetDataListener listener) {
         ref.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -83,7 +83,6 @@ public class DatabaseHelper extends FragmentActivity{
                             }
                         }
                         if (!duplicate) {
-                            ref.child("users").child(username).child("friends").push().setValue(friendName);
                             found = true;
                             createFriendRequestNotification(friendName, username);
                             listener.onSuccess(snapshot);
@@ -443,6 +442,22 @@ public class DatabaseHelper extends FragmentActivity{
         });
     }
 
+    public void checkIfUserHasNullFriend(final String username){
+        ref.child("users").child(username).child("friends").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("0").exists()){
+                    ref.child("users").child(username).child("friends").child("0").removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public void notificationRepliedYes(final String username, final String id, final OnGetDataListener listener){
         final DatabaseReference userRef = ref.child("users").child(username).child("notifications").child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -454,10 +469,13 @@ public class DatabaseHelper extends FragmentActivity{
                     }
                     if(dataSnapshot.child("type").getValue().equals("meetingRequest")){
                         addMeetingToUser(id, username);
+                        ref.child("meetings").child(id).child("participants").push().setValue(username);
                     }
                     else{
                         ref.child("users").child(username).child("friends").push().setValue(id);
                         ref.child("users").child(id).child("friends").push().setValue(username);
+                        checkIfUserHasNullFriend(username);
+                        checkIfUserHasNullFriend(id);
                     }
 
                     ref.child("users").child(username).child("notifications").child(id).removeValue();
@@ -508,7 +526,7 @@ public class DatabaseHelper extends FragmentActivity{
                     listener.onFailure("Read");
                 }
                 else{
-                    listener.onFailure("Error retrieving unread notifications.");
+                    //listener.onFailure("Error retrieving unread notifications.");
                 }
             }
 
