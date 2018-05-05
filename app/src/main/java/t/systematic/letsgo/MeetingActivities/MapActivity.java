@@ -83,6 +83,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private HashMap<String, Marker> hashMapMarkers = new HashMap<>();
     /* Contains all Latlng of all participants of meeting. */
     private HashMap<String, LatLng> participantsLocation = new HashMap<>();
+    /* Keeps track of users who have arrived to destination. */
+    HashMap<String, Boolean> allArrived = new HashMap<>();
     /* Used for alerting user when other users are close to meeting location. */
     private HashMap<String, Double> participantsStatusMessage = new HashMap<>();
     /* Ensures that only one message will play at a time. */
@@ -124,18 +126,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     public void reportUserProgress(){
-        int i = 0;
-        for(String k : participantsLocation.keySet()){
-            Log.d("THISONE"+i, k);
-        }
-
-        Log.d("THI", ""+participantsLocation.size());
 
         float[] dist = new float[1];
         double pStatusMessage;
         String message = "";
         double milesAway;
-        HashMap<String, Boolean> allArrived = new HashMap<>();
+
         Log.d("ALLPARTICIPANTSINKEY", "" + participantsLocation.keySet());
         for(String participantName: participantsLocation.keySet()){
             Location.distanceBetween(participantsLocation.get(participantName).latitude,participantsLocation.get(participantName).longitude,
@@ -147,7 +143,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     .doubleValue();
             Log.d("CRASHNAME", participantName + " name in status mesage: " + participantsStatusMessage.containsKey(participantName) + " and is " + milesAway);
             pStatusMessage = participantsStatusMessage.get(participantName);
-            allArrived.put(participantName, false);
+
             Log.d("PSTATUSMESSAGE", pStatusMessage + " with user " + participantName);
 
             if(milesAway >=4 && milesAway <=5.0 && pStatusMessage != 5.0){
@@ -462,6 +458,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             public void run() {
                 for(int i = 0; i < allPeopleInMeeting.size(); i++){
                     participantsStatusMessage.put(allPeopleInMeeting.get(i), 100.00);
+                    allArrived.put(allPeopleInMeeting.get(i), false);
                 }
                 speakMessageQueue.add("Lets go!");
                 boolean meetingComplete = false;
@@ -622,7 +619,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("ONLOCATIONCHANGED", "TRIGGERED");
         Double lat, lng;
         lat = location.getLatitude();
         lng = location.getLongitude();
