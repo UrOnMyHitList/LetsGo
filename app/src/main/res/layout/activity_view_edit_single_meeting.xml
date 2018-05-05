@@ -35,7 +35,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:ems="10"
-        android:hint="Meeting Name"
+        android:hint="Meeting Name "
         android:inputType="textPersonName"
         android:textSize="24sp"
         android:visibility="invisible"
