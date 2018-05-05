@@ -80,9 +80,10 @@
 
         <Button
             android:id="@+id/viewFriendslistButton"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"
+            android:drawableStart="@drawable/friends_list_icon_2"
             android:paddingStart="25dp"
             android:paddingEnd="25dp"
             android:layout_margin="5dp"

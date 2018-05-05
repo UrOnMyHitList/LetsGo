@@ -64,9 +64,9 @@ public class FriendsManagerActivity extends AppCompatActivity {
     }
 
     private void initializeFriendsList(ArrayList<String> friends){
-        if(friends.get(0).equals("null")){
-            friends.set(0, "Add friends below!");
-        }
+        //if(friends.get(0).equals("null")){
+            //friends.set(0, "Add friends below!");
+        //}
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
                 this,
                 R.layout.friends_text_view,
