@@ -320,7 +320,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
-        int padding = 70;
+        int padding = 180;
         Log.d("NUMBEROFUSERS", "" + hashMapMarkers.size());
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         mMap.moveCamera(cu);
