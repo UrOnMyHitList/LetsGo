@@ -119,9 +119,19 @@ public class ForgotInfoActivity extends AppCompatActivity {
                                 String userEmail = userList.child("email").getValue(String.class);
                                 if (userEmail.equals(enterEmailBox.getText().toString())) {
                                     found = true;
-                                    Toast toast = Toast.makeText(getApplicationContext(), username, Toast.LENGTH_LONG);
-                                    toast.show();
-                                    //TODO update this logic with what we actually want to do later
+                                    if (ContextCompat.checkSelfPermission(thisActivity,Manifest.permission.SEND_SMS)!=PackageManager.PERMISSION_GRANTED) {
+                                        ActivityCompat.requestPermissions(thisActivity,new String[]{Manifest.permission.SEND_SMS},MY_PERMISSIONS_REQUEST_SEND_NUDES);
+                                    }
+                                    else {
+                                        SmsManager sms = SmsManager.getDefault();
+                                        String phoneNum = userList.child("phone").getValue(String.class);
+                                        String forgotName = userList.getKey();
+                                        sms.sendTextMessage(phoneNum, null, "Your username is: "+forgotName,null,null);
+                                        Toast.makeText(getApplicationContext(),"Reminder text message sent!",Toast.LENGTH_LONG).show();
+                                    }
+                                    //Toast toast = Toast.makeText(getApplicationContext(), username, Toast.LENGTH_LONG);
+                                    //toast.show();
+                                    //DONE - update this logic with what we actually want to do later
                                     //send text to user with (link/signal/etc) to reset password
                                     break;
                                 }
