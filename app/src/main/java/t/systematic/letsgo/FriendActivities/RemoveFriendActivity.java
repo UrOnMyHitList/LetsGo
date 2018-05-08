@@ -55,7 +55,16 @@ public class RemoveFriendActivity extends AppCompatActivity {
                                     }
                                 }
                                 myDb.child("users").child(username).child("friends").child(childKey).removeValue();
-
+                                //remove user from friend list
+                                //get key of user in other friend list
+                                //iterate through other friend list
+                                for (DataSnapshot subList: dataSnapshot.child(removeFriend).child("friends").getChildren()) {
+                                    //if you find the user in their friend list, remove them from it
+                                    if(username.equals(subList.getValue())) {
+                                        childKey = subList.getKey();
+                                    }
+                                }
+                                myDb.child("users").child(removeFriend).child("friends").child(childKey).removeValue();
                             }
                         }
                     }
