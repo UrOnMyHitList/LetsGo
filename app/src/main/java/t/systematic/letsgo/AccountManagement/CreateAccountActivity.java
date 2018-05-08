@@ -77,8 +77,15 @@ public class CreateAccountActivity extends AppCompatActivity implements OnGetDat
             );
             user.setLocation(0.0,0.0);
 
-
-            DatabaseHelper.getInstance().createAccount(user, password.getText().toString(), this);
+            //encryption
+            /*String pw = "";
+            try {
+                pw = DatabaseHelper.getInstance().encrypt(password.getText().toString());
+            }
+            catch (Exception e){
+                Toast.makeText(getApplicationContext(),"Error creating password",Toast.LENGTH_SHORT).show();
+            }*/
+            DatabaseHelper.getInstance().createAccount(user, password.getText().toString(), this); //replace pw with password.getText().toString() for unencrypted passthru
 
 
         }

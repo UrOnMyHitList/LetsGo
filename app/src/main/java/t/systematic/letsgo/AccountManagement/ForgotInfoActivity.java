@@ -37,12 +37,8 @@ public class ForgotInfoActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // task you need to do.
                     b1.callOnClick();
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     Toast toast = Toast.makeText(getApplicationContext(), "Error resetting password, can't send reset text message.", Toast.LENGTH_LONG);
                     toast.show();
                 }
@@ -53,7 +49,7 @@ public class ForgotInfoActivity extends AppCompatActivity {
             // permissions this app might request.
         }
     }
-    //TODO allow this activity to send SMS to user's phone.  permissions necessary +sms +access contacts (already implemented?)
+    //DONE - allow this activity to send SMS to user's phone.  permissions necessary +sms +access contacts (already implemented?)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

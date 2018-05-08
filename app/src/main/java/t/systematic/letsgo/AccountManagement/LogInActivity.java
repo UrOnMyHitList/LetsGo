@@ -49,6 +49,16 @@ public class LogInActivity extends AppCompatActivity implements OnGetDataListene
 
         String uname = username.getText().toString();
         String pass = password.getText().toString();
+        //encryption block
+        /*
+        String pass = "";
+        try {
+            pass = DatabaseHelper.getInstance().encrypt(password.getText().toString());
+        }
+        catch (Exception e) {
+            Toast.makeText(getApplicationContext(),"Error validating password",Toast.LENGTH_SHORT).show();
+        }
+        //end encryption block*/
         if(!(TextUtils.isEmpty(uname)) && !(TextUtils.isEmpty(pass))){
             DatabaseHelper.getInstance().validateUser(uname.toLowerCase(), pass, this);
         }

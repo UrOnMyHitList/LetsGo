@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,9 +46,11 @@ public class RemoveFriendActivity extends AppCompatActivity {
                         //remove current user from their friend list also
                         //look through meetings each user has active
                         //remove other user from meetings they admin - do later?
+                        Boolean found = false;
                         for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
                             String name = snapshot.getKey();
                             if(name.equals(removeFriend)) {
+                                found = true;
                                 String childKey = "";
                                 for(DataSnapshot friendList: dataSnapshot.child(username).child("friends").getChildren()) {
                                     if(((String)friendList.getValue()).equals(removeFriend)) {
@@ -66,6 +69,12 @@ public class RemoveFriendActivity extends AppCompatActivity {
                                 }
                                 myDb.child("users").child(removeFriend).child("friends").child(childKey).removeValue();
                             }
+                        }
+                        if (found) {
+                            Toast.makeText(getApplicationContext(),"Friend removed!",Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(),"No such friend in list!",Toast.LENGTH_LONG).show();
                         }
                     }
 
