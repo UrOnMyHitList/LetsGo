@@ -107,9 +107,7 @@ public class User implements Serializable{
     public void addFriend(String newFriend){
         mFriends.add(newFriend);
     }
-    public void removeFriend(User removeFriend){
-        mFriends.remove(removeFriend);
-    }
+    public void removeFriend(String removeFriend){mFriends.remove(removeFriend);}
     public void addNewMeeting(Meeting newMeeting){
         mMeetings.add(newMeeting);
         Collections.sort(mMeetings);
