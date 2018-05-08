@@ -61,6 +61,15 @@ public class ChangeAccountInfoActivity extends SettingsActivity {
     protected void onClickPasswordChange(View view){
         EditText currentPasswrdEditText = (EditText) findViewById(R.id.inputCurrentPswrd);
         final String currentPassword = currentPasswrdEditText.getText().toString();
+        /*//encryption block
+        String currentPassword = "";
+        try {
+            currentPassword = DatabaseHelper.getInstance().encrypt(currentPasswrdEditText.getText().toString());
+        }
+        catch (Exception e) {
+            Toast.makeText(getApplicationContext(),"Error verifying Password",Toast.LENGTH_SHORT).show();
+        }
+        //end encryption block*/
 
         EditText newPasswrdEditText = (EditText) findViewById(R.id.inputNewPswrd);
         final String newPasswrd = newPasswrdEditText.getText().toString();

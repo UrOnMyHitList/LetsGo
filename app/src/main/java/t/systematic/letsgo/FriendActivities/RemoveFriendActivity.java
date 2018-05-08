@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,7 +31,7 @@ public class RemoveFriendActivity extends AppCompatActivity {
         final EditText removefriendbox = findViewById(R.id.RemoveFriendBox);
         Button b1 = findViewById(R.id.SubmitRemoveFriendButton);
         final String TAG = "RemoveFriendActivity";
-        User user = (User)intent.getSerializableExtra("USER_OBJECT");
+        final User user = (User)intent.getSerializableExtra("USER_OBJECT");
         final String username = user.getUsername();
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,9 +46,11 @@ public class RemoveFriendActivity extends AppCompatActivity {
                         //remove current user from their friend list also
                         //look through meetings each user has active
                         //remove other user from meetings they admin - do later?
+                        Boolean found = false;
                         for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
                             String name = snapshot.getKey();
                             if(name.equals(removeFriend)) {
+                                found = true;
                                 String childKey = "";
                                 for(DataSnapshot friendList: dataSnapshot.child(username).child("friends").getChildren()) {
                                     if(((String)friendList.getValue()).equals(removeFriend)) {
@@ -55,8 +58,43 @@ public class RemoveFriendActivity extends AppCompatActivity {
                                     }
                                 }
                                 myDb.child("users").child(username).child("friends").child(childKey).removeValue();
+                                user.removeFriend(removeFriend);
+                                if (!user.hasFriends()) {
+                                    user.addFriend("null");
+                                    myDb.child("users").child(username).child("friends").child("0").setValue("null");
+                                }
+                                //remove user from friend list
+                                //get key of user in other friend list
+                                //iterate through other friend list
+                                for (DataSnapshot subList: dataSnapshot.child(removeFriend).child("friends").getChildren()) {
+                                    //if you find the user in their friend list, remove them from it
+                                    if(username.equals(subList.getValue())) {
+                                        childKey = subList.getKey();
+                                        break;
+                                    }
+                                }
+                                myDb.child("users").child(removeFriend).child("friends").child(childKey).removeValue();
+                                //check if other user has no remaining friends and put a null back in.
+                                myDb.child("users").child(removeFriend).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (!dataSnapshot.hasChild("friends")){
+                                            myDb.child("users").child(removeFriend).child("friends").child("0").setValue("null");
+                                        }
+                                    }
 
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Log.w(TAG, "loadRemoveFriend:onCancelled", databaseError.toException());
+                                    }
+                                });
                             }
+                        }
+                        if (found) {
+                            Toast.makeText(getApplicationContext(),"Friend removed!",Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(),"No such friend in list!",Toast.LENGTH_LONG).show();
                         }
                     }
 
